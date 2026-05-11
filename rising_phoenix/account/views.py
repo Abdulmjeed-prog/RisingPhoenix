@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.db import transaction
 from django.contrib.auth import authenticate, login,logout
 
-
 # Create your views here.
 
 def sign_up(request:HttpRequest):
@@ -47,6 +46,7 @@ def login_view(request:HttpRequest):
 
 def logout_view(request:HttpRequest):
     logout(request)
-    response = redirect(request.GET.get("next"))
-    return response
+    #response = redirect(request.GET.get("next"))
+    #return response
+    return redirect('main:home_view')
 

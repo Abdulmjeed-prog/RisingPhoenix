@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['about','avatar']
+        fields = ['bio','avatar']
 
 class CustomUserCreationForm(UserCreationForm):
     first_name = forms.CharField(max_length=150)
