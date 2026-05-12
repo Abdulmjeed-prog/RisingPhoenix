@@ -136,13 +136,17 @@
                             <div class="col-md-6">
                                 <label for="phone" class="form-label">Phone</label>
                                 <input
-                                    type="text"
+                                    type="tel"
                                     class="form-control {% if profile_form.phone.errors %}is-invalid{% endif %}"
                                     id="phone"
                                     name="phone"
-                                    placeholder="Enter your phone number"
+                                    placeholder="+966501234567"
                                     value="{{ profile_form.phone.value|default:'' }}"
+                                    
+                                    title="Enter a valid phone number, for example +966501234567"
                                 >
+                                <div class="form-text">Use digits only, with optional + and country code.</div>
+
                                 {% for error in profile_form.phone.errors %}
                                     <div class="invalid-feedback d-block">{{ error }}</div>
                                 {% endfor %}

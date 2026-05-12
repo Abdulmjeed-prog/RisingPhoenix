@@ -32,11 +32,12 @@
                         <li class="mb-2"><strong>Phone:</strong> {{ user_profile.phone|default:"Not provided" }}</li>
                         <li class="mb-2"><strong>City:</strong> {{ user_profile.city|default:"Not provided" }}</li>
                         <li class="mb-2"><strong>Joined:</strong> {{ user_profile.user.date_joined|date:"F d, Y" }}</li>
+                        <li class="mb-2"><strong>Rating:</strong>{{ avg_rating }}</li>
                     </ul>
 
                     {% if request.user == user_profile.user %}
                         <div class="mt-4 text-end">
-                            <a href="#" class="btn btn-primary">Edit Profile</a>
+                            <a href="{% url 'account:update_profile_view' request.user.username %}" class="btn btn-primary">Edit Profile</a>
                         </div>
                     {% endif %}
                 </div>

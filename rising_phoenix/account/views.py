@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.db import transaction
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.models import Group, User
+from django.db.models import Avg
+
 
 # Create your views here.
 
@@ -25,7 +27,7 @@ def signup_view(request:HttpRequest):
         else:
             print(user_form.errors)
             messages.error(request, "something goes Wrong")
-            return render(request, 'account/signup.html', {'user_form': user_form})
+            return render(request, 'account/signup.html', {'user_form': user_form, 'profile_form': profile_form})
         
     return render(request, 'account/signup.html')
 
@@ -91,7 +93,9 @@ def profile_view(request:HttpRequest, user_name):
         messages.warning(request, 'Your are not allowed')
         return redirect('main:home_view')
     user_profile = user.profile
-    return render(request,'account/profile.html',{'user_profile': user_profile})
+    user_reviews = user.reviews_received.all()
+    avg_rating = user_reviews.aggregate(avg_rating=Avg('rating'))['avg_rating']
+    return render(request,'account/profile.html',{'user_profile': user_profile, 'user_reviews': user_reviews, 'avg_rating': avg_rating})
 
 def update_profile_view(request:HttpRequest,user_name):
     if user_name != request.user.username:
@@ -114,7 +118,7 @@ def update_profile_view(request:HttpRequest,user_name):
         else:
             print(user_form.errors)
             messages.error(request, "something goes Wrong")
-            return render(request, 'account/update_profile.html', {'user_form': user_form, 'user_profile': user_profile})
+            return render(request, 'account/update_profile.html', {'user_form': user_form, 'user_profile': user_profile, 'profile_form': profile_form})
     return render(request, 'account/update_profile.html',{'user_profile': user_profile})
 
 

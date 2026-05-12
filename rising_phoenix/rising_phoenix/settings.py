@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'staff',
     'workshop',
     'request',
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [
