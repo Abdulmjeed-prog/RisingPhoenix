@@ -28,11 +28,21 @@
       <div class="request-detail-meta">
         <div class="request-detail-meta-item">
           <span class="request-label">Budget</span>
-          <p class="mb-0">{% if project_request.budget_min or project_request.budget_max %}{{ project_request.budget_min|default:'?' }} SAR - {{ project_request.budget_max|default:'?' }} SAR{% else %}Flexible{% endif %}</p>
+          <p class="mb-0">
+            {% if project_request.budget_min and project_request.budget_max %}
+              {{ project_request.budget_min|floatformat:"-2" }} &ndash; {{ project_request.budget_max|floatformat:"-2" }} SAR
+            {% elif project_request.budget_min %}
+              From {{ project_request.budget_min|floatformat:"-2" }} SAR
+            {% elif project_request.budget_max %}
+              Up to {{ project_request.budget_max|floatformat:"-2" }} SAR
+            {% else %}
+              Flexible
+            {% endif %}
+          </p>
         </div>
         <div class="request-detail-meta-item">
           <span class="request-label">Deadline</span>
-          <p class="mb-0">{{ project_request.deadline|default:'Flexible' }}</p>
+          <p class="mb-0">{{ project_request.deadline|default:"Flexible" }}</p>
         </div>
         <div class="request-detail-meta-item">
           <span class="request-label">Status</span>
@@ -47,6 +57,10 @@
               <span class="status-pill status-closed">{{ project_request.get_status_display }}</span>
             {% endif %}
           </p>
+        </div>
+        <div class="request-detail-meta-item">
+          <span class="request-label">Posted</span>
+          <p class="mb-0">{{ project_request.created_at|date:"N j, Y" }}</p>
         </div>
       </div>
 
@@ -66,9 +80,19 @@
           <h2 class="request-detail-subtitle">Reference Images</h2>
           <div class="request-detail-gallery">
             {% for image in images %}
-              <a href="{{ image.image.url }}" target="_blank" rel="noopener" class="request-detail-gallery-item">
-                <img src="{{ image.image.url }}" alt="Reference image {{ forloop.counter }} for {{ project_request.title }}">
-              </a>
+              <div class="request-detail-gallery-item">
+                <button
+                  class="gallery-img-btn"
+                  data-src="{{ image.image.url }}"
+                  data-caption="{{ image.caption }}"
+                  aria-label="View image {{ forloop.counter }} full size"
+                >
+                  <img src="{{ image.image.url }}" alt="Reference image {{ forloop.counter }} for {{ project_request.title }}">
+                </button>
+                {% if image.caption %}
+                  <p class="request-image-caption">{{ image.caption }}</p>
+                {% endif %}
+              </div>
             {% endfor %}
           </div>
         </div>
@@ -76,4 +100,53 @@
     </div>
   </div>
 </section>
+
+<div id="gallery-lightbox" class="gallery-lightbox" hidden>
+  <button class="gallery-lightbox-close" id="gallery-lightbox-close" aria-label="Close">&times;</button>
+  <div class="gallery-lightbox-body">
+    <img id="gallery-lightbox-img" src="" alt="">
+    <p id="gallery-lightbox-caption" class="gallery-lightbox-caption" hidden></p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  var lightbox = document.getElementById('gallery-lightbox');
+  var lbImg = document.getElementById('gallery-lightbox-img');
+  var lbCaption = document.getElementById('gallery-lightbox-caption');
+  var closeBtn = document.getElementById('gallery-lightbox-close');
+  if (!lightbox) return;
+
+  document.querySelectorAll('.gallery-img-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      lbImg.src = btn.dataset.src;
+      lbImg.alt = btn.querySelector('img').alt;
+      if (btn.dataset.caption) {
+        lbCaption.textContent = btn.dataset.caption;
+        lbCaption.hidden = false;
+      } else {
+        lbCaption.hidden = true;
+      }
+      lightbox.hidden = false;
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  function closeLightbox() {
+    lightbox.hidden = true;
+    lbImg.src = '';
+    document.body.style.overflow = '';
+  }
+
+  closeBtn.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+  });
+})();
+</script>
 {% endblock %}

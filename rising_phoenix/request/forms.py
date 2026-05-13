@@ -11,11 +11,6 @@ class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
         fields = ['title', 'description', 'budget_min', 'budget_max', 'category', 'deadline']
-        labels = {
-            'budget_min': 'Minimum budget (SAR) - optional',
-            'budget_max': 'Maximum budget (SAR) - optional',
-            'deadline': 'Preferred deadline - optional',
-        }
         widgets = {
             'title': forms.TextInput(attrs={'class': 'request-input'}),
             'description': forms.Textarea(attrs={'class': 'request-textarea'}),

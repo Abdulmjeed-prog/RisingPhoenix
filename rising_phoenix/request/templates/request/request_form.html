@@ -47,6 +47,7 @@
           <div class="field-full">
             <label class="request-label" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
             {{ form.description }}
+            <p class="desc-char-counter"><span id="desc-char-count">0</span> characters</p>
             <div class="ai-refine-row">
               <button type="button" id="ai-refine-btn" class="ai-refine-btn">Refine with AI</button>
               <span id="ai-refine-loader" class="ai-refine-loader" aria-hidden="true" hidden></span>
@@ -68,9 +69,13 @@
                 <p class="request-label">What changed</p>
                 <div id="ai-diff-output" class="ai-diff-output"></div>
               </div>
+              <div id="ai-missing-details" class="ai-missing-details" hidden>
+                <p class="request-label">To strengthen your request, consider answering:</p>
+                <ul id="ai-missing-list" class="ai-missing-list"></ul>
+              </div>
               <div class="ai-actions">
                 <button type="button" id="ai-accept-btn" class="ai-refine-btn">Accept</button>
-                <button type="button" id="ai-retry-btn" class="ai-refine-btn ai-secondary-btn">Send back to AI</button>
+                <button type="button" id="ai-retry-btn" class="ai-refine-btn ai-secondary-btn">Refine further</button>
                 <button type="button" id="ai-reject-btn" class="ai-refine-btn ai-danger-btn">Reject</button>
               </div>
             </div>
@@ -91,20 +96,23 @@
           {% endif %}
 
           <div>
-            <label class="request-label" for="{{ form.deadline.id_for_label }}">{{ form.deadline.label }}</label>
+            <label class="request-label" for="{{ form.deadline.id_for_label }}">Deadline</label>
             {{ form.deadline }}
+            <p class="field-hint">Leave blank for no deadline</p>
             {% for error in form.deadline.errors %}<p class="request-error">{{ error }}</p>{% endfor %}
           </div>
 
           <div>
-            <label class="request-label" for="{{ form.budget_min.id_for_label }}">{{ form.budget_min.label }}</label>
+            <label class="request-label" for="{{ form.budget_min.id_for_label }}">Min budget (SAR)</label>
             {{ form.budget_min }}
+            <p class="field-hint">Leave blank if flexible</p>
             {% for error in form.budget_min.errors %}<p class="request-error">{{ error }}</p>{% endfor %}
           </div>
 
           <div>
-            <label class="request-label" for="{{ form.budget_max.id_for_label }}">{{ form.budget_max.label }}</label>
+            <label class="request-label" for="{{ form.budget_max.id_for_label }}">Max budget (SAR)</label>
             {{ form.budget_max }}
+            <p class="field-hint">Leave blank if flexible</p>
             {% for error in form.budget_max.errors %}<p class="request-error">{{ error }}</p>{% endfor %}
           </div>
 
@@ -115,6 +123,14 @@
                 {% for image in existing_images %}
                   <label class="existing-img-item">
                     <img src="{{ image.image.url }}" alt="Existing reference image">
+                    <input
+                      type="text"
+                      class="request-input existing-img-caption"
+                      name="existing_image_caption_{{ image.id }}"
+                      value="{{ image.caption }}"
+                      maxlength="160"
+                      placeholder="Optional note for this image"
+                    >
                     <span class="existing-img-remove">
                       <input type="checkbox" name="delete_image_ids" value="{{ image.id }}">
                       Remove
@@ -128,13 +144,52 @@
             <div class="img-upload-zone" id="img-upload-zone">
               <input type="file" id="id_reference_images" name="reference_images"
                      class="img-upload-input" accept="image/*" multiple>
-              <div class="img-upload-prompt" id="img-upload-prompt">
-                <span class="img-upload-icon">&#128444;</span>
-                <p class="img-upload-text">Click to select new images</p>
-                <p class="img-upload-sub">or drag and drop here &mdash; selected files will be added</p>
+              <p class="img-upload-text">Click or drag images here</p>
+              <p class="img-upload-sub">Up to 5 &bull; JPEG, PNG, WebP &bull; Annotate to highlight what you want changed</p>
+            </div>
+            <p id="img-count-badge" class="img-count-badge" hidden></p>
+            <div id="img-preview-grid" class="img-preview-grid" hidden></div>
+
+            <div class="image-editor-modal" id="image-editor-modal" hidden>
+              <div class="image-editor-card">
+                <div class="image-editor-head">
+                  <p class="mb-0">Mark Up Image</p>
+                  <button type="button" class="image-editor-close" id="image-editor-close" aria-label="Close">&times;</button>
+                </div>
+
+                <p class="image-editor-hint">Draw or highlight the parts you want changed. Annotations are saved with the image.</p>
+
+                <div class="image-editor-controls">
+                  <div class="editor-tool-group">
+                    <button type="button" class="editor-tool-btn is-active" id="editor-mode-draw">&#9998; Draw</button>
+                    <button type="button" class="editor-tool-btn" id="editor-mode-highlight">&#9744; Highlight</button>
+                  </div>
+                  <div class="editor-color-group" id="editor-color-group">
+                    <button type="button" class="editor-color-swatch is-active" data-color="#e53935" style="background:#e53935;" title="Red"></button>
+                    <button type="button" class="editor-color-swatch" data-color="#ff9800" style="background:#ff9800;" title="Orange"></button>
+                    <button type="button" class="editor-color-swatch" data-color="#ffeb3b" style="background:#ffeb3b;" title="Yellow"></button>
+                    <button type="button" class="editor-color-swatch" data-color="#43a047" style="background:#43a047;" title="Green"></button>
+                    <button type="button" class="editor-color-swatch" data-color="#1e88e5" style="background:#1e88e5;" title="Blue"></button>
+                    <button type="button" class="editor-color-swatch" data-color="#1c1712" style="background:#1c1712;" title="Black"></button>
+                  </div>
+                  <div class="editor-tool-group" id="editor-width-group">
+                    <button type="button" class="editor-tool-btn is-active" data-width="3" id="editor-width-thin">Thin</button>
+                    <button type="button" class="editor-tool-btn" data-width="7" id="editor-width-thick">Thick</button>
+                  </div>
+                </div>
+
+                <div class="image-editor-canvas-wrap">
+                  <div id="image-editor-host"></div>
+                </div>
+
+                <div class="image-editor-toolbar">
+                  <button type="button" class="image-editor-btn image-editor-btn-primary" id="editor-save">Save Edits</button>
+                  <button type="button" class="image-editor-btn" id="editor-undo">Undo</button>
+                  <button type="button" class="image-editor-btn" id="editor-clear-all">Clear All</button>
+                  <button type="button" class="image-editor-btn" id="editor-cancel">Cancel</button>
+                </div>
               </div>
             </div>
-            <div id="img-preview-grid" class="img-preview-grid" hidden></div>
           </div>
         </div>
 

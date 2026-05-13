@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -27,15 +26,11 @@ class Request(models.Model):
 	def __str__(self):
 		return self.title
 
-	def clean(self):
-		super().clean()
-		if self.budget_min and self.budget_max and self.budget_min > self.budget_max:
-			raise ValidationError({'budget_max': 'Maximum budget must be greater than or equal to minimum budget.'})
-
 
 class RequestImage(models.Model):
 	request = models.ForeignKey(Request, on_delete=models.CASCADE, related_name='images')
 	image = models.ImageField(upload_to='images/requests/')
+	caption = models.CharField(max_length=160, blank=True)
 	uploaded_at = models.DateTimeField(auto_now_add=True)
 
 	class Meta:

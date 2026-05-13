@@ -55,30 +55,53 @@ def _call_with_retry(call_fn, attempts: int, base_delay_seconds: float):
 	raise RuntimeError('Retry helper failed without an explicit error.')
 
 
-def _save_uploaded_request_images(request_instance: Request, request_files):
-	max_size_bytes = int(float(getattr(settings, 'REQUEST_IMAGE_MAX_SIZE_MB', 5)) * 1024 * 1024)
+def _save_uploaded_request_images(request_instance: Request, request_files, captions=None):
+	max_size_mb = float(getattr(settings, 'REQUEST_IMAGE_MAX_SIZE_MB', 5))
+	max_size_bytes = int(max_size_mb * 1024 * 1024)
 	allowed_types = list(getattr(settings, 'REQUEST_IMAGE_ALLOWED_TYPES', ['image/jpeg', 'image/png', 'image/webp', 'image/gif']))
-	for image_file in request_files.getlist('reference_images'):
+	max_count = int(getattr(settings, 'REQUEST_IMAGE_MAX_COUNT', 5))
+	captions = captions or []
+	skipped = []
+
+	existing_count = request_instance.images.count()
+	slots_remaining = max(0, max_count - existing_count)
+	incoming = request_files.getlist('reference_images')
+
+	if len(incoming) > slots_remaining:
+		overflow = len(incoming) - slots_remaining
+		skipped.append(f'{overflow} image(s) skipped — requests are limited to {max_count} images total.')
+		incoming = incoming[:slots_remaining]
+
+	for index, image_file in enumerate(incoming):
 		if image_file.size > max_size_bytes:
 			logger.warning('Rejected oversized image upload "%s" (%d bytes) for request id=%s', image_file.name, image_file.size, request_instance.id)
+			skipped.append(f'"{image_file.name}" exceeds the {max_size_mb:.0f} MB size limit.')
 			continue
 		content_type = getattr(image_file, 'content_type', '') or ''
 		if content_type.lower() not in allowed_types:
 			logger.warning('Rejected disallowed content type "%s" for image "%s" on request id=%s', content_type, image_file.name, request_instance.id)
+			skipped.append(f'"{image_file.name}" is not an accepted image type (JPEG, PNG, WebP, GIF).')
 			continue
 		try:
-			RequestImage.objects.create(request=request_instance, image=image_file)
+			caption = (captions[index] if index < len(captions) else '').strip()
+			RequestImage.objects.create(request=request_instance, image=image_file, caption=caption[:160])
 		except Exception:
 			logger.exception('Failed to save uploaded image "%s"', image_file.name)
+			skipped.append(f'"{image_file.name}" could not be saved.')
+	return skipped
 
 
 def _refresh_time_based_statuses():
+	cache_key = 'request_statuses_refreshed'
+	if cache.get(cache_key):
+		return
 	today = timezone.localdate()
 	Request.objects.filter(
 		status__in=[Request.Status.OPEN, Request.Status.IN_REVIEW],
 		deadline__isnull=False,
 		deadline__lt=today,
 	).update(status=Request.Status.TIME_ENDED)
+	cache.set(cache_key, True, timeout=60)
 
 
 def request_list_view(request: HttpRequest):
@@ -171,7 +194,6 @@ def request_detail_view(request: HttpRequest, request_id: int):
 	return render(request, 'request/request_detail.html', {'project_request': project_request, 'images': images, 'has_images': bool(images)})
 
 
-
 @login_required
 def request_create_view(request: HttpRequest):
 	_refresh_time_based_statuses()
@@ -181,7 +203,10 @@ def request_create_view(request: HttpRequest):
 			request_instance = form.save(commit=False)
 			request_instance.requester = request.user
 			request_instance.save()
-			_save_uploaded_request_images(request_instance, request.FILES)
+			captions = request.POST.getlist('reference_image_captions')
+			skipped = _save_uploaded_request_images(request_instance, request.FILES, captions)
+			for msg in skipped:
+				messages.warning(request, f'Image skipped: {msg}')
 			messages.success(request, 'Your request has been posted.')
 			return redirect('request:request_list_view')
 	else:
@@ -207,12 +232,22 @@ def request_edit_view(request: HttpRequest, request_id: int):
 		form = RequestForm(request.POST, request.FILES, instance=request_instance)
 		if form.is_valid():
 			form.save()
+			for image in request_instance.images.all():
+				field_name = f'existing_image_caption_{image.id}'
+				new_caption = (request.POST.get(field_name, '') or '').strip()[:160]
+				if image.caption != new_caption:
+					image.caption = new_caption
+					image.save(update_fields=['caption'])
+
 			delete_image_ids = request.POST.getlist('delete_image_ids')
 			if delete_image_ids:
 				request_instance.images.filter(id__in=delete_image_ids).delete()
-			_save_uploaded_request_images(request_instance, request.FILES)
+			captions = request.POST.getlist('reference_image_captions')
+			skipped = _save_uploaded_request_images(request_instance, request.FILES, captions)
+			for msg in skipped:
+				messages.warning(request, f'Image skipped: {msg}')
 			messages.success(request, 'Request updated successfully.')
-			return redirect('request:request_edit_view', request_id=request_instance.id)
+			return redirect('request:request_detail_view', request_id=request_instance.id)
 	else:
 		form = RequestForm(instance=request_instance)
 
@@ -234,6 +269,8 @@ def refine_request_view(request: HttpRequest):
 		return JsonResponse({'error': 'Invalid JSON payload.'}, status=400)
 
 	user_text = (payload.get('text') or '').strip()
+	category_name = (payload.get('category_name') or '').strip()[:80]
+	previous_suggestion = (payload.get('previous_suggestion') or '').strip()
 	if not user_text:
 		return JsonResponse({'error': 'Please provide request text to refine.'}, status=400)
 
@@ -254,7 +291,8 @@ def refine_request_view(request: HttpRequest):
 	model_for_cache = getattr(settings, 'OPENAI_MODEL', 'gpt-4o-mini')
 	cache_key = None
 	if cache_ttl > 0:
-		text_hash = hashlib.sha256(f'{model_for_cache}:{user_text}'.encode('utf-8')).hexdigest()
+		cache_input = f'{model_for_cache}:{category_name}:{previous_suggestion}:{user_text}'
+		text_hash = hashlib.sha256(cache_input.encode('utf-8')).hexdigest()
 		cache_key = f'ai_refine_cache:{text_hash}'
 		cached_response = cache.get(cache_key)
 		if cached_response is not None:
@@ -285,7 +323,7 @@ def refine_request_view(request: HttpRequest):
 	timeout_seconds = float(getattr(settings, 'OPENAI_REFINE_TIMEOUT_SECONDS', 15))
 	retries = int(getattr(settings, 'OPENAI_REFINE_RETRIES', 2))
 	retry_base_delay_seconds = float(getattr(settings, 'OPENAI_REFINE_RETRY_BASE_DELAY_SECONDS', 0.7))
-	max_output_tokens = int(getattr(settings, 'OPENAI_REFINE_MAX_OUTPUT_TOKENS', 140))
+	max_output_tokens = int(getattr(settings, 'OPENAI_REFINE_MAX_OUTPUT_TOKENS', 300))
 	temperature = float(getattr(settings, 'OPENAI_REFINE_TEMPERATURE', 0.5))
 
 	retries = max(1, min(retries, 5))
@@ -294,12 +332,15 @@ def refine_request_view(request: HttpRequest):
 	temperature = max(0.0, min(temperature, 1.2))
 	retry_base_delay_seconds = max(0.2, min(retry_base_delay_seconds, 3.0))
 
+	category_line = f' The request is in the category: {category_name}.' if category_name else ''
 	system_prompt = (
-		'You are an expert artisan consultant. Rewrite the request as if the requester is speaking in first person. '
-		'The refined text must begin with "I want" and stay under 50 words. '\
-		'Return JSON only with this exact schema: '
-		'{"refined_text":"string","missing_details":["string"],"confidence":0.0}. '
-		'Include only short phrases in missing_details, and keep confidence between 0 and 1.'
+		f'You are an expert consultant for a Saudi custom-item marketplace.{category_line} '
+		'Rewrite the buyer\'s request in clear, natural first-person English. '
+		'Stay under 80 words. Include only details that are stated or clearly implied — do not invent specifics. '
+		'Return JSON only: {"refined_text":"string","missing_details":["string"],"confidence":0.0}. '
+		'Each item in missing_details must be a short question the buyer should answer to strengthen their request '
+		'(e.g. "What size do you need?", "Do you have a preferred material?"). '
+		'Include up to 4 questions. Keep confidence between 0 and 1.'
 	)
 
 	start_time = time.monotonic()
@@ -323,13 +364,23 @@ def refine_request_view(request: HttpRequest):
 			)
 			return JsonResponse({'error': 'Your text could not be processed. Please rephrase and try again.'}, status=400)
 
+		if previous_suggestion:
+			messages_payload = [
+				{'role': 'system', 'content': system_prompt},
+				{'role': 'user', 'content': user_text},
+				{'role': 'assistant', 'content': previous_suggestion},
+				{'role': 'user', 'content': 'Please refine this further, making it clearer and more specific.'},
+			]
+		else:
+			messages_payload = [
+				{'role': 'system', 'content': system_prompt},
+				{'role': 'user', 'content': user_text},
+			]
+
 		response = _call_with_retry(
 			lambda: client.chat.completions.create(
 				model=model_name,
-				messages=[
-					{'role': 'system', 'content': system_prompt},
-					{'role': 'user', 'content': user_text},
-				],
+				messages=messages_payload,
 				temperature=temperature,
 				max_tokens=max_output_tokens,
 				response_format={'type': 'json_object'},
@@ -374,9 +425,6 @@ def refine_request_view(request: HttpRequest):
 	if not refined_text:
 		return JsonResponse({'error': 'AI returned an empty response. Please try again.'}, status=502)
 
-	if not refined_text.lower().startswith('i want'):
-		refined_text = f"I want {refined_text.lstrip()}"
-
 	latency_ms = int((time.monotonic() - start_time) * 1000)
 	tokens_used = None
 	try:
@@ -414,7 +462,3 @@ def refine_request_view(request: HttpRequest):
 	)
 
 	return JsonResponse(result)
-
-
-
-
