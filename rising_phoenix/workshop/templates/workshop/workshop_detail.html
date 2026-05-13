@@ -263,6 +263,15 @@
         object-fit: cover;
     }
 
+    .portfolio-empty {
+        padding: 22px;
+        border: 1px dashed #e0ccb9;
+        border-radius: 10px;
+        color: var(--text-muted);
+        background: #fcf8f4;
+        font-size: 0.95rem;
+    }
+
     .portfolio-badge {
         position: absolute;
         top: 8px;
@@ -293,12 +302,12 @@
         <div class="artisan-info flex-grow-1">
             <h3>{{ workshop.workshop_name }}</h3>
             <p>{{ artisan.user.first_name }} · {{ workshop.location|default:"Riyadh" }} · Member since Jan 2023</p>
-            {% if workshop.categories.all %}
+            {% if workshop.categories %}
+            {% for category in workshop.categories.all %}
             <div class="categories-tags">
-                {% for cat in workshop.categories.all %}
-                <span class="tag">{{ cat.name }}</span>
-                {% endfor %}
+                <span class="tag">{{ category.name }}</span>
             </div>
+            {% endfor %}
             {% endif %}
         </div>
         {% if artisan.is_verified %}
@@ -329,16 +338,25 @@
                 </div>
             </div>
 
-            {% if workshop.portfolio_images.all %}
+            {% if portfolio_images %}
             <div class="portfolio-section">
                 <h2>Portfolio</h2>
                 <div class="portfolio-grid">
-                    {% for img in workshop.portfolio_images.all|slice:":6" %}
+                    {% for img in portfolio_images|slice:":6" %}
                     <div class="portfolio-item">
                         <img src="{{ img.image.url }}" alt="{{ img.caption }}">
+                        {% if img.is_pinned %}
                         <span class="portfolio-badge">Pinned</span>
+                        {% endif %}
                     </div>
                     {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="portfolio-section">
+                <h2>Portfolio</h2>
+                <div class="portfolio-empty">
+                    No portfolio images uploaded yet.
                 </div>
             </div>
             {% endif %}

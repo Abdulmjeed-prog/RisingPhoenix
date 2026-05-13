@@ -62,8 +62,13 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Categories</label>
-                                {{ form.categories }}
+                                {% for choice in form.categories %}
+                                <div class="form-check">
+                                    {{ choice }}
+                                    <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                    </label>
+                                </div>
+                                {% endfor %}
                                 {% if form.categories.errors %}
                                 <div class="invalid-feedback d-block">{{ form.categories.errors }}</div>
                                 {% endif %}
