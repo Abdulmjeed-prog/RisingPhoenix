@@ -40,30 +40,64 @@
             </div>
         </div>
 
-        <div class="row g-3">
-            <div class="col-md-4">
-                <a href="{% url 'workshop:create_workshop_view' %}" class="saaf-tile-link">
-                    <div class="saaf-dashboard-card rounded-4 p-4 h-100">
-                        <h5 class="mb-2">Workshop Profile</h5>
-                        <p class="text-muted mb-0">{% if workshop %}Edit workshop details and publish settings.{% else %}Create your workshop profile to start receiving work.{% endif %}</p>
-                    </div>
-                </a>
+        <nav class="sidebar-nav">
+            <a href="{% url 'account:artisan_dashboard_view' %}" class="active">
+                <i class="bi bi-house-door-fill"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#">
+                <i class="bi bi-search"></i>
+                <span>Browse Requests</span>
+                <span class="sidebar-badge">12</span>
+            </a>
+            <a href="#">
+                <i class="bi bi-box-seam"></i>
+                <span>Active Orders</span>
+                <span class="sidebar-badge">2</span>
+            </a>
+            <a href="#">
+                <i class="bi bi-clipboard-check"></i>
+                <span>My Proposals</span>
+                <span class="sidebar-badge">4</span>
+            </a>
+            <a href="{% url 'workshop:projects_list_view' artisan.user.id %}">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Completed</span>
+            </a>
+            <a href="#">
+                <i class="bi bi-chat-dots"></i>
+                <span>Messages</span>
+                <span class="sidebar-badge">2</span>
+            </a>
+            <a href="{% url 'workshop:workshop_detail_view' artisan_id=request.user.id %}">
+                <i class="bi bi-images"></i>
+                <span>My Profile</span>
+            </a>
+            <a href="#">
+                <i class="bi bi-cash-coin"></i>
+                <span>Earnings</span>
+            </a>
+            <a href="{% url 'account:logout_view' %}">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Sign Out</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <div class="header-label">PAGE 12 OF 16 — ARTISAN DASHBOARD: EARNINGS, ORDERS, PROPOSALS PREVIEW,
+                    MATCHING REQUESTS FEED</div>
+                <h1>Welcome back, {{ artisan.user.first_name }}</h1>
+                <p class="header-subtitle">12 open requests match your skills right now.</p>
             </div>
-            <div class="col-md-4">
-                <a href="{% url 'workshop:upload_portfolio_view' %}" class="saaf-tile-link">
-                    <div class="saaf-dashboard-card rounded-4 p-4 h-100">
-                        <h5 class="mb-2">Portfolio</h5>
-                        <p class="text-muted mb-0">Upload and pin images that represent your craftsmanship.</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a href="{% url 'request:request_list_view' %}" class="saaf-tile-link">
-                    <div class="saaf-dashboard-card rounded-4 p-4 h-100">
-                        <h5 class="mb-2">Marketplace Requests</h5>
-                        <p class="text-muted mb-0">Browse customer demand and pick projects that fit your category.</p>
-                    </div>
-                </a>
+            <div class="header-right">
+                <a href="#" class="btn btn-outline-primary">Browse Open Requests →</a>
+                <a href="{% url 'workshop:create_project_view' %}" class="btn btn-primary" style="margin-left:12px;">Add
+                    Completed Project</a>
             </div>
         </div>
     </div>

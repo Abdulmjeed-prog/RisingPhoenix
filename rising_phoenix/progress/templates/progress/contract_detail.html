@@ -1,0 +1,370 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Project — {{ contract.proposal.request.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/request.css' %}">
+<link rel="stylesheet" href="{% static 'css/proposal.css' %}">
+<link rel="stylesheet" href="{% static 'css/progress.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="request-shell">
+  <div class="request-container">
+
+    {# ── Header ── #}
+    <header class="request-hero">
+      <p class="request-eyebrow">
+        Project Workspace &bull;
+        <span class="progress-status-pill progress-status-pill--{{ contract.status }}">
+          {{ contract.get_status_display }}
+        </span>
+      </p>
+      <h1 class="mb-1">{{ contract.proposal.request.title }}</h1>
+      <p class="request-sub">
+        {{ contract.proposal.request.category.name }} &bull;
+        Artisan: <strong>{{ contract.artisan.username }}</strong> &bull;
+        Agreed price: <strong>{{ contract.proposal.price|floatformat:"-2" }} SAR</strong> &bull;
+        Timeline: <strong>{{ contract.proposal.estimated_days }} day{{ contract.proposal.estimated_days|pluralize }}</strong>
+      </p>
+      <div class="progress-header-actions">
+        <a href="{% url 'request:request_detail_view' contract.proposal.request.id %}" class="proposal-action-btn">
+          <i class="bi bi-arrow-left"></i> Back to Request
+        </a>
+        {% if contract.proposal.conversation %}
+          <a href="{% url 'message:conversation_detail_view' contract.proposal.conversation.id %}" class="proposal-action-btn proposal-action-btn--chat">
+            <i class="bi bi-chat-dots-fill"></i> Open Chat
+          </a>
+        {% elif is_requester %}
+          <a href="{% url 'message:start_conversation_view' contract.proposal.id %}" class="proposal-action-btn proposal-action-btn--chat">
+            <i class="bi bi-chat-dots-fill"></i> Start Chat
+          </a>
+        {% endif %}
+      </div>
+    </header>
+
+    {# ── Completion banner ── #}
+    {% if contract.is_completed %}
+      <div class="progress-completion-banner">
+        <i class="bi bi-check-circle-fill"></i>
+        Project completed on {{ contract.completed_at|date:"N j, Y" }}.
+      </div>
+    {% endif %}
+
+    {# ── Artisan action form (above timeline) ── #}
+    {% if is_artisan and not contract.is_completed %}
+      <div class="progress-post-card">
+        <div class="progress-post-top">
+          <h2 class="progress-section-title" style="margin-bottom:0;">Post an Update</h2>
+        </div>
+        <form id="artisan-form" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <textarea name="body" class="progress-textarea" rows="3"
+            placeholder="Describe your progress or what you've completed..."></textarea>
+
+          <label class="request-label" style="margin-top:0.75rem;">Images (optional)</label>
+          <div class="img-upload-zone" id="artisan-img-upload-zone">
+            <input type="file" id="id_artisan_images" name="images"
+                   class="img-upload-input" accept="image/*" multiple>
+            <p class="img-upload-text">Click or drag images here</p>
+            <p class="img-upload-sub">Up to 5 &bull; JPEG, PNG, WebP &bull; Mark up to highlight your work</p>
+          </div>
+          <p id="artisan-img-count-badge" class="img-count-badge" hidden></p>
+          <div id="artisan-img-preview-grid" class="img-preview-grid" hidden></div>
+
+          <div class="progress-artisan-actions">
+            <button type="submit" class="request-action"
+              formaction="{% url 'progress:post_update_view' contract.id %}">
+              <i class="bi bi-send"></i> Post Update
+            </button>
+            {% if contract.is_in_progress %}
+              <button type="submit" class="proposal-action-btn proposal-action-btn--accept"
+                formaction="{% url 'progress:request_completion_view' contract.id %}"
+                formnovalidate
+                data-confirm-title="Mark as Complete"
+                data-confirm-body="This will ask the requester to review and confirm completion."
+                data-confirm-variant="accept">
+                <i class="bi bi-check-lg"></i> Mark as Complete
+              </button>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    {% endif %}
+
+    {# ── Timeline ── #}
+    <h2 class="progress-section-title">Progress Timeline</h2>
+
+    {% if timeline %}
+      <div class="progress-timeline">
+        {% for item in timeline %}
+          {% if item.kind == 'update' %}
+            {% with update=item.obj %}
+            <div class="progress-timeline-item">
+              <div class="progress-timeline-dot"></div>
+              <div class="progress-update-card">
+                <div class="progress-update-meta">
+                  <span class="progress-update-author">{{ contract.artisan.username }}</span>
+                  <span class="progress-update-date">{{ update.created_at|date:"N j, Y · g:i a" }}</span>
+                </div>
+                <p class="progress-update-body">{{ update.body }}</p>
+
+                {% with imgs=update.images.all %}
+                  {% if imgs %}
+                    <div class="progress-image-gallery">
+                      {% for img in imgs %}
+                        <div class="progress-gallery-item">
+                          <button type="button" class="progress-gallery-btn"
+                            data-src="{{ img.image.url }}" data-caption="{{ img.caption }}"
+                            aria-label="View image {{ forloop.counter }}">
+                            <img src="{{ img.image.url }}" alt="Progress image {{ forloop.counter }}">
+                            {% if img.caption %}<span class="progress-gallery-caption">{{ img.caption }}</span>{% endif %}
+                          </button>
+                          {% if not contract.is_completed %}
+                            {% if is_artisan %}
+                              <button type="button" class="progress-include-btn"
+                                data-src="{{ img.image.url }}" data-target-zone="artisan"
+                                title="Add to your update">Add</button>
+                            {% elif is_requester %}
+                              <button type="button" class="progress-include-btn"
+                                data-src="{{ img.image.url }}" data-target-zone="requester"
+                                title="Add to your response">Add</button>
+                            {% endif %}
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+                {% with comments=update.comments.all %}
+                  {% if comments %}
+                    <div class="progress-comments">
+                      {% for comment in comments %}
+                        <div class="progress-comment">
+                          <span class="progress-comment-author">{{ comment.author.username }}</span>
+                          <span class="progress-comment-body">{{ comment.body }}</span>
+                          <span class="progress-comment-date">{{ comment.created_at|date:"N j · g:i a" }}</span>
+                        </div>
+                        {% with cimgs=comment.images.all %}
+                          {% if cimgs %}
+                            <div class="progress-image-gallery" style="margin-top:0.4rem;">
+                              {% for img in cimgs %}
+                                <div class="progress-gallery-item">
+                                  <button type="button" class="progress-gallery-btn"
+                                    data-src="{{ img.image.url }}" data-caption="{{ img.caption }}"
+                                    aria-label="View image {{ forloop.counter }}">
+                                    <img src="{{ img.image.url }}" alt="Comment image {{ forloop.counter }}">
+                                    {% if img.caption %}<span class="progress-gallery-caption">{{ img.caption }}</span>{% endif %}
+                                  </button>
+                                </div>
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        {% endwith %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+            {% endwith %}
+
+          {% else %}
+            {% with event=item.obj %}
+            <div class="progress-timeline-item">
+              <div class="progress-timeline-dot progress-timeline-dot--{{ event.event_type }}"></div>
+              <div class="progress-event-card progress-event-card--{{ event.event_type }}">
+                <div class="progress-event-meta">
+                  {% if event.event_type == 'completion_requested' %}
+                    <i class="bi bi-check-circle"></i>
+                  {% elif event.event_type == 'completion_rejected' %}
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                  {% else %}
+                    <i class="bi bi-check-circle-fill"></i>
+                  {% endif %}
+                  <span class="progress-event-label">{{ event.get_event_type_display }}</span>
+                  <span class="progress-event-actor">by {{ event.actor.username }}</span>
+                  <span class="progress-event-date">{{ event.created_at|date:"N j, Y · g:i a" }}</span>
+                </div>
+
+                {% if event.message %}
+                  <p class="progress-event-message progress-event-message--{{ event.event_type }}">{{ event.message }}</p>
+                {% endif %}
+
+                {% with imgs=event.images.all %}
+                  {% if imgs %}
+                    <div class="progress-image-gallery" style="margin-top:0.75rem;">
+                      {% for img in imgs %}
+                        <div class="progress-gallery-item">
+                          <button type="button" class="progress-gallery-btn"
+                            data-src="{{ img.image.url }}" data-caption="{{ img.caption }}"
+                            aria-label="View image {{ forloop.counter }}">
+                            <img src="{{ img.image.url }}" alt="Event image {{ forloop.counter }}">
+                            {% if img.caption %}<span class="progress-gallery-caption">{{ img.caption }}</span>{% endif %}
+                          </button>
+                          {% if not contract.is_completed %}
+                            {% if is_artisan %}
+                              <button type="button" class="progress-include-btn"
+                                data-src="{{ img.image.url }}" data-target-zone="artisan"
+                                title="Add to your update">Add</button>
+                            {% elif is_requester %}
+                              <button type="button" class="progress-include-btn"
+                                data-src="{{ img.image.url }}" data-target-zone="requester"
+                                title="Add to your response">Add</button>
+                            {% endif %}
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+            {% endwith %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="progress-empty">
+        <i class="bi bi-clock-history"></i>
+        <p>No updates yet. {% if is_artisan %}Post your first update above.{% else %}Check back soon.{% endif %}</p>
+      </div>
+    {% endif %}
+
+    {# ── Requester action form (below timeline) ── #}
+    {% if is_requester and not contract.is_completed %}
+      <div class="progress-action-card">
+
+        {# Confirm complete — separate prominent form #}
+        {% if contract.is_completion_requested %}
+          <div class="progress-confirm-row">
+            <div>
+              <p class="progress-action-hint" style="margin-bottom:0.5rem;">
+                <i class="bi bi-hourglass-split"></i>
+                <strong>{{ contract.artisan.username }}</strong> has marked this project as complete.
+              </p>
+              <form method="post" action="{% url 'progress:confirm_completion_view' contract.id %}">
+                {% csrf_token %}
+                <button type="submit" class="proposal-action-btn proposal-action-btn--accept"
+                  data-confirm-title="Confirm Complete"
+                  data-confirm-body="This project will be marked as complete. This cannot be undone."
+                  data-confirm-variant="accept">
+                  <i class="bi bi-check-circle"></i> Confirm Complete
+                </button>
+              </form>
+            </div>
+          </div>
+          <hr class="progress-divider">
+        {% endif %}
+
+        {# Feedback / Send Back unified form #}
+        <p class="progress-action-hint">
+          {% if contract.is_completion_requested %}Something needs fixing? Leave feedback or send it back.
+          {% else %}Have feedback on the latest update?{% endif %}
+        </p>
+        <form id="requester-form" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <textarea name="body" class="progress-textarea" rows="3"
+            placeholder="{% if contract.is_completion_requested %}Describe what needs to be fixed or leave a note...{% else %}Leave your feedback...{% endif %}"></textarea>
+
+          <label class="request-label" style="margin-top:0.75rem;">Images (optional)</label>
+          <div class="img-upload-zone" id="requester-img-upload-zone">
+            <input type="file" id="id_requester_images" name="images"
+                   class="img-upload-input" accept="image/*" multiple>
+            <p class="img-upload-text">Click or drag images here</p>
+            <p class="img-upload-sub">Up to 5 &bull; JPEG, PNG, WebP &bull; Annotate to show exactly what to fix</p>
+          </div>
+          <p id="requester-img-count-badge" class="img-count-badge" hidden></p>
+          <div id="requester-img-preview-grid" class="img-preview-grid" hidden></div>
+
+          <div class="progress-artisan-actions" style="margin-top:0.75rem;">
+            {% if latest_update_id %}
+              <button type="submit" class="request-action"
+                formaction="{% url 'progress:add_comment_view' latest_update_id %}">
+                <i class="bi bi-chat"></i> Leave Feedback
+              </button>
+            {% endif %}
+            {% if contract.is_completion_requested %}
+              <button type="submit" class="proposal-action-btn proposal-action-btn--danger"
+                formaction="{% url 'progress:reject_completion_view' contract.id %}">
+                <i class="bi bi-arrow-counterclockwise"></i> Send Back
+              </button>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{# ── Image editor modal (shared by all zones) ── #}
+{% if not contract.is_completed %}
+<div class="image-editor-modal" id="progress-image-editor-modal" hidden>
+  <div class="image-editor-card">
+    <div class="image-editor-head">
+      <p class="mb-0">Mark Up Image</p>
+      <button type="button" class="image-editor-close" id="progress-image-editor-close" aria-label="Close">&times;</button>
+    </div>
+    <p class="image-editor-hint">Draw or highlight areas to annotate the image.</p>
+    <div class="image-editor-controls">
+      <div class="editor-tool-group">
+        <button type="button" class="editor-tool-btn is-active" id="progress-editor-mode-draw">&#9998; Draw</button>
+        <button type="button" class="editor-tool-btn" id="progress-editor-mode-highlight">&#9744; Highlight</button>
+      </div>
+      <div class="editor-color-group" id="progress-editor-color-group">
+        <button type="button" class="editor-color-swatch is-active" data-color="#e53935" style="background:#e53935;" title="Red"></button>
+        <button type="button" class="editor-color-swatch" data-color="#ff9800" style="background:#ff9800;" title="Orange"></button>
+        <button type="button" class="editor-color-swatch" data-color="#ffeb3b" style="background:#ffeb3b;" title="Yellow"></button>
+        <button type="button" class="editor-color-swatch" data-color="#43a047" style="background:#43a047;" title="Green"></button>
+        <button type="button" class="editor-color-swatch" data-color="#1e88e5" style="background:#1e88e5;" title="Blue"></button>
+        <button type="button" class="editor-color-swatch" data-color="#1c1712" style="background:#1c1712;" title="Black"></button>
+      </div>
+      <div class="editor-tool-group" id="progress-editor-width-group">
+        <button type="button" class="editor-tool-btn is-active" id="progress-editor-width-thin">Thin</button>
+        <button type="button" class="editor-tool-btn" id="progress-editor-width-thick">Thick</button>
+      </div>
+    </div>
+    <div class="image-editor-canvas-wrap">
+      <div id="progress-image-editor-host"></div>
+    </div>
+    <div class="image-editor-toolbar">
+      <button type="button" class="image-editor-btn image-editor-btn-primary" id="progress-editor-save">Save Edits</button>
+      <button type="button" class="image-editor-btn" id="progress-editor-undo">Undo</button>
+      <button type="button" class="image-editor-btn" id="progress-editor-clear-all">Clear All</button>
+      <button type="button" class="image-editor-btn" id="progress-editor-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{# ── Lightbox ── #}
+<div id="progressLightbox" class="gallery-lightbox" style="display:none;" role="dialog" aria-modal="true">
+  <button class="gallery-lightbox-close" id="progressLightboxClose" aria-label="Close">&times;</button>
+  <div class="gallery-lightbox-body">
+    <img id="progressLightboxImg" src="" alt="">
+    <p id="progressLightboxCaption" class="gallery-lightbox-caption"></p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not contract.is_completed %}
+<script src="{% static 'js/progress_update.js' %}"></script>
+{% endif %}
+<script>
+  document.querySelectorAll('.progress-gallery-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.getElementById('progressLightboxImg').src = btn.dataset.src;
+      document.getElementById('progressLightboxCaption').textContent = btn.dataset.caption || '';
+      document.getElementById('progressLightbox').style.display = 'flex';
+    });
+  });
+  var lb = document.getElementById('progressLightbox');
+  document.getElementById('progressLightboxClose').addEventListener('click', function() { lb.style.display = 'none'; });
+  lb.addEventListener('click', function(e) { if (e.target === lb) lb.style.display = 'none'; });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && lb.style.display !== 'none') lb.style.display = 'none'; });
+</script>
+{% endblock %}

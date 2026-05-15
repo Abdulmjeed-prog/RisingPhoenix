@@ -61,5 +61,74 @@
             {% endif %}
         </div>
     </div>
-</section>
+</div>
+
+<!-- Portfolio Modal -->
+{% comment %} Completed Projects showcase for this artisan {% endcomment %}
+{% if workshop.completed_projects.exists %}
+<div class="container" style="max-width:1200px; margin-top:18px;">
+    <div class="portfolio-section">
+        <h2><a href="{% url 'workshop:projects_list_view' artisan_id=artisan.user.id %}"
+                style="text-decoration:none;color:inherit;">Completed Projects</a></h2>
+        {% if can_edit_portfolio %}
+        <a href="{% url 'workshop:create_project_view' %}">add project</a>
+        {% endif %}
+
+        <div class="portfolio-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
+            {% for project in workshop.completed_projects.all|dictsortreversed:'is_featured'|slice:":4" %}
+            <div class="portfolio-item" style="aspect-ratio:4/3;">
+                <a href="{% url 'workshop:project_detail_view' project_id=project.id %}" class="portfolio-trigger">
+                    {% if project.main_image %}
+                    <img src="{{ project.main_image.url }}" alt="{{ project.title }}">
+                    {% else %}
+                    {% with first=project.images.first %}
+                    {% if first %}
+                    <img src="{{ first.image.url }}" alt="{{ project.title }}">
+                    {% else %}
+                    <div style="padding:24px;color:#8b7461;">No image</div>
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                </a>
+                <div style="padding:8px;">
+                    <strong>{{ project.title }}</strong>
+                    <div class="small text-muted">{{ project.date_completed }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="modal fade portfolio-modal" id="portfolioImageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-1" id="portfolioModalTitle">Portfolio Image</h5>
+                    <small class="text-muted">Click outside or press Esc to close</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3 p-md-4">
+                <img src="" alt="Portfolio image preview" id="portfolioModalImage" class="portfolio-modal-image">
+                <div class="portfolio-modal-caption" id="portfolioModalCaption"></div>
+
+                {% if can_edit_portfolio %}
+                <form method="post" class="portfolio-edit-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="portfolio_image_id" id="portfolioImageId" value="">
+                    <label for="portfolioCaption">Edit description</label>
+                    <textarea name="caption" id="portfolioCaption"
+                        placeholder="Write a short description for this image..."></textarea>
+                    <div class="portfolio-edit-actions">
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

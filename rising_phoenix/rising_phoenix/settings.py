@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     'request',
     'proposal',
     'phonenumber_field',
+    'payment',
+    'message',
+    'progress',
 ]
 
 MIDDLEWARE = [
