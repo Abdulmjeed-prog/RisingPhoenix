@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from request.models import Request
 from .forms import ProposalForm
 from .models import Proposal, ProposalImage
+from progress.models import Contract
 
 logger = logging.getLogger(__name__)
 
@@ -209,6 +210,8 @@ def accept_proposal_view(request, proposal_id):
     project_request.status = Request.Status.CLOSED
     project_request.save(update_fields=['status'])
 
+    Contract.objects.get_or_create(proposal=proposal)
+
     messages.success(request, f"You accepted {proposal.artisan.username}'s proposal. The request is now closed.")
     return redirect('request:request_detail_view', request_id=project_request.id)
 
@@ -241,7 +244,7 @@ def my_proposals_view(request):
 
     proposals = (
         Proposal.objects.filter(artisan=request.user)
-        .select_related('request', 'request__category', 'request__requester')
+        .select_related('request', 'request__category', 'request__requester', 'contract')
         .prefetch_related('images')
         .order_by('-created_at')
     )

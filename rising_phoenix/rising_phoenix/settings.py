@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'payment',
     'message',
+    'progress',
 ]
 
 MIDDLEWARE = [

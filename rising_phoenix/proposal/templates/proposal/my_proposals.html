@@ -69,8 +69,16 @@
                 <form method="post" action="{% url 'proposal:withdraw_proposal_view' proposal.id %}" style="display:inline;">
                   {% csrf_token %}
                   <button type="submit" class="proposal-action-btn proposal-action-btn--danger"
-                    onclick="return confirm('Withdraw this proposal?')">Withdraw</button>
+                    data-confirm-title="Withdraw Proposal"
+                    data-confirm-body="Your proposal will be withdrawn and you will no longer be considered for this project."
+                    data-confirm-variant="danger">Withdraw</button>
                 </form>
+              </div>
+            {% elif proposal.is_accepted and proposal.contract %}
+              <div class="proposal-card-actions">
+                <a href="{% url 'progress:contract_detail_view' proposal.contract.id %}" class="proposal-action-btn proposal-action-btn--accept">
+                  <i class="bi bi-box-arrow-up-right"></i> View Project
+                </a>
               </div>
             {% endif %}
           </div>

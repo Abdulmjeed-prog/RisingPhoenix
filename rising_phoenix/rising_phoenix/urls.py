@@ -29,4 +29,5 @@ urlpatterns = [
     path('payment/', include('payment.urls')),
     path('proposals/', include('proposal.urls')),
     path('message/', include('message.urls')),
+    path('progress/', include('progress.urls')),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

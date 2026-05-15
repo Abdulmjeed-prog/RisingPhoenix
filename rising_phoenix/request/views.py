@@ -199,10 +199,10 @@ def request_detail_view(request: HttpRequest, request_id: int):
 
 	if is_requester:
 		proposals = list(
-			project_request.proposals.select_related('artisan').prefetch_related('images').order_by('-created_at')
+			project_request.proposals.select_related('artisan', 'contract').prefetch_related('images').order_by('-created_at')
 		)
 	elif is_artisan:
-		user_proposal = project_request.proposals.prefetch_related('images').filter(artisan=request.user).first()
+		user_proposal = project_request.proposals.select_related('contract').prefetch_related('images').filter(artisan=request.user).first()
 
 	can_submit = (
 		is_artisan

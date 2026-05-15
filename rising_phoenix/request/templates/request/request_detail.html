@@ -124,16 +124,23 @@
         {% elif user_proposal %}
           <div class="proposal-panel-header">
             <h2 class="proposal-panel-title">Your Proposal</h2>
-            {% if user_proposal.is_pending %}
-              <div class="proposal-panel-header-actions">
+            <div class="proposal-panel-header-actions">
+              {% if user_proposal.is_pending %}
                 <a href="{% url 'proposal:edit_proposal_view' user_proposal.id %}" class="proposal-action-btn">Edit</a>
                 <form method="post" action="{% url 'proposal:withdraw_proposal_view' user_proposal.id %}" style="display:inline;">
                   {% csrf_token %}
                   <button type="submit" class="proposal-action-btn proposal-action-btn--danger"
-                    onclick="return confirm('Withdraw this proposal?')">Withdraw</button>
+                    data-confirm-title="Withdraw Proposal"
+                    data-confirm-body="Your proposal will be withdrawn and you will no longer be considered for this project."
+                    data-confirm-variant="danger">Withdraw</button>
                 </form>
-              </div>
-            {% endif %}
+              {% endif %}
+              {% if user_proposal.is_accepted and user_proposal.contract %}
+                <a href="{% url 'progress:contract_detail_view' user_proposal.contract.id %}" class="proposal-action-btn proposal-action-btn--accept">
+                  <i class="bi bi-box-arrow-up-right"></i> View Project
+                </a>
+              {% endif %}
+            </div>
           </div>
           <div class="proposal-card proposal-card--{{ user_proposal.status }}">
             <div class="proposal-card-head">
@@ -191,11 +198,25 @@
                   <div>
                     <p class="proposal-card-artisan">
                       <strong>{{ proposal.artisan.username }}</strong>
-                                <a class="proposal-chat-btn" href="{% url 'message:start_conversation_view' proposal.id %}">
-            <i class="bi bi-chat-dots-fill"></i>
-            <span>Open Chat</span>
-          </a>
-
+                      {% if proposal.is_accepted %}
+                        {% if proposal.contract %}
+                          <a class="proposal-chat-btn" href="{% url 'progress:contract_detail_view' proposal.contract.id %}">
+                            <i class="bi bi-box-arrow-up-right"></i>
+                            <span>View Project</span>
+                          </a>
+                        {% endif %}
+                        {% if proposal.conversation %}
+                          <a class="proposal-chat-btn" href="{% url 'message:conversation_detail_view' proposal.conversation.id %}">
+                            <i class="bi bi-chat-dots-fill"></i>
+                            <span>Open Chat</span>
+                          </a>
+                        {% else %}
+                          <a class="proposal-chat-btn" href="{% url 'message:start_conversation_view' proposal.id %}">
+                            <i class="bi bi-chat-dots-fill"></i>
+                            <span>Start Chat</span>
+                          </a>
+                        {% endif %}
+                      {% endif %}
                     </p>
                     <div class="proposal-card-stats-row">
                       <div class="proposal-card-stat">
@@ -238,14 +259,18 @@
                     <form method="post" action="{% url 'proposal:accept_proposal_view' proposal.id %}">
                       {% csrf_token %}
                       <button type="submit" class="proposal-action-btn proposal-action-btn--accept"
-                        onclick="return confirm('Accept this proposal? This will close the request and reject all other proposals.')">
+                        data-confirm-title="Accept Proposal"
+                        data-confirm-body="This will close the request and reject all other proposals. This cannot be undone."
+                        data-confirm-variant="accept">
                         Accept
                       </button>
                     </form>
                     <form method="post" action="{% url 'proposal:reject_proposal_view' proposal.id %}">
                       {% csrf_token %}
                       <button type="submit" class="proposal-action-btn proposal-action-btn--danger"
-                        onclick="return confirm('Reject this proposal?')">
+                        data-confirm-title="Reject Proposal"
+                        data-confirm-body="This proposal will be rejected and the artisan will be notified."
+                        data-confirm-variant="danger">
                         Reject
                       </button>
                     </form>

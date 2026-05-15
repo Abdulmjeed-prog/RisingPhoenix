@@ -84,13 +84,19 @@ a:hover {
 .saaf-logo {
     width: 40px;
     height: 40px;
-    background-color: var(--saaf-brown);
     border-radius: 12px;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--saaf-white);
-    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.saaf-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .brand-name {
@@ -277,6 +283,8 @@ a:hover {
     justify-content: center;
     position: relative;
     font-size: 19px;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .sidebar-label {
@@ -351,6 +359,8 @@ a:hover {
     justify-content: center;
     font-size: 19px;
     border: none;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .sidebar-btn-new i {
@@ -732,6 +742,60 @@ a:hover {
     font-weight: 600;
 }
 
+/* Craft category cards */
+.saaf-craft-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.25rem 0.75rem;
+    background: var(--saaf-white);
+    border: 1px solid var(--saaf-border);
+    border-radius: 14px;
+    color: var(--saaf-brown);
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    text-align: center;
+    min-height: 100px;
+}
+
+.saaf-craft-card:hover {
+    background: var(--saaf-beige);
+    border-color: var(--saaf-brown-light);
+    color: var(--saaf-brown);
+    transform: translateY(-2px);
+}
+
+.saaf-craft-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.saaf-craft-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+/* Artisan join CTA banner */
+.saaf-artisan-cta-banner {
+    background: var(--saaf-beige);
+    border: 1px solid var(--saaf-border);
+    border-radius: 20px;
+    padding: 2.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.saaf-artisan-cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--saaf-brown);
+}
+
 /* ============================================
    FOOTER STYLES
    ============================================ */
@@ -907,4 +971,100 @@ a:hover {
 
 .container-lg {
     max-width: 1200px;
+}
+
+/* ── In-site confirmation modal ── */
+.saaf-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 9, 6, 0.55);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: saaf-confirm-fadein 0.15s ease;
+}
+
+@keyframes saaf-confirm-fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.saaf-confirm-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 8px 40px rgba(12, 9, 6, 0.18);
+    animation: saaf-confirm-slidein 0.18s ease;
+}
+
+@keyframes saaf-confirm-slidein {
+    from { transform: translateY(10px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.saaf-confirm-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    color: var(--ink, #1c1712);
+    margin: 0 0 0.6rem;
+}
+
+.saaf-confirm-body {
+    font-size: 0.9rem;
+    color: var(--ink-light, #8a7a6e);
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+}
+
+.saaf-confirm-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.saaf-confirm-cancel {
+    background: none;
+    border: 1px solid var(--sand, #e8ddd3);
+    color: var(--ink, #1c1712);
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.saaf-confirm-cancel:hover {
+    background: var(--sand, #e8ddd3);
+}
+
+.saaf-confirm-ok {
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+}
+
+.saaf-confirm-ok:hover { opacity: 0.88; }
+
+.saaf-confirm-ok--accept {
+    background: #1a7a4a;
+    color: #fff;
+}
+
+.saaf-confirm-ok--danger {
+    background: #c0392b;
+    color: #fff;
+}
+
+.saaf-confirm-ok--default {
+    background: var(--clay, #c2724f);
+    color: #fff;
 }
