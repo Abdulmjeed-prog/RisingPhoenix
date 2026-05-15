@@ -11,7 +11,7 @@ from django.db.models import Avg
 from twilio.rest import Client
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
-
+from notification.utils import send_welcome_email, send_artisan_welcome_email
 # Create your views here.
 
 def signup_view(request:HttpRequest):
@@ -27,6 +27,7 @@ def signup_view(request:HttpRequest):
                 profile.user = new_user
                 profile.save()
                 messages.success(request, "You have been register")
+            send_welcome_email(new_user)
             return redirect('account:login_view')
         else:
             print(user_form.errors)
@@ -50,6 +51,7 @@ def artisan_signup_view(request:HttpRequest):
                 profile.user = new_user
                 profile.save()
                 messages.success(request, "You have been register")
+            send_artisan_welcome_email(new_user)
             return redirect('account:login_view')
         else:
             print(user_form.errors)

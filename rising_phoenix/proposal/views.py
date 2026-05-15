@@ -5,8 +5,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
+from notification.models import Notification
+from notification.utils import notify
 from request.models import Request
 from .forms import ProposalForm
 from .models import Proposal, ProposalImage
@@ -94,6 +97,13 @@ def submit_proposal_view(request, request_id):
                     project_request.status = Request.Status.IN_REVIEW
                     project_request.save(update_fields=['status'])
                 messages.success(request, 'Your proposal has been submitted.')
+                notify(
+                    project_request.requester,
+                    Notification.NotifType.PROPOSAL_RECEIVED,
+                    f'{request.user.username} submitted a proposal for your request',
+                    body=f'"{project_request.title}" — review it and decide.',
+                    link=reverse('request:request_detail_view', kwargs={'request_id': request_id}),
+                )
                 return redirect('request:request_detail_view', request_id=request_id)
             except IntegrityError:
                 messages.error(request, 'You have already submitted a proposal for this request.')
@@ -129,7 +139,6 @@ def edit_proposal_view(request, proposal_id):
         if form.is_valid():
             form.save()
 
-            # Update captions on existing proposal images
             for image in proposal.images.all():
                 field_name = f'existing_proposal_image_caption_{image.id}'
                 new_caption = (request.POST.get(field_name, '') or '').strip()[:160]
@@ -137,12 +146,10 @@ def edit_proposal_view(request, proposal_id):
                     image.caption = new_caption
                     image.save(update_fields=['caption'])
 
-            # Delete removed images
             delete_ids = request.POST.getlist('delete_proposal_image_ids')
             if delete_ids:
                 proposal.images.filter(id__in=delete_ids).delete()
 
-            # Save new images
             captions = request.POST.getlist('proposal_image_captions')
             skipped = _save_proposal_images(proposal, request.FILES, captions)
             for msg in skipped:
@@ -210,9 +217,16 @@ def accept_proposal_view(request, proposal_id):
     project_request.status = Request.Status.CLOSED
     project_request.save(update_fields=['status'])
 
-    Contract.objects.get_or_create(proposal=proposal)
+    contract, _ = Contract.objects.get_or_create(proposal=proposal)
 
     messages.success(request, f"You accepted {proposal.artisan.username}'s proposal. The request is now closed.")
+    notify(
+        proposal.artisan,
+        Notification.NotifType.PROPOSAL_ACCEPTED,
+        'Your proposal was accepted!',
+        body=f'You were chosen for "{project_request.title}". Head to the project page to get started.',
+        link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract.id}),
+    )
     return redirect('request:request_detail_view', request_id=project_request.id)
 
 
@@ -233,6 +247,13 @@ def reject_proposal_view(request, proposal_id):
     proposal.status = Proposal.Status.REJECTED
     proposal.save(update_fields=['status', 'updated_at'])
     messages.success(request, f"{proposal.artisan.username}'s proposal has been rejected.")
+    notify(
+        proposal.artisan,
+        Notification.NotifType.PROPOSAL_REJECTED,
+        'Your proposal was not selected',
+        body=f'The requester passed on your proposal for "{project_request.title}".',
+        link=reverse('request:request_detail_view', kwargs={'request_id': project_request.id}),
+    )
     return redirect('request:request_detail_view', request_id=project_request.id)
 
 
