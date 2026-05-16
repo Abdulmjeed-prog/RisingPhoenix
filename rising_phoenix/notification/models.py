@@ -3,6 +3,44 @@ from django.db import models
 
 User = get_user_model()
 
+_NOTIF_TYPES = [
+    'proposal_received', 'proposal_accepted', 'proposal_rejected',
+    'progress_update', 'comment_added', 'completion_requested',
+    'completion_confirmed', 'completion_rejected', 'message_received',
+]
+
+
+class NotificationPreference(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notification_preference')
+
+    # Email toggles
+    email_proposal_received    = models.BooleanField(default=True)
+    email_proposal_accepted    = models.BooleanField(default=True)
+    email_proposal_rejected    = models.BooleanField(default=True)
+    email_progress_update      = models.BooleanField(default=True)
+    email_comment_added        = models.BooleanField(default=True)
+    email_completion_requested = models.BooleanField(default=True)
+    email_completion_confirmed = models.BooleanField(default=True)
+    email_completion_rejected  = models.BooleanField(default=True)
+    email_message_received     = models.BooleanField(default=True)
+
+    # In-site toggles
+    insite_proposal_received    = models.BooleanField(default=True)
+    insite_proposal_accepted    = models.BooleanField(default=True)
+    insite_proposal_rejected    = models.BooleanField(default=True)
+    insite_progress_update      = models.BooleanField(default=True)
+    insite_comment_added        = models.BooleanField(default=True)
+    insite_completion_requested = models.BooleanField(default=True)
+    insite_completion_confirmed = models.BooleanField(default=True)
+    insite_completion_rejected  = models.BooleanField(default=True)
+    insite_message_received     = models.BooleanField(default=True)
+
+    def wants_email(self, notif_type):
+        return getattr(self, f'email_{notif_type}', True)
+
+    def wants_insite(self, notif_type):
+        return getattr(self, f'insite_{notif_type}', True)
+
 
 class Notification(models.Model):
     class NotifType(models.TextChoices):

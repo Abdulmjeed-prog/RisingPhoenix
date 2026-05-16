@@ -1,14 +1,32 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.conf import settings
 from django.db import transaction
 from account.models import ArtisanProfile
+from rising_phoenix.moderation import image_is_clean, text_is_clean
 from .models import WorkshopProfile, PortfolioImage, CompletedProject, CompletedProjectImage
 from .forms import WorkshopProfileForm, PortfolioImageForm, CompletedProjectForm, ProjectImageUploadForm
 from django.db.models import Q
 from .models import Category
 from request.models import Request
 from proposal.models import Proposal
+
+
+def _validate_workshop_image(image):
+    """
+    Returns None if the image passes all checks, or an error string if rejected.
+    Checks: file size, content type, nudity.
+    """
+    max_size_bytes = int(float(getattr(settings, 'REQUEST_IMAGE_MAX_SIZE_MB', 5)) * 1024 * 1024)
+    allowed_types = list(getattr(settings, 'REQUEST_IMAGE_ALLOWED_TYPES', ['image/jpeg', 'image/png', 'image/webp', 'image/gif']))
+    if image.size > max_size_bytes:
+        return f'"{image.name}" exceeds the 5 MB size limit.'
+    if (getattr(image, 'content_type', '') or '').lower() not in allowed_types:
+        return f'"{image.name}" is not an accepted image type (JPEG, PNG, WebP, GIF).'
+    if not image_is_clean(image):
+        return f'"{image.name}" was removed: explicit content detected.'
+    return None
 
 
 def is_artisan(user):
@@ -157,16 +175,25 @@ def upload_portfolio_view(request):
             if not images:
                 messages.error(request, "Please select at least one image to upload.")
             else:
+                if caption and not text_is_clean(caption):
+                    caption = ''
+                saved_count = 0
                 with transaction.atomic():
                     for image in images:
+                        error = _validate_workshop_image(image)
+                        if error:
+                            messages.warning(request, f'Image skipped: {error}')
+                            continue
                         PortfolioImage.objects.create(
                             workshop=workshop,
                             image=image,
                             caption=caption,
                             is_pinned=is_pinned,
                         )
+                        saved_count += 1
 
-                messages.success(request, f"{len(images)} portfolio image(s) uploaded successfully.")
+                if saved_count:
+                    messages.success(request, f"{saved_count} portfolio image(s) uploaded successfully.")
                 return redirect('workshop:upload_portfolio_view')
         else:
             messages.error(request, "Please correct the errors below.")
@@ -242,15 +269,24 @@ def upload_project_images_view(request, project_id):
             if not images:
                 messages.error(request, "Please select at least one image to upload.")
             else:
+                if caption and not text_is_clean(caption):
+                    caption = ''
+                saved_count = 0
                 with transaction.atomic():
                     for img in images:
+                        error = _validate_workshop_image(img)
+                        if error:
+                            messages.warning(request, f'Image skipped: {error}')
+                            continue
                         CompletedProjectImage.objects.create(
                             project=project,
                             image=img,
                             caption=caption,
                             is_before=is_before,
                         )
-                messages.success(request, f"{len(images)} project image(s) uploaded successfully.")
+                        saved_count += 1
+                if saved_count:
+                    messages.success(request, f"{saved_count} project image(s) uploaded successfully.")
                 return redirect('workshop:project_detail_view', project_id=project.id)
         else:
             messages.error(request, "Please correct the errors below.")

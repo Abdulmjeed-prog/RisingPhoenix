@@ -11,15 +11,18 @@ logger = logging.getLogger(__name__)
 
 
 def notify(recipient, notif_type, title, body='', link=''):
-    from .models import Notification
-    Notification.objects.create(
-        recipient=recipient,
-        notif_type=notif_type,
-        title=title,
-        body=body,
-        link=link,
-    )
-    _send_notification_email(recipient, title, body, link)
+    from .models import Notification, NotificationPreference
+    prefs, _ = NotificationPreference.objects.get_or_create(user=recipient)
+    if prefs.wants_insite(notif_type):
+        Notification.objects.create(
+            recipient=recipient,
+            notif_type=notif_type,
+            title=title,
+            body=body,
+            link=link,
+        )
+    if prefs.wants_email(notif_type):
+        _send_notification_email(recipient, title, body, link)
 
 
 def send_welcome_email(user):

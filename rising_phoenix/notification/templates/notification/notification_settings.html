@@ -1,0 +1,139 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Notification Settings — Saaf{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/notification.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-lg py-5">
+
+    <div class="notif-page-header">
+        <div>
+            <h2 class="notif-page-title">Notification Settings</h2>
+            <p class="notif-settings-sub">Choose how and when you want to be notified.</p>
+        </div>
+        <a href="{% url 'notification:notification_list_view' %}" class="notif-back-link">
+            <i class="bi bi-arrow-left"></i> Back to notifications
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for msg in messages %}
+        <div class="alert alert-success mb-4" role="alert">{{ msg }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="notif-settings-grid">
+
+            <!-- EMAIL NOTIFICATIONS -->
+            <div class="notif-settings-card">
+                <div class="notif-settings-card-header">
+                    <div class="notif-settings-card-icon">
+                        <i class="bi bi-envelope-fill"></i>
+                    </div>
+                    <div class="notif-settings-card-titles">
+                        <h3 class="notif-settings-card-title">Email Notifications</h3>
+                        <p class="notif-settings-card-desc">Sent to your registered email address.</p>
+                    </div>
+                    <div class="notif-master-wrap ms-auto">
+                        <span class="notif-master-label">Toggle all</span>
+                        <label class="notif-master-toggle" title="Toggle all email notifications">
+                            <input type="checkbox" class="notif-master-check" data-group="email"
+                                {% if prefs.email_proposal_received and prefs.email_proposal_accepted and prefs.email_proposal_rejected and prefs.email_progress_update and prefs.email_comment_added and prefs.email_completion_requested and prefs.email_completion_confirmed and prefs.email_completion_rejected and prefs.email_message_received %}checked{% endif %}>
+                            <span class="notif-master-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <ul class="notif-settings-list">
+                    {% include "notification/partials/pref_row.html" with field="email_proposal_received" checked=prefs.email_proposal_received label="New Proposal" desc="When an artisan submits a proposal on your request." icon="bi-envelope-fill" color="#1a6fa8" only %}
+                    {% include "notification/partials/pref_row.html" with field="email_proposal_accepted" checked=prefs.email_proposal_accepted label="Proposal Accepted" desc="When a requester accepts your proposal." icon="bi-check-circle-fill" color="#1a7a4a" only %}
+                    {% include "notification/partials/pref_row.html" with field="email_proposal_rejected" checked=prefs.email_proposal_rejected label="Proposal Rejected" desc="When your proposal is rejected." icon="bi-x-circle-fill" color="#8a7a6e" only %}
+                    {% include "notification/partials/pref_row.html" with field="email_progress_update" checked=prefs.email_progress_update label="Progress Update" desc="When the artisan posts a new update on your project." icon="bi-image" color="#c2724f" only %}
+                    {% include "notification/partials/pref_row.html" with field="email_comment_added" checked=prefs.email_comment_added label="New Feedback" desc="When the requester comments on a progress update." icon="bi-chat-dots-fill" color="#c2724f" only %}
+                    {% include "notification/partials/pref_row.html" with field="email_completion_requested" checked=prefs.email_completion_requested label="Completion Requested" desc="When the artisan marks the project as complete." icon="bi-hourglass-split" color="#b07c00" only %}
+                    {% include "notification/partials/pref_row.html" with field="email_completion_confirmed" checked=prefs.email_completion_confirmed label="Project Completed" desc="When the requester confirms project completion." icon="bi-trophy-fill" color="#1a7a4a" only %}
+                    {% include "notification/partials/pref_row.html" with field="email_completion_rejected" checked=prefs.email_completion_rejected label="Completion Sent Back" desc="When the requester sends the work back for revision." icon="bi-arrow-counterclockwise" color="#b07c00" only %}
+                    {% include "notification/partials/pref_row.html" with field="email_message_received" checked=prefs.email_message_received label="New Message" desc="When you receive a new message." icon="bi-chat-fill" color="#1a6fa8" only %}
+                </ul>
+            </div>
+
+            <!-- IN-SITE NOTIFICATIONS -->
+            <div class="notif-settings-card">
+                <div class="notif-settings-card-header">
+                    <div class="notif-settings-card-icon">
+                        <i class="bi bi-bell-fill"></i>
+                    </div>
+                    <div class="notif-settings-card-titles">
+                        <h3 class="notif-settings-card-title">In-site Notifications</h3>
+                        <p class="notif-settings-card-desc">Appear in the bell icon in the navbar.</p>
+                    </div>
+                    <div class="notif-master-wrap ms-auto">
+                        <span class="notif-master-label">Toggle all</span>
+                        <label class="notif-master-toggle" title="Toggle all in-site notifications">
+                            <input type="checkbox" class="notif-master-check" data-group="insite"
+                                {% if prefs.insite_proposal_received and prefs.insite_proposal_accepted and prefs.insite_proposal_rejected and prefs.insite_progress_update and prefs.insite_comment_added and prefs.insite_completion_requested and prefs.insite_completion_confirmed and prefs.insite_completion_rejected and prefs.insite_message_received %}checked{% endif %}>
+                            <span class="notif-master-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <ul class="notif-settings-list">
+                    {% include "notification/partials/pref_row.html" with field="insite_proposal_received" checked=prefs.insite_proposal_received label="New Proposal" desc="When an artisan submits a proposal on your request." icon="bi-envelope-fill" color="#1a6fa8" only %}
+                    {% include "notification/partials/pref_row.html" with field="insite_proposal_accepted" checked=prefs.insite_proposal_accepted label="Proposal Accepted" desc="When a requester accepts your proposal." icon="bi-check-circle-fill" color="#1a7a4a" only %}
+                    {% include "notification/partials/pref_row.html" with field="insite_proposal_rejected" checked=prefs.insite_proposal_rejected label="Proposal Rejected" desc="When your proposal is rejected." icon="bi-x-circle-fill" color="#8a7a6e" only %}
+                    {% include "notification/partials/pref_row.html" with field="insite_progress_update" checked=prefs.insite_progress_update label="Progress Update" desc="When the artisan posts a new update on your project." icon="bi-image" color="#c2724f" only %}
+                    {% include "notification/partials/pref_row.html" with field="insite_comment_added" checked=prefs.insite_comment_added label="New Feedback" desc="When the requester comments on a progress update." icon="bi-chat-dots-fill" color="#c2724f" only %}
+                    {% include "notification/partials/pref_row.html" with field="insite_completion_requested" checked=prefs.insite_completion_requested label="Completion Requested" desc="When the artisan marks the project as complete." icon="bi-hourglass-split" color="#b07c00" only %}
+                    {% include "notification/partials/pref_row.html" with field="insite_completion_confirmed" checked=prefs.insite_completion_confirmed label="Project Completed" desc="When the requester confirms project completion." icon="bi-trophy-fill" color="#1a7a4a" only %}
+                    {% include "notification/partials/pref_row.html" with field="insite_completion_rejected" checked=prefs.insite_completion_rejected label="Completion Sent Back" desc="When the requester sends the work back for revision." icon="bi-arrow-counterclockwise" color="#b07c00" only %}
+                    {% include "notification/partials/pref_row.html" with field="insite_message_received" checked=prefs.insite_message_received label="New Message" desc="When you receive a new message." icon="bi-chat-fill" color="#1a6fa8" only %}
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="notif-settings-footer">
+            <button type="submit" class="notif-save-btn">Save preferences</button>
+        </div>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    document.querySelectorAll('.notif-master-check').forEach(function (master) {
+        var group = master.dataset.group;
+
+        function getChildren() {
+            return Array.from(document.querySelectorAll('input[name^="' + group + '_"]'));
+        }
+
+        function syncChildren() {
+            getChildren().forEach(function (c) {
+                c.checked = master.checked;
+                c.closest('.notif-pref-row').classList.toggle('notif-pref-row--disabled', !master.checked);
+            });
+        }
+
+        function syncMaster() {
+            master.checked = getChildren().every(function (c) { return c.checked; });
+        }
+
+        master.addEventListener('change', syncChildren);
+
+        getChildren().forEach(function (c) {
+            c.addEventListener('change', function () {
+                c.closest('.notif-pref-row').classList.toggle('notif-pref-row--disabled', !c.checked);
+                syncMaster();
+            });
+        });
+    });
+})();
+</script>
+{% endblock %}

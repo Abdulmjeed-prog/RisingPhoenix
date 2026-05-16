@@ -94,7 +94,8 @@
                                     data-notif-api="{% url 'notification:recent_api_view' %}"
                                     data-notif-mark-all="{% url 'notification:mark_all_read_view' %}"
                                     data-notif-mark-one="/notifications/api/mark-read/"
-                                    data-notif-list="{% url 'notification:notification_list_view' %}">
+                                    data-notif-list="{% url 'notification:notification_list_view' %}"
+                                    data-notif-settings="{% url 'notification:notification_settings_view' %}">
                                 <i class="bi bi-bell{% if unread_notification_count %}-fill{% endif %}"></i>
                                 {% if unread_notification_count %}
                                     <span class="saaf-notif-badge">{{ unread_notification_count }}</span>
@@ -305,8 +306,9 @@
 
         var API          = btn.dataset.notifApi;
         var MARK_ALL_URL = btn.dataset.notifMarkAll;
-        var MARK_ONE_URL = btn.dataset.notifMarkOne;
-        var LIST_URL     = btn.dataset.notifList;
+        var MARK_ONE_URL   = btn.dataset.notifMarkOne;
+        var LIST_URL       = btn.dataset.notifList;
+        var SETTINGS_URL   = btn.dataset.notifSettings;
         var dropdown = null;
         var isOpen   = false;
 
@@ -352,11 +354,14 @@
             d.className = 'saaf-notif-dropdown';
 
             var hdr = '<div class="saaf-notif-dd-header">' +
-                      '<span class="saaf-notif-dd-title">Notifications</span>';
+                      '<span class="saaf-notif-dd-title">Notifications</span>' +
+                      '<div class="saaf-notif-dd-header-actions">';
             if (count > 0) {
                 hdr += '<button class="saaf-notif-mark-btn" id="saaf-mark-all-btn">Mark all read</button>';
             }
-            hdr += '</div>';
+            hdr += '<a href="' + SETTINGS_URL + '" class="saaf-notif-dd-settings-btn" title="Notification settings">' +
+                   '<i class="bi bi-gear"></i></a>' +
+                   '</div></div>';
             d.innerHTML = hdr;
 
             var list = document.createElement('div');

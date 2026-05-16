@@ -861,6 +861,22 @@ a:hover {
     color: var(--ink, #1c1712);
 }
 
+.saaf-notif-dd-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.saaf-notif-dd-settings-btn {
+    font-size: 0.95rem;
+    color: var(--ink-light, #8a7a6e);
+    text-decoration: none;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.saaf-notif-dd-settings-btn:hover { color: var(--clay, #c2724f); }
+
 .saaf-notif-mark-btn {
     background: none;
     border: none;
