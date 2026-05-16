@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from notification.models import Notification
 from notification.utils import notify
+from rising_phoenix.moderation import image_is_clean, text_is_clean
 from request.models import Request
 from .forms import ProposalForm
 from .models import Proposal, ProposalImage
@@ -46,8 +47,13 @@ def _save_proposal_images(proposal, request_files, captions=None):
         if content_type.lower() not in allowed_types:
             skipped.append(f'"{image_file.name}" is not an accepted image type.')
             continue
+        if not image_is_clean(image_file):
+            skipped.append(f'"{image_file.name}" was removed: explicit content detected.')
+            continue
         try:
             caption = (captions[index] if index < len(captions) else '').strip()
+            if caption and not text_is_clean(caption):
+                caption = ''
             ProposalImage.objects.create(proposal=proposal, image=image_file, caption=caption[:160])
         except Exception:
             logger.exception('Failed to save proposal image "%s"', image_file.name)

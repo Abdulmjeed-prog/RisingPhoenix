@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 
 from notification.models import Notification
 from notification.utils import notify
+from rising_phoenix.moderation import image_is_clean, text_is_clean
 from .forms import ProgressCommentForm
 from .models import Contract, ContractEvent, ContractEventImage, ProgressComment, ProgressCommentImage, ProgressImage, ProgressUpdate
 
@@ -30,8 +31,13 @@ def _save_images(model_cls, fk_field, fk_obj, request_files, captions=None):
         if (getattr(image_file, 'content_type', '') or '').lower() not in allowed_types:
             skipped.append(f'"{image_file.name}" is not an accepted image type.')
             continue
+        if not image_is_clean(image_file):
+            skipped.append(f'"{image_file.name}" was removed: explicit content detected.')
+            continue
         try:
             caption = (captions[index] if index < len(captions) else '').strip()[:160]
+            if caption and not text_is_clean(caption):
+                caption = ''
             model_cls.objects.create(**{fk_field: fk_obj, 'image': image_file, 'caption': caption})
         except Exception:
             logger.exception('Failed to save image "%s"', image_file.name)
@@ -104,6 +110,10 @@ def post_update_view(request, contract_id):
         messages.error(request, 'Update text is required.')
         return redirect('progress:contract_detail_view', contract_id=contract_id)
 
+    if not text_is_clean(body):
+        messages.error(request, 'Your update contains inappropriate language. Please revise it.')
+        return redirect('progress:contract_detail_view', contract_id=contract_id)
+
     update = ProgressUpdate.objects.create(contract=contract, body=body)
     captions = request.POST.getlist('image_captions')
     for msg in _save_images(ProgressImage, 'update', update, request.FILES, captions):
@@ -171,6 +181,10 @@ def request_completion_view(request, contract_id):
         return redirect('progress:contract_detail_view', contract_id=contract_id)
 
     body = request.POST.get('body', '').strip()[:5000]
+    if body and not text_is_clean(body):
+        messages.error(request, 'Your message contains inappropriate language. Please revise it.')
+        return redirect('progress:contract_detail_view', contract_id=contract_id)
+
     contract.status = Contract.Status.COMPLETION_REQUESTED
     contract.save(update_fields=['status', 'updated_at'])
     event = ContractEvent.objects.create(
@@ -240,6 +254,10 @@ def reject_completion_view(request, contract_id):
         return redirect('progress:contract_detail_view', contract_id=contract_id)
 
     body = request.POST.get('body', '').strip()[:1000]
+    if body and not text_is_clean(body):
+        messages.error(request, 'Your message contains inappropriate language. Please revise it.')
+        return redirect('progress:contract_detail_view', contract_id=contract_id)
+
     contract.status = Contract.Status.IN_PROGRESS
     contract.save(update_fields=['status', 'updated_at'])
     event = ContractEvent.objects.create(

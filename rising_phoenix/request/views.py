@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.utils import timezone
 
+from rising_phoenix.moderation import image_is_clean, text_is_clean
 from .forms import RequestForm
 from .models import AIRefineLog, Request, RequestImage
 from workshop.models import Category, WorkshopProfile
@@ -82,8 +83,14 @@ def _save_uploaded_request_images(request_instance: Request, request_files, capt
 			logger.warning('Rejected disallowed content type "%s" for image "%s" on request id=%s', content_type, image_file.name, request_instance.id)
 			skipped.append(f'"{image_file.name}" is not an accepted image type (JPEG, PNG, WebP, GIF).')
 			continue
+		if not image_is_clean(image_file):
+			logger.warning('Rejected explicit image "%s" for request id=%s', image_file.name, request_instance.id)
+			skipped.append(f'"{image_file.name}" was removed: explicit content detected.')
+			continue
 		try:
 			caption = (captions[index] if index < len(captions) else '').strip()
+			if caption and not text_is_clean(caption):
+				caption = ''
 			RequestImage.objects.create(request=request_instance, image=image_file, caption=caption[:160])
 		except Exception:
 			logger.exception('Failed to save uploaded image "%s"', image_file.name)
