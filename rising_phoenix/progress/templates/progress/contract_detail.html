@@ -41,6 +41,17 @@
             <i class="bi bi-chat-dots-fill"></i> Start Chat
           </a>
         {% endif %}
+        {% if is_artisan and not contract.is_completed %}
+          <a href="#artisan-action-form" class="proposal-action-btn">
+            <i class="bi bi-arrow-down"></i> Post Update
+          </a>
+        {% endif %}
+        {% if is_requester and not contract.is_completed %}
+          <a href="#requester-action-form" class="proposal-action-btn">
+            <i class="bi bi-arrow-down"></i>
+            {% if contract.is_completion_requested %}Send Back{% else %}Give Feedback{% endif %}
+          </a>
+        {% endif %}
       </div>
     </header>
 
@@ -49,47 +60,18 @@
       <div class="progress-completion-banner">
         <i class="bi bi-check-circle-fill"></i>
         Project completed on {{ contract.completed_at|date:"N j, Y" }}.
-      </div>
-    {% endif %}
-
-    {# ── Artisan action form (above timeline) ── #}
-    {% if is_artisan and not contract.is_completed %}
-      <div class="progress-post-card">
-        <div class="progress-post-top">
-          <h2 class="progress-section-title" style="margin-bottom:0;">Post an Update</h2>
-        </div>
-        <form id="artisan-form" method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          <textarea name="body" class="progress-textarea" rows="3"
-            placeholder="Describe your progress or what you've completed..."></textarea>
-
-          <label class="request-label" style="margin-top:0.75rem;">Images (optional)</label>
-          <div class="img-upload-zone" id="artisan-img-upload-zone">
-            <input type="file" id="id_artisan_images" name="images"
-                   class="img-upload-input" accept="image/*" multiple>
-            <p class="img-upload-text">Click or drag images here</p>
-            <p class="img-upload-sub">Up to 5 &bull; JPEG, PNG, WebP &bull; Mark up to highlight your work</p>
-          </div>
-          <p id="artisan-img-count-badge" class="img-count-badge" hidden></p>
-          <div id="artisan-img-preview-grid" class="img-preview-grid" hidden></div>
-
-          <div class="progress-artisan-actions">
-            <button type="submit" class="request-action"
-              formaction="{% url 'progress:post_update_view' contract.id %}">
-              <i class="bi bi-send"></i> Post Update
-            </button>
-            {% if contract.is_in_progress %}
-              <button type="submit" class="proposal-action-btn proposal-action-btn--accept"
-                formaction="{% url 'progress:request_completion_view' contract.id %}"
-                formnovalidate
-                data-confirm-title="Mark as Complete"
-                data-confirm-body="This will ask the requester to review and confirm completion."
-                data-confirm-variant="accept">
-                <i class="bi bi-check-lg"></i> Mark as Complete
-              </button>
-            {% endif %}
-          </div>
-        </form>
+        {% if is_requester %}
+          {% if contract.proposal.request.review %}
+            <span style="margin-left:1rem; color:#27ae60;">
+              <i class="bi bi-check-lg"></i> Review submitted
+            </span>
+          {% else %}
+            <a href="{% url 'account:submit_review_view' contract.id %}"
+               class="proposal-action-btn proposal-action-btn--accept" style="margin-left:1rem;">
+              <i class="bi bi-star-fill"></i> Leave a Review
+            </a>
+          {% endif %}
+        {% endif %}
       </div>
     {% endif %}
 
@@ -229,13 +211,54 @@
     {% else %}
       <div class="progress-empty">
         <i class="bi bi-clock-history"></i>
-        <p>No updates yet. {% if is_artisan %}Post your first update above.{% else %}Check back soon.{% endif %}</p>
+        <p>No updates yet. {% if is_artisan %}Post your first update below.{% else %}Check back soon.{% endif %}</p>
+      </div>
+    {% endif %}
+
+    {# ── Artisan action form (below timeline) ── #}
+    {% if is_artisan and not contract.is_completed %}
+      <div class="progress-post-card" id="artisan-action-form">
+        <div class="progress-post-top">
+          <h2 class="progress-section-title" style="margin-bottom:0;">Post an Update</h2>
+        </div>
+        <form id="artisan-form" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <textarea name="body" class="progress-textarea" rows="3"
+            placeholder="Describe your progress or what you've completed..."></textarea>
+
+          <label class="request-label" style="margin-top:0.75rem;">Images (optional)</label>
+          <div class="img-upload-zone" id="artisan-img-upload-zone">
+            <input type="file" id="id_artisan_images" name="images"
+                   class="img-upload-input" accept="image/*" multiple>
+            <p class="img-upload-text">Click or drag images here</p>
+            <p class="img-upload-sub">Up to 5 &bull; JPEG, PNG, WebP &bull; Mark up to highlight your work</p>
+          </div>
+          <p id="artisan-img-count-badge" class="img-count-badge" hidden></p>
+          <div id="artisan-img-preview-grid" class="img-preview-grid" hidden></div>
+
+          <div class="progress-artisan-actions">
+            <button type="submit" class="request-action"
+              formaction="{% url 'progress:post_update_view' contract.id %}">
+              <i class="bi bi-send"></i> Post Update
+            </button>
+            {% if contract.is_in_progress %}
+              <button type="submit" class="proposal-action-btn proposal-action-btn--accept"
+                formaction="{% url 'progress:request_completion_view' contract.id %}"
+                formnovalidate
+                data-confirm-title="Mark as Complete"
+                data-confirm-body="This will ask the requester to review and confirm completion."
+                data-confirm-variant="accept">
+                <i class="bi bi-check-lg"></i> Mark as Complete
+              </button>
+            {% endif %}
+          </div>
+        </form>
       </div>
     {% endif %}
 
     {# ── Requester action form (below timeline) ── #}
     {% if is_requester and not contract.is_completed %}
-      <div class="progress-action-card">
+      <div class="progress-action-card" id="requester-action-form">
 
         {# Confirm complete — separate prominent form #}
         {% if contract.is_completion_requested %}

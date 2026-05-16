@@ -1,0 +1,85 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Notifications — Saaf{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/notification.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-lg py-5">
+
+    <div class="notif-page-header">
+        <h2 class="notif-page-title">Notifications</h2>
+        <div class="notif-page-meta">
+            {% if unread_count %}
+                <span class="notif-count-label">{{ unread_count }} unread</span>
+            {% elif notifications %}
+                <span class="notif-count-label">All caught up</span>
+            {% endif %}
+            <a href="{% url 'notification:notification_settings_view' %}" class="notif-settings-link" title="Notification settings">
+                <i class="bi bi-gear"></i>
+            </a>
+        </div>
+    </div>
+
+    {% if notifications %}
+        <div class="notif-list">
+            {% for n in notifications %}
+            <div class="notif-row {% if not n.is_read %}notif-row--unread{% endif %}" data-notif-id="{{ n.id }}">
+                <div class="notif-icon-wrap" style="color: {{ n.icon_color }}">
+                    <i class="bi {{ n.icon_class }}"></i>
+                </div>
+                <div class="notif-content">
+                    <p class="notif-title">{{ n.title }}</p>
+                    {% if n.body %}
+                        <p class="notif-body">{{ n.body }}</p>
+                    {% endif %}
+                    <span class="notif-date">{{ n.created_at|timesince }} ago</span>
+                </div>
+                {% if n.link %}
+                    <a href="{{ n.link }}" class="notif-view-btn">
+                        View <i class="bi bi-arrow-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="notif-empty">
+            <i class="bi bi-bell-slash"></i>
+            <p>You're all caught up — no notifications yet.</p>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    function csrf() {
+        var m = document.cookie.match(/csrftoken=([^;]+)/);
+        return m ? decodeURIComponent(m[1]) : '';
+    }
+
+    document.querySelectorAll('.notif-view-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            var row = btn.closest('.notif-row');
+            if (!row) return;
+            var id   = row.dataset.notifId;
+            var href = btn.href;
+            e.preventDefault();
+            row.classList.remove('notif-row--unread');
+            fetch('/notifications/api/mark-read/' + id + '/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrf() },
+            }).finally(function () {
+                window.location.href = href;
+            });
+        });
+    });
+})();
+</script>
+{% endblock %}

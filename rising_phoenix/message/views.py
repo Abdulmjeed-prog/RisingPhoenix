@@ -3,7 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from .models import Conversation, Message
+from notification.models import Notification
+from notification.utils import notify
 from proposal.models import Proposal
 
 @login_required
@@ -27,6 +30,13 @@ def start_conversation_view(request: HttpRequest, proposal_id: int) -> HttpRespo
 
     if created:
         messages.success(request, "Conversation started successfully.")
+        notify(
+            recipient=artisan,
+            notif_type=Notification.NotifType.MESSAGE_RECEIVED,
+            title=f'{requester.username} wants to chat',
+            body=f'About: {proposal.request.title}',
+            link=reverse('message:conversation_detail_view', args=[conversation.id]),
+        )
 
     return redirect('message:conversation_detail_view', conversation_id=conversation.id)
 
@@ -65,6 +75,18 @@ def conversation_detail_view(request, conversation_id):
                 sender=request.user,
                 body=body,
                 image=image
+            )
+            recipient = (
+                conversation.artisan
+                if request.user == conversation.requester
+                else conversation.requester
+            )
+            notify(
+                recipient=recipient,
+                notif_type=Notification.NotifType.MESSAGE_RECEIVED,
+                title=f'New message from {request.user.username}',
+                body=body[:120] if body else 'Sent an image',
+                link=reverse('message:conversation_detail_view', args=[conversation.id]),
             )
             return redirect('message:conversation_detail_view', conversation_id=conversation.id)
 
