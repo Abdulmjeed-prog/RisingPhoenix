@@ -87,6 +87,21 @@
                             <i class="bi bi-chat-dots"></i>
                             Messages
                         </a>
+                        <span class="saaf-bell-wrap">
+                            <button id="saaf-bell-btn" type="button"
+                                    class="btn btn-saaf-outline rounded-pill d-inline-flex align-items-center justify-content-center position-relative saaf-bell-btn"
+                                    aria-label="Notifications"
+                                    data-notif-api="{% url 'notification:recent_api_view' %}"
+                                    data-notif-mark-all="{% url 'notification:mark_all_read_view' %}"
+                                    data-notif-mark-one="/notifications/api/mark-read/"
+                                    data-notif-list="{% url 'notification:notification_list_view' %}"
+                                    data-notif-settings="{% url 'notification:notification_settings_view' %}">
+                                <i class="bi bi-bell{% if unread_notification_count %}-fill{% endif %}"></i>
+                                {% if unread_notification_count %}
+                                    <span class="saaf-notif-badge">{{ unread_notification_count }}</span>
+                                {% endif %}
+                            </button>
+                        </span>
                         {% if request.user.artisanprofile %}
                             <span class="btn btn-saaf-outline rounded-pill d-inline-flex align-items-center gap-2">
                                 <i class="bi bi-person-circle"></i>
@@ -282,6 +297,182 @@
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && overlay.style.display !== 'none') closeConfirm();
       });
+    })();
+    </script>
+
+    <!-- Notification dropdown + polling -->
+    <script>
+    (function () {
+        var btn = document.getElementById('saaf-bell-btn');
+        if (!btn) return;
+
+        var API          = btn.dataset.notifApi;
+        var MARK_ALL_URL = btn.dataset.notifMarkAll;
+        var MARK_ONE_URL   = btn.dataset.notifMarkOne;
+        var LIST_URL       = btn.dataset.notifList;
+        var SETTINGS_URL   = btn.dataset.notifSettings;
+        var dropdown = null;
+        var isOpen   = false;
+
+        function csrf() {
+            var m = document.cookie.match(/csrftoken=([^;]+)/);
+            return m ? decodeURIComponent(m[1]) : '';
+        }
+
+        function esc(text) {
+            var d = document.createElement('div');
+            d.appendChild(document.createTextNode(text || ''));
+            return d.innerHTML;
+        }
+
+        function ago(iso) {
+            var s = Math.floor((Date.now() - new Date(iso)) / 1000);
+            if (s < 60)    return 'just now';
+            if (s < 3600)  return Math.floor(s / 60) + 'm ago';
+            if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+            return Math.floor(s / 86400) + 'd ago';
+        }
+
+        function setBadge(count) {
+            var badge = btn.querySelector('.saaf-notif-badge');
+            var icon  = btn.querySelector('i');
+            if (count > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'saaf-notif-badge';
+                    btn.appendChild(badge);
+                }
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = '';
+                if (icon) icon.className = 'bi bi-bell-fill';
+            } else {
+                if (badge) badge.style.display = 'none';
+                if (icon) icon.className = 'bi bi-bell';
+            }
+        }
+
+        function buildDropdown(notifs, count) {
+            var d = document.createElement('div');
+            d.className = 'saaf-notif-dropdown';
+
+            var hdr = '<div class="saaf-notif-dd-header">' +
+                      '<span class="saaf-notif-dd-title">Notifications</span>' +
+                      '<div class="saaf-notif-dd-header-actions">';
+            if (count > 0) {
+                hdr += '<button class="saaf-notif-mark-btn" id="saaf-mark-all-btn">Mark all read</button>';
+            }
+            hdr += '<a href="' + SETTINGS_URL + '" class="saaf-notif-dd-settings-btn" title="Notification settings">' +
+                   '<i class="bi bi-gear"></i></a>' +
+                   '</div></div>';
+            d.innerHTML = hdr;
+
+            var list = document.createElement('div');
+            list.className = 'saaf-notif-dd-list';
+
+            if (notifs.length === 0) {
+                list.innerHTML = '<div class="saaf-notif-dd-empty">' +
+                    '<i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>';
+            } else {
+                notifs.forEach(function (n) {
+                    var tag  = n.link ? 'a' : 'div';
+                    var item = document.createElement(tag);
+                    item.className = 'saaf-notif-dd-item' + (n.is_read ? '' : ' saaf-notif-dd-item--unread');
+                    if (n.link) { item.href = n.link; }
+                    item.innerHTML =
+                        '<div class="saaf-notif-dd-icon" style="color:' + n.icon_color + '">' +
+                            '<i class="bi ' + n.icon_class + '"></i>' +
+                        '</div>' +
+                        '<div class="saaf-notif-dd-content">' +
+                            '<p class="saaf-notif-dd-item-title">' + esc(n.title) + '</p>' +
+                            (n.body ? '<p class="saaf-notif-dd-item-body">' + esc(n.body) + '</p>' : '') +
+                            '<span class="saaf-notif-dd-item-time">' + ago(n.created_at) + '</span>' +
+                        '</div>';
+                    item.addEventListener('click', function (e) {
+                        item.classList.remove('saaf-notif-dd-item--unread');
+                        markOneRead(n.id);
+                        if (n.link) {
+                            e.preventDefault();
+                            setTimeout(function () { window.location.href = n.link; }, 150);
+                        }
+                    });
+                    list.appendChild(item);
+                });
+            }
+            d.appendChild(list);
+
+            var footer = document.createElement('a');
+            footer.className = 'saaf-notif-dd-footer';
+            footer.href = LIST_URL;
+            footer.textContent = 'View all notifications';
+            d.appendChild(footer);
+
+            return d;
+        }
+
+        function markAllRead() {
+            fetch(MARK_ALL_URL, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrf() },
+            }).then(function () { setBadge(0); });
+        }
+
+        function markOneRead(id) {
+            fetch(MARK_ONE_URL + id + '/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrf() },
+            }).then(function (r) { return r.json(); })
+              .then(function (data) { setBadge(data.count); });
+        }
+
+        function openDropdown() {
+            fetch(API)
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (dropdown) { dropdown.remove(); }
+                    dropdown = buildDropdown(data.notifications, data.count);
+                    btn.closest('.saaf-bell-wrap').appendChild(dropdown);
+                    isOpen = true;
+
+                    var markBtn = document.getElementById('saaf-mark-all-btn');
+                    if (markBtn) {
+                        markBtn.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            markAllRead();
+                            markBtn.remove();
+                            dropdown.querySelectorAll('.saaf-notif-dd-item--unread')
+                                .forEach(function (el) { el.classList.remove('saaf-notif-dd-item--unread'); });
+                        });
+                    }
+
+                });
+        }
+
+        function closeDropdown() {
+            if (dropdown) { dropdown.remove(); dropdown = null; }
+            isOpen = false;
+        }
+
+        btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            isOpen ? closeDropdown() : openDropdown();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (isOpen && dropdown && !dropdown.contains(e.target)) { closeDropdown(); }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && isOpen) { closeDropdown(); }
+        });
+
+        // Poll every 30s for badge count
+        setInterval(function () {
+            if (!isOpen) {
+                fetch(API)
+                    .then(function (r) { return r.json(); })
+                    .then(function (data) { setBadge(data.count); });
+            }
+        }, 30000);
     })();
     </script>
 

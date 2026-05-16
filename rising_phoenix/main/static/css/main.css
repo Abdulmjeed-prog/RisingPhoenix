@@ -800,6 +800,207 @@ a:hover {
    FOOTER STYLES
    ============================================ */
 
+/* Notification bell */
+.saaf-bell-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.saaf-bell-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.saaf-notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--clay, #c2724f);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 700;
+    border-radius: 10px;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* Notification dropdown */
+.saaf-notif-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 320px;
+    max-width: calc(100vw - 1.5rem);
+    background: #fff;
+    border: 1px solid var(--sand, #e8ddd3);
+    border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    z-index: 1055;
+    overflow: hidden;
+}
+
+.saaf-notif-dd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--sand, #e8ddd3);
+}
+
+.saaf-notif-dd-title {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--ink, #1c1712);
+}
+
+.saaf-notif-dd-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.saaf-notif-dd-settings-btn {
+    font-size: 0.95rem;
+    color: var(--ink-light, #8a7a6e);
+    text-decoration: none;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.saaf-notif-dd-settings-btn:hover { color: var(--clay, #c2724f); }
+
+.saaf-notif-mark-btn {
+    background: none;
+    border: none;
+    font-size: 0.78rem;
+    color: var(--clay, #c2724f);
+    cursor: pointer;
+    padding: 0;
+    font-weight: 600;
+}
+
+.saaf-notif-mark-btn:hover {
+    color: #a85c3a;
+}
+
+.saaf-notif-dd-list {
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.saaf-notif-dd-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--sand, #e8ddd3);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.12s, opacity 0.2s;
+    cursor: default;
+    opacity: 0.5;
+}
+
+a.saaf-notif-dd-item {
+    cursor: pointer;
+}
+
+.saaf-notif-dd-item:last-child {
+    border-bottom: none;
+}
+
+.saaf-notif-dd-item--unread {
+    background: #fdfaf5;
+    opacity: 1;
+}
+
+.saaf-notif-dd-item:hover {
+    background: #f9f5ef;
+    color: inherit;
+}
+
+.saaf-notif-dd-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+    padding-top: 2px;
+}
+
+.saaf-notif-dd-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.saaf-notif-dd-item-title {
+    font-size: 0.83rem;
+    font-weight: 500;
+    color: var(--ink, #1c1712);
+    margin: 0 0 0.15rem;
+    line-height: 1.35;
+}
+
+.saaf-notif-dd-item--unread .saaf-notif-dd-item-title {
+    font-weight: 700;
+}
+
+.saaf-notif-dd-item-body {
+    font-size: 0.77rem;
+    color: var(--ink-light, #8a7a6e);
+    margin: 0 0 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.saaf-notif-dd-item-time {
+    font-size: 0.72rem;
+    color: var(--ink-light, #8a7a6e);
+}
+
+.saaf-notif-dd-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--ink-light, #8a7a6e);
+}
+
+.saaf-notif-dd-empty i {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    opacity: 0.4;
+}
+
+.saaf-notif-dd-empty p {
+    margin: 0;
+    font-size: 0.83rem;
+}
+
+.saaf-notif-dd-footer {
+    display: block;
+    text-align: center;
+    padding: 0.7rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--clay, #c2724f);
+    text-decoration: none;
+    border-top: 1px solid var(--sand, #e8ddd3);
+    background: #fdfaf5;
+    transition: background 0.12s;
+}
+
+.saaf-notif-dd-footer:hover {
+    background: #f5ede4;
+    color: #a85c3a;
+}
+
 /* Toast notifications */
 .saaf-toast-container {
     position: fixed;

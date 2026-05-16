@@ -4,9 +4,12 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from notification.models import Notification
+from notification.utils import notify
 from .forms import ProgressCommentForm
 from .models import Contract, ContractEvent, ContractEventImage, ProgressComment, ProgressCommentImage, ProgressImage, ProgressUpdate
 
@@ -106,7 +109,13 @@ def post_update_view(request, contract_id):
     for msg in _save_images(ProgressImage, 'update', update, request.FILES, captions):
         messages.warning(request, f'Image skipped: {msg}')
     messages.success(request, 'Progress update posted.')
-    # TODO Notifications: notify requester that a new update was posted
+    notify(
+        contract.requester,
+        Notification.NotifType.PROGRESS_UPDATE,
+        'New progress update on your project',
+        body=body[:200] if body else '',
+        link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract_id}),
+    )
     return redirect('progress:contract_detail_view', contract_id=contract_id)
 
 
@@ -134,7 +143,14 @@ def add_comment_view(request, update_id):
         captions = request.POST.getlist('image_captions')
         for msg in _save_images(ProgressCommentImage, 'comment', comment, request.FILES, captions):
             messages.warning(request, f'Image skipped: {msg}')
-        # TODO Notifications: notify the other party that a comment was posted
+        other_party = contract.artisan if request.user == contract.requester else contract.requester
+        notify(
+            other_party,
+            Notification.NotifType.COMMENT_ADDED,
+            'New feedback on your project',
+            body=form.cleaned_data['body'][:200],
+            link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract.id}),
+        )
     else:
         messages.error(request, 'Feedback cannot be empty.')
 
@@ -167,7 +183,13 @@ def request_completion_view(request, contract_id):
     for msg in _save_images(ContractEventImage, 'event', event, request.FILES, captions):
         messages.warning(request, f'Image skipped: {msg}')
     messages.success(request, 'Completion requested. Waiting for the requester to confirm.')
-    # TODO Notifications: notify requester that artisan has marked the project complete
+    notify(
+        contract.requester,
+        Notification.NotifType.COMPLETION_REQUESTED,
+        'Your artisan has marked the project as complete',
+        body='Please review the work and confirm or send it back.',
+        link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract_id}),
+    )
     return redirect('progress:contract_detail_view', contract_id=contract_id)
 
 
@@ -193,9 +215,14 @@ def confirm_completion_view(request, contract_id):
         actor=request.user,
     )
     messages.success(request, 'Project confirmed as complete. Thank you!')
-    # TODO Notifications: notify artisan that the project is confirmed complete
+    notify(
+        contract.artisan,
+        Notification.NotifType.COMPLETION_CONFIRMED,
+        'Your project has been confirmed as complete',
+        body='Congratulations! The requester has confirmed the work is done.',
+        link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract_id}),
+    )
     # TODO Escrow: contract.completed_at is the trigger for payment release
-    # TODO Reviews: contract.status == 'completed' unlocks the review form
     return redirect('progress:contract_detail_view', contract_id=contract_id)
 
 
@@ -225,5 +252,11 @@ def reject_completion_view(request, contract_id):
     for msg in _save_images(ContractEventImage, 'event', event, request.FILES, captions):
         messages.warning(request, f'Image skipped: {msg}')
     messages.success(request, 'Sent back. The project is back in progress.')
-    # TODO Notifications: notify artisan that requester has rejected the completion
+    notify(
+        contract.artisan,
+        Notification.NotifType.COMPLETION_REJECTED,
+        'Completion request was sent back',
+        body=body if body else 'The requester sent the project back for more work.',
+        link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract_id}),
+    )
     return redirect('progress:contract_detail_view', contract_id=contract_id)
