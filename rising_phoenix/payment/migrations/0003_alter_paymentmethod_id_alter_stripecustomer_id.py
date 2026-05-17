@@ -6,12 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('staff', '0005_alter_report_id'),
+        ('payment', '0002_alter_paymentmethod_id_alter_stripecustomer_id'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='report',
+            model_name='paymentmethod',
+            name='id',
+            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
+        ),
+        migrations.AlterField(
+            model_name='stripecustomer',
             name='id',
             field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
         ),

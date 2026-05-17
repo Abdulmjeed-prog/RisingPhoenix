@@ -173,45 +173,81 @@
         return div.innerHTML;
     }
 
-    function addOptimisticMessage(text, imageSrc) {
-        const emptyState = document.getElementById('empty-chat');
-        if (emptyState) emptyState.remove();
+    function showToast(message, type = 'error') {
+        const iconMap = {
+            success: '<i class="bi bi-check-circle-fill text-success"></i>',
+            error:   '<i class="bi bi-x-circle-fill text-danger"></i>',
+            warning: '<i class="bi bi-exclamation-triangle-fill text-warning"></i>',
+        };
+        const icon = iconMap[type] || '<i class="bi bi-info-circle-fill text-info"></i>';
 
-        const wrapper = document.createElement('div');
-        wrapper.className = 'd-flex justify-content-end';
-        wrapper.setAttribute('data-optimistic-message', 'true');
+        let container = document.querySelector('.saaf-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'saaf-toast-container';
+            container.setAttribute('aria-live', 'polite');
+            container.setAttribute('aria-atomic', 'true');
+            document.body.appendChild(container);
+        }
 
-        wrapper.innerHTML = `
-            <div class="rounded-4 px-3 py-3 shadow-sm bg-primary text-white"
-                 style="max-width: 75%; min-width: 180px; opacity: 0.88;">
-                <div class="d-flex justify-content-between align-items-center mb-2 gap-3">
-                    <span class="fw-semibold small">You</span>
-                    <span class="small text-white-50">Sending...</span>
+        const toastEl = document.createElement('div');
+        toastEl.className = 'toast saaf-toast align-items-center border-0 show';
+        toastEl.setAttribute('data-bs-autohide', 'true');
+        toastEl.setAttribute('data-bs-delay', '4500');
+        toastEl.setAttribute('role', 'alert');
+        toastEl.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    ${icon}
+                    ${escapeHtml(message)}
                 </div>
-                ${imageSrc ? `
-                    <div class="${text ? 'mb-3' : 'mb-0'}">
-                        <img
-                            src="${escapeHtml(imageSrc)}"
-                            alt="Uploading image preview"
-                            class="img-fluid rounded-4"
-                            style="max-width: 280px; max-height: 320px; object-fit: cover;"
-                        >
-                    </div>
-                ` : ''}
-                ${text ? `<p class="mb-0" style="white-space: pre-line;">${escapeHtml(text)}</p>` : ''}
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         `;
+        container.appendChild(toastEl);
 
-        messagesWrapper.appendChild(wrapper);
-        shouldStickToBottom = true;
-        scrollToBottom(true);
-
-        return wrapper;
+        const bsToast = new bootstrap.Toast(toastEl);
+        bsToast.show();
+        toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
     }
 
-    function removeOptimisticMessage(element) {
-        if (element && element.parentNode) {
-            element.parentNode.removeChild(element);
+    async function submitMessageForm() {
+        const hasText = bodyInput.value.trim().length > 0;
+        const hasImage = imageInput.files && imageInput.files.length > 0;
+
+        if (!hasText && !hasImage) {
+            alert('Please write a message or attach an image.');
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                showToast(data.error || 'Something went wrong while sending the message.');
+                return;
+            }
+
+            bodyInput.value = '';
+            imageInput.value = '';
+            imagePreview.src = '';
+            imagePreviewWrapper.classList.add('d-none');
+
+            shouldStickToBottom = true;
+            await fetchMessages();
+            scrollToBottom(true);
+        } catch (error) {
+            console.error(error);
+            showToast('Something went wrong while sending the message.');
         }
     }
 
