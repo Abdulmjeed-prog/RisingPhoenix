@@ -10,10 +10,11 @@
 }
 
 .notif-page-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 1.8rem;
     color: var(--ink, #1c1712);
     margin: 0;
+    font-weight: 700;
 }
 
 .notif-page-meta {
@@ -40,7 +41,7 @@
 }
 
 .notif-mark-all-btn:hover {
-    color: #a85c3a;
+    color: var(--saaf-btn-hover, #A95E49);
 }
 
 .notif-settings-link {
@@ -66,7 +67,7 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    background: #fff;
+    background: var(--saaf-white, #FFF8F0);
     border-bottom: 1px solid var(--sand, #e8ddd3);
     border-left: 3px solid transparent;
     transition: background 0.12s, opacity 0.2s;
@@ -78,7 +79,7 @@
 }
 
 .notif-row--unread {
-    background: #fdfaf5;
+    background: var(--saaf-beige, #F8EDDF);
     border-left-color: var(--clay, #c2724f);
     opacity: 1;
 }
@@ -88,7 +89,7 @@
 }
 
 .notif-row:hover {
-    background: #f9f5ef;
+    background: var(--saaf-beige, #F8EDDF);
 }
 
 .notif-icon-wrap {
@@ -137,7 +138,7 @@
 }
 
 .notif-view-btn:hover {
-    color: #a85c3a;
+    color: var(--saaf-btn-hover, #A95E49);
 }
 
 .notif-empty {
@@ -178,7 +179,7 @@
     gap: 0.3rem;
 }
 
-.notif-back-link:hover { color: #a85c3a; }
+.notif-back-link:hover { color: var(--saaf-btn-hover, #A95E49); }
 
 .notif-settings-grid {
     display: grid;
@@ -195,7 +196,7 @@
     border: 1px solid var(--sand, #e8ddd3);
     border-radius: 14px;
     overflow: hidden;
-    background: #fff;
+    background: var(--saaf-white, #FFF8F0);
 }
 
 .notif-settings-card-header {
@@ -203,7 +204,7 @@
     align-items: center;
     gap: 0.85rem;
     padding: 1.1rem 1.25rem;
-    background: #fdfaf5;
+    background: var(--saaf-beige, #F8EDDF);
     border-bottom: 1px solid var(--sand, #e8ddd3);
 }
 
@@ -216,10 +217,11 @@
 .notif-settings-card-titles { flex: 1; min-width: 0; }
 
 .notif-settings-card-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 1.05rem;
     color: var(--ink, #1c1712);
     margin: 0;
+    font-weight: 700;
 }
 
 .notif-settings-card-desc {
@@ -300,7 +302,7 @@
 .notif-slider, .notif-master-slider {
     position: absolute;
     inset: 0;
-    background: #d4c9be;
+    background: rgba(74, 52, 40, 0.24);
     border-radius: 24px;
     transition: background 0.2s;
 }
@@ -312,7 +314,7 @@
     height: 18px;
     left: 3px;
     top: 3px;
-    background: #fff;
+    background: var(--saaf-white, #FFF8F0);
     border-radius: 50%;
     transition: transform 0.2s;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
@@ -335,7 +337,7 @@
 
 .notif-save-btn {
     background: var(--clay, #c2724f);
-    color: #fff;
+    color: var(--saaf-white, #FFF8F0);
     border: none;
     border-radius: 8px;
     padding: 0.65rem 1.75rem;
@@ -345,4 +347,23 @@
     transition: background 0.15s;
 }
 
-.notif-save-btn:hover { background: #a85c3a; }
+.notif-save-btn:hover { background: var(--saaf-btn-hover, #A95E49); }
+
+[data-theme="dark"] .notif-row,
+[data-theme="dark"] .notif-settings-card,
+[data-theme="dark"] .notif-settings-card-header,
+[data-theme="dark"] .notif-empty,
+[data-theme="dark"] .notif-list {
+    background: var(--saaf-white) !important;
+    border-color: var(--saaf-border) !important;
+}
+
+[data-theme="dark"] .notif-row--unread,
+[data-theme="dark"] .notif-row:hover {
+    background: var(--saaf-beige) !important;
+}
+
+[data-theme="dark"] .notif-slider,
+[data-theme="dark"] .notif-master-slider {
+    background: rgba(245, 230, 211, 0.28);
+}

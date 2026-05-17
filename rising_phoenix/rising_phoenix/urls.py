@@ -21,6 +21,7 @@ from . import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
     path('', include('main.urls')),
     path('account/', include('account.urls')),
     path('staff/', include('staff.urls')),

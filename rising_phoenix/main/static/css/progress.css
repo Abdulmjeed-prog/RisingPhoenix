@@ -1,6 +1,14 @@
 /* ── Progress / Contract workspace ── */
 
 /* Status pills */
+:root {
+    --sand: var(--saaf-beige, #E0D2B4);
+    --clay: var(--saaf-brown-light, #B08C5A);
+    --ink: var(--saaf-brown, #6B4826);
+    --ink-light: var(--saaf-text-muted, #8B6841);
+    --cream: var(--saaf-bg, #F1E8D5);
+    --border: rgba(107, 72, 38, 0.14);
+}
 .progress-status-pill {
     display: inline-block;
     padding: 0.2em 0.7em;
@@ -12,12 +20,12 @@
     vertical-align: middle;
 }
 .progress-status-pill--in_progress          { background: #e8f4fd; color: #1a6fa8; }
-.progress-status-pill--completion_requested { background: #fff8e1; color: #b07c00; }
+.progress-status-pill--completion_requested { background: #F5EDDC; color: #8B5E3C; }
 .progress-status-pill--completed            { background: #e6f9f0; color: #1a7a4a; }
-
+.progress-status-pill--in_progress          { background: #E8EEF5; color: #2E5282; }
 /* Artisan / requester action button row */
 .progress-artisan-actions {
-    display: flex;
+.progress-status-pill--completed            { background: #EAF0E8; color: #3A6B35; }
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-top: 0.75rem;
@@ -45,12 +53,12 @@
 
 .proposal-action-btn--chat {
     background: var(--clay, #c2724f);
-    color: #fff;
+    color: #F5F0E6;
     border-color: var(--clay, #c2724f);
 }
 .proposal-action-btn--chat:hover {
     background: #a85c3a;
-    color: #fff;
+    color: #F5F0E6;
 }
 
 /* Completion banners */
@@ -59,7 +67,7 @@
     border: 1px solid #a3d9bc;
     border-radius: 10px;
     color: #1a7a4a;
-    padding: 1rem 1.25rem;
+    background: #EAF0E8;
     margin-bottom: 1.5rem;
     font-weight: 600;
     display: flex;
@@ -68,7 +76,7 @@
 }
 
 .progress-completion-request-banner {
-    background: #fff8e1;
+    background: #F5EDDC;
     border: 1px solid #ffe082;
     border-radius: 10px;
     color: #7a5f00;
@@ -118,7 +126,7 @@
     color: var(--ink, #1c1712);
 }
 
-.progress-sendback-textarea:focus {
+    background: var(--cream);
     outline: none;
     border-color: var(--clay, #c2724f);
 }
@@ -128,7 +136,7 @@
     border: 1px solid #c5d0f5;
     border-radius: 10px;
     color: #3550a8;
-    padding: 0.9rem 1.25rem;
+    background: #E8EEF5;
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
@@ -138,7 +146,7 @@
 
 /* Post update card (above timeline) */
 .progress-post-card {
-    background: #fff;
+    background: #EADDCA;
     border: 1px solid var(--sand, #e8ddd3);
     border-radius: 14px;
     padding: 1.5rem;
@@ -156,10 +164,11 @@
 
 /* Section title */
 .progress-section-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 1.3rem;
     color: var(--ink, #1c1712);
     margin-bottom: 1.5rem;
+    font-weight: 700;
 }
 
 /* Timeline */
@@ -185,7 +194,7 @@
     height: 12px;
     background: var(--clay, #c2724f);
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 2px solid #F5F0E6;
     box-shadow: 0 0 0 2px var(--clay, #c2724f);
 }
 
@@ -208,14 +217,14 @@
     border: 1px solid var(--sand, #e8ddd3);
     border-radius: 10px;
     padding: 0.75rem 1rem;
-}
+    background: var(--cream);
 
 .progress-event-card--completion_requested {
     background: #f0faf5;
     border-color: #a3d9bc;
 }
 .progress-event-card--completion_rejected {
-    background: #fffdf0;
+    background: #EAF0E8;
     border-color: #ffe082;
 }
 .progress-event-card--completed {
@@ -261,7 +270,7 @@
 
 /* Update card */
 .progress-update-card {
-    background: #fff;
+    background: #EADDCA;
     border: 1px solid var(--sand, #e8ddd3);
     border-radius: 12px;
     padding: 1.25rem;
@@ -407,14 +416,14 @@
     background: #fdfaf5;
 }
 
-.progress-textarea--comment:focus {
+    background: var(--cream);
     outline: none;
     border-color: var(--clay, #c2724f);
 }
 
 .progress-comment-submit {
     background: var(--clay, #c2724f);
-    color: #fff;
+    color: #F5F0E6;
     border: none;
     border-radius: 8px;
     padding: 0.5rem 0.75rem;
@@ -429,7 +438,7 @@
 
 /* Action card (mark-complete / decision) */
 .progress-action-card {
-    background: #fff;
+    background: #EADDCA;
     border: 1px solid var(--sand, #e8ddd3);
     border-radius: 14px;
     padding: 1.5rem;
@@ -524,7 +533,7 @@
     background: #fdfaf5;
     color: var(--ink, #1c1712);
     margin-bottom: 0.5rem;
-}
+    background: var(--cream);
 
 .progress-textarea:focus {
     outline: none;

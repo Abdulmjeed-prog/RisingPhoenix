@@ -3,14 +3,26 @@ from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from workshop.models import Category
+from workshop.models import WorkshopProfile
 from django.db.models import Q, Avg
 
 
 # Create your views here.
 
 def home_view(request:HttpRequest):
+    latest_workshops = (
+        WorkshopProfile.objects
+        .filter(is_published=True)
+        .select_related('artisan__user')
+        .prefetch_related('categories')
+        .order_by('-created_at')[:8]
+    )
 
-    return render(request,'main/index.html')
+    context = {
+        'latest_workshops': latest_workshops,
+    }
+
+    return render(request, 'main/index.html', context)
 
 
 @login_required(login_url='account:login_view')
