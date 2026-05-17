@@ -533,7 +533,64 @@
         {% empty %}
         <p class="stat-detail">No active orders currently.</p>
         {% endfor %}
-
+        <!-- Completed Orders -->
+        
+        <div class="section-header" style="margin-top:28px;">
+            <div class="section-title" style="margin:0;">
+                Completed Orders
+            </div>
+        </div>
+        
+        {% for contract in completed_orders %}
+        
+        <div class="order-card">
+        
+            <div class="order-icon">
+                ✅
+            </div>
+        
+            <div class="order-info">
+        
+                <h6>
+                    {{ contract.proposal.request.title }}
+                </h6>
+        
+                <p>
+        
+                    Customer:
+                    {{ contract.requester.get_full_name }}
+        
+                    <br>
+        
+                    Amount:
+                    SAR {{ contract.proposal.price }}
+        
+                    <br>
+        
+                    Completed:
+                    {{ contract.completed_at|date:"M d, Y" }}
+        
+                </p>
+        
+            </div>
+        
+            <div class="order-right">
+        
+                <span class="badge-status badge-in-progress">
+                    Completed
+                </span>
+        
+            </div>
+        
+        </div>
+        
+        {% empty %}
+        
+        <p class="stat-detail">
+            No completed orders yet
+        </p>
+        
+        {% endfor %}
         <!-- My Proposals -->
         <div class="section-header" style="margin-top: 28px;">
             <div class="section-title" style="margin: 0;">My Proposals</div>
