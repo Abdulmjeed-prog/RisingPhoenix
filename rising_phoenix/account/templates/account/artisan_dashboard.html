@@ -58,16 +58,16 @@
             <a href="{% url 'proposal:my_proposals_view' %}">
                 <i class="bi bi-clipboard-check"></i>
                 <span>My Proposals</span>
-                <span class="sidebar-badge">{{ stats.my_proposals }}</span>
+                <!-- <span class="sidebar-badge">{{ stats.my_proposals }}</span> -->
             </a>
-            <a href="{% url 'workshop:projects_list_view' artisan.user.id %}">
+            <a href="{% url 'account:completed_orders_view' %}">
                 <i class="bi bi-check-circle-fill"></i>
                 <span>Completed</span>
             </a>
             <a href="{% url 'message:conversation_list_view' %}">
                 <i class="bi bi-chat-dots"></i>
                 <span>Messages</span>
-                <span class="sidebar-badge">2</span>
+                <!-- <span class="sidebar-badge">{{ stats.messages }}</span> -->
             </a>
             <a href="{% url 'workshop:workshop_detail_view' artisan_id=request.user.id %}">
                 <i class="bi bi-images"></i>
@@ -97,8 +97,6 @@
             <div class="header-right">
                 <a href="{% url 'request:request_list_view' %}" class="btn btn-outline-primary">Browse Open Requests
                     →</a>
-                <a href="{% url 'workshop:create_project_view' %}" class="btn btn-primary" style="margin-left:12px;">Add
-                    Completed Project</a>
             </div>
         </div>
     </div>

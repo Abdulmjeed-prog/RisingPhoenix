@@ -15,6 +15,8 @@ from twilio.rest import Client
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from notification.utils import send_welcome_email, send_artisan_welcome_email
+from django.core.paginator import Paginator
+from request.models import Request
 from staff.views import submit_report_view, my_reports_view  # re-export for account URLs
 # Create your views here.
 
@@ -343,11 +345,11 @@ def artisan_dashboard_view(request: HttpRequest):
         'workshop': workshop,
         'stats': stats,
 
-        'active_contracts': active_contracts_qs[:5],
+        'active_contracts': active_contracts_qs[:3],
 
-        'completed_orders': completed_orders[:10],
+        'completed_orders': completed_orders[:3],
 
-        'my_proposals': my_proposals_qs[:5],
+        'my_proposals': my_proposals_qs[:3],
 
         'requests_matching_list': requests_matching_list,
 
@@ -538,5 +540,38 @@ def password_reset_view(request: HttpRequest):
         form = PasswordResetForm()
 
     return render(request, 'account/password_reset.html', {'form': form})
+
+@login_required(login_url='account:login_view')
+@user_passes_test(is_artisan, login_url='main:home_view')
+def completed_orders_view(request):
+
+    completed_requests = (
+        Request.objects.filter(
+            status=Request.Status.CLOSED,
+            proposals__artisan=request.user
+        )
+        .distinct()
+        .order_by('-created_at')
+    )
+
+    paginator = Paginator(
+        completed_requests,
+        6
+    )
+
+    page_number = request.GET.get('page')
+
+    page_obj = paginator.get_page(
+        page_number
+    )
+
+    return render(
+        request,
+        'account/completed_orders.html',
+        {
+            'requests': page_obj,
+            'page_obj': page_obj
+        }
+    )
 
 

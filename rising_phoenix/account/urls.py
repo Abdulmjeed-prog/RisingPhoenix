@@ -16,6 +16,7 @@ urlpatterns = [
     path('profile/<user_name>', views.profile_view, name='profile_view'),
     path('profile/<user_name>/update', views.update_profile_view, name='update_profile_view'),
     path('profile/<user_name>/verified_phone', views.verify_phone_view, name='verify_phone_view'),
+    path('completed-orders/', views.completed_orders_view, name='completed_orders_view'),
     path('account/profile/<str:user_name>/send-phone-verification/', views.send_phone_verification_view, name='send_phone_verification'),
     # Report & flagging (user-facing)
     path('report/<str:content_type>/<int:object_id>/', views.submit_report_view, name='submit_report_view'),

@@ -105,7 +105,6 @@
                     <strong>{{ project.title }}</strong>
                     <div class="small text-muted">{{ project.date_completed }}</div>
                 </div>
-
             </div>
             {% endfor %}
         </div>
@@ -154,41 +153,20 @@
       {% endfor %}
     </div>
 
-    <!-- MODAL -->
-
+    <!-- PORTFOLIO IMAGE MODAL -->
     <div class="modal fade portfolio-modal" id="portfolioImageModal" tabindex="-1" aria-hidden="true">
-
         <div class="modal-dialog modal-dialog-centered modal-xl">
-
             <div class="modal-content">
-
-                <div class="modal-header">
-
-                    <div>
-                        <h5 class="modal-title" id="portfolioModalTitle">
-
-                            Portfolio Image
-                        </h5>
-                    </div>
-
-                    <button type="button" class="btn-close" data-bs-dismiss="modal">
-                    </button>
-
-                </div>
-
+                <div class="modal-header"><div><h5 class="modal-title" id="portfolioModalTitle">Portfolio Image</h5></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body p-4">
-
                     <img src="" id="portfolioModalImage" class="portfolio-modal-image">
-
-                    <div class="portfolio-modal-caption" id="portfolioModalCaption">
-                    </div>
-
+                    <div class="portfolio-modal-caption" id="portfolioModalCaption"></div>
+                    {% if can_edit_portfolio %}
+                        <form method="post" id="portfolioCaptionForm" style="margin-top:16px;">{% csrf_token %}<input type="hidden" name="portfolio_image_id" id="portfolioImageIdInput" value=""><div><label for="captionInput" style="font-weight:600;">Edit description</label><textarea id="captionInput" name="caption" rows="3" style="width:100%;padding:8px;border:1px solid #e0ccb9;border-radius:8px;margin-top:8px;"></textarea></div><div style="display:flex;gap:8px;margin-top:10px;"><button type="submit" class="btn btn-primary">Save</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div></form>
+                    {% endif %}
                 </div>
-
             </div>
-
         </div>
-
     </div>
 </div>
 {% endif %}
