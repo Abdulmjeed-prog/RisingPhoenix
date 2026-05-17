@@ -154,65 +154,70 @@
     const removeImageBtn = document.getElementById('remove-image');
     const form = document.getElementById('message-form');
     const bodyInput = document.getElementById('body');
-    let shouldStickToBottom = true;
+    const submitButton = form ? form.querySelector('button[type="submit"]') : null;
 
-    let lastRendered = messagesWrapper.innerHTML.trim();
+    let shouldStickToBottom = true;
+    let isSubmitting = false;
+    let lastRendered = messagesWrapper ? messagesWrapper.innerHTML.trim() : '';
 
     function scrollToBottom(force = false) {
+        if (!chatBox) return;
         if (force || shouldStickToBottom) {
             chatBox.scrollTop = chatBox.scrollHeight;
         }
     }
-
-        chatBox.addEventListener('scroll', function () {
-        const nearBottom = chatBox.scrollTop + chatBox.clientHeight >= chatBox.scrollHeight - 80;
-        shouldStickToBottom = nearBottom;
-    });
 
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text || '';
         return div.innerHTML;
     }
-    async function submitMessageForm() {
-        const hasText = bodyInput.value.trim().length > 0;
-        const hasImage = imageInput.files && imageInput.files.length > 0;
 
-        if (!hasText && !hasImage) {
-            alert('Please write a message or attach an image.');
-            return;
-        }
+    function addOptimisticMessage(text, imageSrc) {
+        const emptyState = document.getElementById('empty-chat');
+        if (emptyState) emptyState.remove();
 
-        const formData = new FormData(form);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'd-flex justify-content-end';
+        wrapper.setAttribute('data-optimistic-message', 'true');
 
-        try {
-            const response = await fetch(window.location.href, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
+        wrapper.innerHTML = `
+            <div class="rounded-4 px-3 py-3 shadow-sm bg-primary text-white"
+                 style="max-width: 75%; min-width: 180px; opacity: 0.88;">
+                <div class="d-flex justify-content-between align-items-center mb-2 gap-3">
+                    <span class="fw-semibold small">You</span>
+                    <span class="small text-white-50">Sending...</span>
+                </div>
+                ${imageSrc ? `
+                    <div class="${text ? 'mb-3' : 'mb-0'}">
+                        <img
+                            src="${escapeHtml(imageSrc)}"
+                            alt="Uploading image preview"
+                            class="img-fluid rounded-4"
+                            style="max-width: 280px; max-height: 320px; object-fit: cover;"
+                        >
+                    </div>
+                ` : ''}
+                ${text ? `<p class="mb-0" style="white-space: pre-line;">${escapeHtml(text)}</p>` : ''}
+            </div>
+        `;
 
-            if (!response.ok) {
-                throw new Error('Failed to send message.');
-            }
+        messagesWrapper.appendChild(wrapper);
+        shouldStickToBottom = true;
+        scrollToBottom(true);
 
-            bodyInput.value = '';
-            imageInput.value = '';
-            imagePreview.src = '';
-            imagePreviewWrapper.classList.add('d-none');
+        return wrapper;
+    }
 
-            shouldStickToBottom = true;
-            await fetchMessages();
-            scrollToBottom(true);
-        } catch (error) {
-            console.error(error);
-            alert('Something went wrong while sending the message.');
+    function removeOptimisticMessage(element) {
+        if (element && element.parentNode) {
+            element.parentNode.removeChild(element);
         }
     }
 
     function renderMessages(messages) {
+        if (!messagesWrapper) return;
+
         if (!messages.length) {
             const emptyHtml = `
                 <div class="text-center py-5" id="empty-chat">
@@ -234,7 +239,7 @@
             const isMine = msg.is_mine;
             const imageHtml = msg.image_url ? `
                 <div class="${msg.body ? 'mb-3' : 'mb-0'}">
-                    <a href="${escapeHtml(msg.image_url)}" target="_blank">
+                    <a href="${escapeHtml(msg.image_url)}" target="_blank" rel="noopener noreferrer">
                         <img
                             src="${escapeHtml(msg.image_url)}"
                             alt="Conversation image"
@@ -294,20 +299,92 @@
         }
     }
 
+    async function submitMessageForm() {
+        if (isSubmitting) return;
+
+        const textValue = bodyInput ? bodyInput.value : '';
+        const trimmedValue = textValue.trim();
+        const hasText = trimmedValue.length > 0;
+        const hasImage = imageInput && imageInput.files && imageInput.files.length > 0;
+
+        if (!hasText && !hasImage) {
+            alert('Please write a message or attach an image.');
+            return;
+        }
+
+        const formData = new FormData(form);
+        const previewImageSrc = imagePreview ? imagePreview.src : '';
+        const optimisticNode = addOptimisticMessage(trimmedValue, previewImageSrc);
+
+        bodyInput.value = '';
+        if (imageInput) imageInput.value = '';
+        if (imagePreview) imagePreview.src = '';
+        if (imagePreviewWrapper) imagePreviewWrapper.classList.add('d-none');
+
+        isSubmitting = true;
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Sending...';
+        }
+
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to send message.');
+            }
+
+            shouldStickToBottom = true;
+            await fetchMessages();
+            scrollToBottom(true);
+        } catch (error) {
+            console.error(error);
+            removeOptimisticMessage(optimisticNode);
+
+            bodyInput.value = textValue;
+
+            if (previewImageSrc && imagePreview && imagePreviewWrapper) {
+                imagePreview.src = previewImageSrc;
+                imagePreviewWrapper.classList.remove('d-none');
+            }
+
+            alert('Something went wrong while sending the message.');
+        } finally {
+            isSubmitting = false;
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Send Message';
+            }
+        }
+    }
+
+    if (chatBox) {
+        chatBox.addEventListener('scroll', function () {
+            const nearBottom = chatBox.scrollTop + chatBox.clientHeight >= chatBox.scrollHeight - 80;
+            shouldStickToBottom = nearBottom;
+        });
+    }
+
     if (imageInput) {
         imageInput.addEventListener('change', function () {
             const file = this.files && this.files[0];
 
             if (!file) {
-                imagePreviewWrapper.classList.add('d-none');
-                imagePreview.src = '';
+                if (imagePreviewWrapper) imagePreviewWrapper.classList.add('d-none');
+                if (imagePreview) imagePreview.src = '';
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = function (e) {
-                imagePreview.src = e.target.result;
-                imagePreviewWrapper.classList.remove('d-none');
+                if (imagePreview) imagePreview.src = e.target.result;
+                if (imagePreviewWrapper) imagePreviewWrapper.classList.remove('d-none');
             };
             reader.readAsDataURL(file);
         });
@@ -315,9 +392,9 @@
 
     if (removeImageBtn) {
         removeImageBtn.addEventListener('click', function () {
-            imageInput.value = '';
-            imagePreview.src = '';
-            imagePreviewWrapper.classList.add('d-none');
+            if (imageInput) imageInput.value = '';
+            if (imagePreview) imagePreview.src = '';
+            if (imagePreviewWrapper) imagePreviewWrapper.classList.add('d-none');
         });
     }
 
@@ -336,6 +413,7 @@
             submitMessageForm();
         });
     }
+
     scrollToBottom();
     setInterval(fetchMessages, 2000);
 })();

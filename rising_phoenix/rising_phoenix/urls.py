@@ -27,7 +27,7 @@ urlpatterns = [
     path('workshop/', include('workshop.urls')),
     path('requests/', include('request.urls')),
     path('payment/', include('payment.urls')),
-    path('proposals/', include('proposal.urls')),
+    path('proposals/', include(('proposal.urls', 'proposal'), namespace='proposal')),
     path('message/', include('message.urls')),
     path('progress/', include('progress.urls')),
     path('notifications/', include('notification.urls')),

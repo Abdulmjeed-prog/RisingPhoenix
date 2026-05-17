@@ -286,3 +286,4 @@ def my_proposals_view(request):
         .order_by('-created_at')
     )
     return render(request, 'proposal/my_proposals.html', {'proposals': proposals})
+
