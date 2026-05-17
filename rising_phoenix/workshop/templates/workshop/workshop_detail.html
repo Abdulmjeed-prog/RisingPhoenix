@@ -40,8 +40,6 @@
                     <p class="mb-1"><strong>Phone:</strong> {{ workshop.phone|default:"Not provided" }}</p>
                     <p class="mb-0"><strong>Artisan:</strong> {{ artisan.user.username }}</p>
                 </div>
-
-                {% endif %}
             </div>
         </div>
 
@@ -55,9 +53,6 @@
                         <img src="{{ img.image.url }}" alt="{{ img.caption|default:workshop.workshop_name }}" class="img-fluid rounded-3 w-100">
                         {% if img.caption %}<p class="small text-muted mt-2 mb-0">{{ img.caption }}</p>{% endif %}
                     </div>
-            
-                    {% endfor %}
-            
                 </div>
                 {% endfor %}
             </div>
@@ -177,4 +172,5 @@
 
     </div>
 </div>
+{% endif %}
 {% endblock %}
