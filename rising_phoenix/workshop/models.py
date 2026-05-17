@@ -27,6 +27,19 @@ class WorkshopProfile(models.Model):
 		return f"WorkshopProfile - {self.workshop_name}"
 
 
+class WorkshopDetail(models.Model):
+	workshop = models.OneToOneField(WorkshopProfile, on_delete=models.CASCADE, related_name='details')
+	response_time = models.CharField(max_length=100, blank=True, help_text='E.g. ~2 hours')
+	typical_turnaround = models.CharField(max_length=100, blank=True, help_text='E.g. 3–10 days')
+	active_orders = models.CharField(max_length=100, blank=True, help_text='E.g. 2 (available)')
+	item_drop_off = models.BooleanField(default=False)
+	ships_ksa = models.BooleanField(default=False)
+	protection_text = models.TextField(blank=True, help_text='Optional protection / policy text shown to buyers')
+
+	def __str__(self):
+		return f"WorkshopDetail - {self.workshop.workshop_name}"
+
+
 class PortfolioImage(models.Model):
 	workshop = models.ForeignKey(WorkshopProfile, on_delete=models.CASCADE, related_name='portfolio_images')
 	image = models.ImageField(upload_to='images/workshop_portfolio/')

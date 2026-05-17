@@ -424,16 +424,16 @@
             <a href="{% url 'proposal:my_proposals_view' %}">
                 <i class="bi bi-clipboard-check"></i>
                 <span>My Proposals</span>
-                <span class="sidebar-badge">{{ stats.my_proposals }}</span>
+                <!-- <span class="sidebar-badge">{{ stats.my_proposals }}</span> -->
             </a>
-            <a href="{% url 'workshop:projects_list_view' artisan.user.id %}">
+            <a href="{% url 'account:completed_orders_view' %}">
                 <i class="bi bi-check-circle-fill"></i>
                 <span>Completed</span>
             </a>
             <a href="{% url 'message:conversation_list_view' %}">
                 <i class="bi bi-chat-dots"></i>
                 <span>Messages</span>
-                <span class="sidebar-badge">2</span>
+                <!-- <span class="sidebar-badge">{{ stats.messages }}</span> -->
             </a>
             <a href="{% url 'workshop:workshop_detail_view' artisan_id=request.user.id %}">
                 <i class="bi bi-images"></i>
@@ -463,8 +463,6 @@
             <div class="header-right">
                 <a href="{% url 'request:request_list_view' %}" class="btn btn-outline-primary">Browse Open Requests
                     →</a>
-                <a href="{% url 'workshop:create_project_view' %}" class="btn btn-primary" style="margin-left:12px;">Add
-                    Completed Project</a>
             </div>
         </div>
 
@@ -508,8 +506,7 @@
         <!-- Active Orders -->
         <div class="section-header">
             <div class="section-title" style="margin: 0;">Active Orders</div>
-            <a href="{% url 'workshop:workshop_detail_view' artisan_id=request.user.id %}" class="see-all">Manage all
-                →</a>
+            <!-- <a href="{% url 'workshop:workshop_detail_view' artisan_id=request.user.id %}" class="see-all">View all →</a> -->
         </div>
 
         {% for contract in active_contracts %}
@@ -521,8 +518,8 @@
             </div>
             <div class="order-right">
                 {% if contract.is_in_progress %}
-                    <span class="order-warning">⚠ Upload progress photo</span>
-                    <span class="badge-status badge-in-progress">In Progress</span>
+                    <a href="{% url 'progress:contract_detail_view' contract.id %}" class="order-warning">⚠ Upload progress photo</a>
+                    <a href="{% url 'progress:contract_detail_view' contract.id %}" class="badge-status badge-in-progress">In Progress</a>
                 {% elif contract.is_completion_requested %}
                     <span class="badge-status badge-pending">Completion Requested</span>
                 {% else %}
@@ -539,6 +536,9 @@
             <div class="section-title" style="margin:0;">
                 Completed Orders
             </div>
+            <a href="{% url 'account:completed_orders_view' %}">
+                View All
+            </a>
         </div>
         
         {% for contract in completed_orders %}

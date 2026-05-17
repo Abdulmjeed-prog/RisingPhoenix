@@ -7,10 +7,13 @@ from account.models import ArtisanProfile
 from rising_phoenix.moderation import image_is_clean, text_is_clean
 from .models import WorkshopProfile, PortfolioImage, CompletedProject, CompletedProjectImage
 from .forms import WorkshopProfileForm, PortfolioImageForm, CompletedProjectForm, ProjectImageUploadForm
+from .forms import WorkshopDetailForm
 from django.db.models import Q
 from .models import Category
 from request.models import Request
 from proposal.models import Proposal
+from django.core.paginator import Paginator
+from progress.models import Contract
 
 
 def _validate_workshop_image(image):
@@ -78,65 +81,235 @@ def create_workshop_view(request):
 
 def workshop_detail_view(request, artisan_id):
     """View public workshop profile."""
-    try:
-        artisan_profile = ArtisanProfile.objects.get(user_id=artisan_id)
-        workshop = WorkshopProfile.objects.get(artisan=artisan_profile)
-    except ArtisanProfile.DoesNotExist:
-        messages.error(request, "Artisan profile not found.")
-        return redirect('main:home_view')
-    except WorkshopProfile.DoesNotExist:
-        # إذا صاحب الحساب نفسه يحاول العرض، حوله إلى صفحة إنشاء الورشة
-        if request.user.is_authenticated and request.user.id == artisan_id:
-            messages.info(request, "You don't have a workshop yet — create one to show your profile.")
-            return redirect('workshop:create_workshop_view')
-        # أما الزائرون الآخرون فيعرض لهم رسالة ويعيد التوجيه للصفحة الرئيسية
-        messages.error(request, "Workshop profile not found. The artisan hasn't created a workshop yet.")
-        return redirect('main:home_view')
 
-    can_edit_portfolio = request.user.is_authenticated and request.user == artisan_profile.user
+    try:
+        artisan_profile = ArtisanProfile.objects.get(
+            user_id=artisan_id
+        )
+
+        workshop = WorkshopProfile.objects.get(
+            artisan=artisan_profile
+        )
+
+    except ArtisanProfile.DoesNotExist:
+
+        messages.error(
+            request,
+            "Artisan profile not found."
+        )
+
+        return redirect(
+            'main:home_view'
+        )
+
+    except WorkshopProfile.DoesNotExist:
+
+        if (
+            request.user.is_authenticated
+            and request.user.id == artisan_id
+        ):
+
+            messages.info(
+                request,
+                "You don't have a workshop yet — create one to show your profile."
+            )
+
+            return redirect(
+                'workshop:create_workshop_view'
+            )
+
+        messages.error(
+            request,
+            "Workshop profile not found."
+        )
+
+        return redirect(
+            'main:home_view'
+        )
+
+    can_edit_portfolio = (
+        request.user.is_authenticated
+        and request.user == artisan_profile.user
+    )
+
+    # ensure workshop details exist for display/edit
+    try:
+        workshop_details = workshop.details
+    except Exception:
+        workshop_details = None
+    # prepare edit form for modal if artisan
+    detail_form = WorkshopDetailForm(instance=workshop_details) if can_edit_portfolio else None
+
 
     if request.method == 'POST' and can_edit_portfolio:
-        # Handle caption update
-        if 'caption' in request.POST and 'portfolio_image_id' in request.POST:
-            image_id = request.POST.get('portfolio_image_id')
-            caption = request.POST.get('caption', '').strip()
-            portfolio_image = workshop.portfolio_images.filter(id=image_id).first()
+
+        if (
+            'caption' in request.POST
+            and 'portfolio_image_id' in request.POST
+        ):
+
+            image_id = request.POST.get(
+                'portfolio_image_id'
+            )
+
+            caption = request.POST.get(
+                'caption',
+                ''
+            ).strip()
+
+            portfolio_image = (
+                workshop.portfolio_images.filter(
+                    id=image_id
+                ).first()
+            )
+
             if portfolio_image:
+
                 portfolio_image.caption = caption
-                portfolio_image.save(update_fields=['caption'])
-                messages.success(request, "Portfolio description updated successfully.")
+
+                portfolio_image.save(
+                    update_fields=['caption']
+                )
+
+                messages.success(
+                    request,
+                    "Portfolio description updated successfully."
+                )
+
             else:
-                messages.error(request, "Portfolio image not found.")
-            return redirect('workshop:workshop_detail_view', artisan_id=artisan_id)
-        # Handle image delete
+
+                messages.error(
+                    request,
+                    "Portfolio image not found."
+                )
+
+            return redirect(
+                'workshop:workshop_detail_view',
+                artisan_id=artisan_id
+            )
+
+
         elif 'delete_portfolio_image_id' in request.POST:
-            image_id = request.POST.get('delete_portfolio_image_id')
-            portfolio_image = workshop.portfolio_images.filter(id=image_id).first()
+
+            image_id = request.POST.get(
+                'delete_portfolio_image_id'
+            )
+
+            portfolio_image = (
+                workshop.portfolio_images.filter(
+                    id=image_id
+                ).first()
+            )
+
             if portfolio_image:
+
                 portfolio_image.delete()
-                messages.success(request, "Portfolio image deleted successfully.")
+
+                messages.success(
+                    request,
+                    "Portfolio image deleted successfully."
+                )
+
             else:
-                messages.error(request, "Portfolio image not found.")
+
+                messages.error(
+                    request,
+                    "Portfolio image not found."
+                )
+
+            return redirect(
+                'workshop:workshop_detail_view',
+                artisan_id=artisan_id
+            )
+
+        elif 'edit_workshop_details' in request.POST:
+
+            form = WorkshopDetailForm(request.POST, instance=getattr(workshop, 'details', None))
+
+            if form.is_valid():
+                detail = form.save(commit=False)
+                detail.workshop = workshop
+                detail.save()
+                messages.success(request, 'Workshop details updated successfully.')
+            else:
+                messages.error(request, 'Please correct errors in the details form.')
+
             return redirect('workshop:workshop_detail_view', artisan_id=artisan_id)
-    
-    reviews = artisan_profile.user.reviews_received.select_related(
-        'reviews_given', 'request'
-    ).order_by('-created_at')
-    completed_orders = Request.objects.filter(
-    proposals__artisan=artisan_profile.user,
-    proposals__status=Proposal.Status.ACCEPTED,
-    status='completed'
-).distinct().order_by('-updated_at')
+
+
+    # Reviews
+    reviews_list = (
+        artisan_profile.user.reviews_received
+        .select_related(
+            'reviews_given',
+            'request'
+        )
+        .order_by(
+            '-created_at'
+        )
+    )
+
+    paginator = Paginator(
+        reviews_list,
+        3
+    )
+
+    page_number = request.GET.get(
+        'review_page'
+    )
+
+    reviews = paginator.get_page(
+        page_number
+    )
+
+
+    # Completed projects
+    completed_orders = (
+        Request.objects.filter(
+            proposals__artisan=artisan_profile.user,
+            proposals__contract__status=Contract.Status.COMPLETED
+        )
+        .distinct()
+        .order_by('-updated_at')[:3]
+    )
+
+    completed_orders_count = (
+        Request.objects.filter(
+            proposals__artisan=artisan_profile.user,
+            proposals__contract__status=Contract.Status.COMPLETED
+        )
+        .distinct()
+        .count()
+    )    
+
 
     context = {
+
         'workshop': workshop,
         'artisan': artisan_profile,
-        'portfolio_images': workshop.portfolio_images.all(),
-        'can_edit_portfolio': can_edit_portfolio,
+
+        'portfolio_images':
+        workshop.portfolio_images.all(),
+
+        'can_edit_portfolio':
+        can_edit_portfolio,
+
         'reviews': reviews,
-        'completed_orders': completed_orders,
+
+        'completed_orders':
+        completed_orders,
+        'completed_orders_count':
+        completed_orders_count,
+        'workshop_details': workshop_details,
+        'detail_form': detail_form,
+
     }
-    return render(request, 'workshop/workshop_detail.html', context)
+
+    return render(
+        request,
+        'workshop/workshop_detail.html',
+        context
+    )
 
 
 @login_required(login_url='account:login_view')
