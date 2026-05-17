@@ -1,707 +1,143 @@
 {% extends "main/base.html" %}
 
-{% block title %}{{ workshop.workshop_name }}{% endblock %}
-
-{% block extra_css %}
-<style>
-    :root {
-        --primary: #c96f52;
-        --light-bg: #faf3ec;
-        --card-bg: #fff;
-        --text-muted: #8b7461;
-        --border-light: #efe6dd;
-    }
-
-    body {
-        background: var(--light-bg);
-    }
-
-    .cover-image {
-        width: 100%;
-        height: 300px;
-        object-fit: cover;
-        border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        display: block;
-    }
-
-    .page-label {
-        display: inline-block;
-        background: #4d2f22;
-        color: var(--primary);
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        margin-bottom: 24px;
-    }
-
-    .workshop-header {
-        display: flex;
-        gap: 24px;
-        align-items: flex-start;
-        margin-bottom: 32px;
-    }
-
-    .artisan-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: #d9b9a8;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 1.8rem;
-        flex-shrink: 0;
-        border: 4px solid var(--light-bg);
-        margin-top: -50px;
-    }
-
-    .artisan-info h3 {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #2c1f1a;
-        margin-bottom: 4px;
-    }
-
-    .artisan-info p {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        margin: 0;
-    }
-
-    .categories-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 12px;
-    }
-
-    .tag {
-        background: #e9dccf;
-        color: #4d2f22;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .verified-badge {
-        background: var(--primary);
-        color: #fff;
-        padding: 8px 14px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        font-weight: 700;
-    }
-
-    .two-column {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 24px;
-        margin-bottom: 24px;
-    }
-
-    .workshop-card,
-    .portfolio-section,
-    .artisan-details {
-        background: var(--card-bg);
-        border: 1px solid var(--border-light);
-        border-radius: 12px;
-        padding: 24px;
-    }
-
-    .workshop-card h2,
-    .portfolio-section h2 {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #2c1f1a;
-        margin-bottom: 16px;
-    }
-
-    .workshop-card p {
-        color: var(--text-muted);
-        line-height: 1.6;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-top: 16px;
-    }
-
-    .stat-item {
-        background: #f7efe7;
-        padding: 16px;
-        border-radius: 10px;
-        text-align: center;
-    }
-
-    .stat-number {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #2c1f1a;
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin-top: 6px;
-    }
-
-    .detail-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid var(--border-light);
-    }
-
-    .detail-item:last-child {
-        border-bottom: none;
-    }
-
-    .detail-label {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-    }
-
-    .detail-value {
-        font-weight: 600;
-        color: #2c1f1a;
-    }
-
-    .check-icon {
-        color: #27ae60;
-    }
-
-    .btn-primary-custom {
-        background: var(--primary);
-        color: #fff;
-        padding: 12px 20px;
-        border-radius: 8px;
-        border: none;
-        font-weight: 600;
-        width: 100%;
-        margin-top: 16px;
-    }
-
-    .btn-secondary-custom {
-        background: #fff;
-        color: var(--text-muted);
-        padding: 12px 20px;
-        border-radius: 8px;
-        border: 1px solid var(--border-light);
-        font-weight: 600;
-        width: 100%;
-        margin-top: 12px;
-    }
-
-    .notice-box {
-        background: #fef5e7;
-        border-left: 4px solid #ff9800;
-        padding: 16px;
-        border-radius: 8px;
-        margin-top: 16px;
-        font-size: 0.9rem;
-        color: #666;
-    }
-
-    .portfolio-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 16px;
-    }
-
-    .portfolio-item {
-        position: relative;
-        background: #f7efe7;
-        border-radius: 12px;
-        overflow: hidden;
-    }
-
-    .portfolio-item img {
-        width: 100%;
-        height: 220px;
-        object-fit: cover;
-    }
-
-    .portfolio-trigger {
-        all: unset;
-        cursor: pointer;
-        display: block;
-        width: 100%;
-    }
-
-    .portfolio-delete-btn {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        z-index: 10;
-        background: rgba(255, 255, 255, .9);
-        border: none;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        font-size: 18px;
-        color: #c96f52;
-    }
-
-    .portfolio-badge {
-        position: absolute;
-        top: 8px;
-        left: 8px;
-        background: var(--primary);
-        color: white;
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-size: .75rem;
-        font-weight: 700;
-    }
-
-    .portfolio-empty {
-        padding: 22px;
-        border: 1px dashed #e0ccb9;
-        border-radius: 10px;
-        color: var(--text-muted);
-        background: #fcf8f4;
-    }
-
-    .portfolio-modal-image {
-        width: 100%;
-        max-height: 70vh;
-        object-fit: contain;
-        border-radius: 14px;
-    }
-
-    .portfolio-modal-caption {
-        margin-top: 14px;
-        color: #3d3430;
-        line-height: 1.6;
-    }
-
-    .review-card {
-        background: #f7efe7;
-        border-radius: 12px;
-        padding: 20px 24px;
-    }
-
-    .review-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #c96f52;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-    }
-
-    .review-stars {
-        color: #c96f52;
-        font-size: 1.1rem;
-    }
-</style>
+{% block sidebar %}
+{% if request.user.is_authenticated and request.user == artisan.user %}
+{% include 'main/_sidebar.html' with active='workshop' %}
+{% endif %}
 {% endblock %}
 
 {% block content %}
+<section class="py-4 py-md-5">
+    <div class="container-lg">
+        <div class="saaf-dashboard-card rounded-4 p-4 p-md-5 mb-4">
+            <p class="saaf-eyebrow mb-2">Workshop</p>
+            <h1 class="saaf-section-title mb-2">{{ workshop.workshop_name }}</h1>
+            <p class="text-muted mb-0">{{ workshop.tagline|default:"Saudi handmade workshop" }}</p>
 
-<div class="container" style="max-width: 1200px; margin-top: 24px;">
-
-    <div class="page-label">
-        WORKSHOP PROFILE
-    </div>
-
-    {% if workshop.cover_image %}
-    <img src="{{ workshop.cover_image.url }}" alt="{{ workshop.workshop_name }}" class="cover-image">
-    {% endif %}
-
-    <div class="workshop-header">
-
-        <div class="artisan-avatar">
-            {{ artisan.user.first_name|slice:":1"|default:'A' }}
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                {% if request.user.is_authenticated and request.user == artisan.user %}
+                <a href="{% url 'workshop:create_workshop_view' %}" class="btn btn-saaf-primary rounded-pill">Edit Workshop</a>
+                <a href="{% url 'workshop:upload_portfolio_view' %}" class="btn btn-saaf-outline rounded-pill">Manage Portfolio</a>
+                {% endif %}
+                {% if request.user.is_authenticated and not request.user.artisanprofile %}
+                <a href="{% url 'request:request_create_view' %}" class="btn btn-saaf-primary rounded-pill">Request Custom Work</a>
+                {% endif %}
+                <a href="{% url 'request:request_list_view' %}" class="btn btn-saaf-outline rounded-pill">Browse Requests</a>
+            </div>
         </div>
 
-        <div class="artisan-info flex-grow-1">
+        <div class="row g-3 mb-4">
+            <div class="col-md-8">
+                <div class="saaf-info-card h-100">
+                    <span class="saaf-info-label">About</span>
+                    <p class="mb-0">{{ workshop.description|default:"No description yet." }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="saaf-info-card h-100">
+                    <span class="saaf-info-label">Contact & Details</span>
+                    <p class="mb-1"><strong>Location:</strong> {{ workshop.location|default:"Not provided" }}</p>
+                    <p class="mb-1"><strong>Phone:</strong> {{ workshop.phone|default:"Not provided" }}</p>
+                    <p class="mb-0"><strong>Artisan:</strong> {{ artisan.user.username }}</p>
+                </div>
 
-            <h3>
-                {{ workshop.workshop_name }}
-
-                {% if can_edit_portfolio %}
-                <a href="{% url 'workshop:create_workshop_view' %}" class="btn btn-sm btn-outline-primary ms-2">
-                    Edit
-                </a>
                 {% endif %}
-            </h3>
+            </div>
+        </div>
 
-            <p>
-                {{ artisan.user.first_name }}
-                ·
-                {{ workshop.location|default:"Riyadh" }}
-            </p>
-
-            <div class="categories-tags">
-                {% for category in workshop.categories.all %}
-                <span class="tag">{{ category.name }}</span>
+        <div class="saaf-dashboard-card rounded-4 p-4 p-md-5">
+            <h3 class="mb-3">Portfolio</h3>
+            {% if portfolio_images %}
+            <div class="row g-3">
+                {% for img in portfolio_images %}
+                <div class="col-sm-6 col-md-4">
+                    <div class="saaf-portfolio-item">
+                        <img src="{{ img.image.url }}" alt="{{ img.caption|default:workshop.workshop_name }}" class="img-fluid rounded-3 w-100">
+                        {% if img.caption %}<p class="small text-muted mt-2 mb-0">{{ img.caption }}</p>{% endif %}
+                    </div>
+            
+                    {% endfor %}
+            
+                </div>
                 {% endfor %}
             </div>
-        </div>
-
-        {% if artisan.is_verified %}
-        <span class="verified-badge">
-            ✓ Verified Artisan
-        </span>
-        {% endif %}
-    </div>
-
-    <div class="two-column">
-
-        <!-- LEFT -->
-        <div>
-
-            <div class="workshop-card">
-                <h2>About Workshop</h2>
-
-                <p>
-                    {{ workshop.description|default:"Woodworking specialist with years of experience." }}
-                </p>
-
-                <div class="stats-grid">
-
-                    <div class="stat-item">
-                        <div class="stat-number">
-                            {{ artisan.completed_jobs|default:"142" }}
-                        </div>
-                        <div class="stat-label">
-                            Completed orders
-                        </div>
-                    </div>
-
-                    <div class="stat-item">
-                        <div class="stat-number">
-                            ⭐ {{ artisan.average_rating|default:"4.9" }}
-                        </div>
-                        <div class="stat-label">
-                            Average rating
-                        </div>
-                    </div>
-
-                    <div class="stat-item">
-                        <div class="stat-number">~2h</div>
-                        <div class="stat-label">
-                            Avg. response time
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- PORTFOLIO -->
-
-            <div class="portfolio-section">
-
-                <h2>Portfolio</h2>
-
-                {% if can_edit_portfolio %}
-                <a href="{% url 'workshop:upload_portfolio_view' %}">
-                    add images
-                </a>
-                {% endif %}
-
-                {% if portfolio_images %}
-                <div class="portfolio-grid">
-
-                    {% for img in portfolio_images|slice:":6" %}
-                    <div class="portfolio-item">
-
-                        {% if can_edit_portfolio %}
-                        <form method="post" style="position:absolute;top:0;right:0;z-index:5;">
-
-                            {% csrf_token %}
-
-                            <input type="hidden" name="delete_portfolio_image_id" value="{{ img.id }}">
-
-                            <button type="submit" class="portfolio-delete-btn">
-                                ×
-                            </button>
-                        </form>
-                        {% endif %}
-
-                        <button type="button" class="portfolio-trigger" data-bs-toggle="modal"
-                            data-bs-target="#portfolioImageModal" data-image="{{ img.image.url }}"
-                            data-caption="{{ img.caption|default:''|escapejs }}"
-                            data-title="{{ workshop.workshop_name|escapejs }}" data-id="{{ img.id }}">
-
-                            <img src="{{ img.image.url }}" alt="{{ img.caption|default:workshop.workshop_name }}">
-
-                            {% if img.is_pinned %}
-                            <span class="portfolio-badge">
-                                Pinned
-                            </span>
-                            {% endif %}
-
-                        </button>
-
-                    </div>
-                    {% endfor %}
-
-                </div>
-
-                {% else %}
-
-                <div class="portfolio-empty">
-                    No portfolio images uploaded yet.
-                </div>
-
-                {% endif %}
-            </div>
-
-            <!-- COMPLETED PROJECTS -->
-
-            {% comment %} Closed / Completed Requests Section {% endcomment %}
-            
-            {% if workshop.completed_projects.exists %}
-            
-            <div class="portfolio-section">
-            
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            
-                    <h2 style="margin:0;">
-                        Closed Requests
-                    </h2>
-            
-                    <a href="{% url 'workshop:projects_list_view' artisan_id=artisan.user.id %}" style="
-                            color: var(--primary);
-                            text-decoration:none;
-                            font-weight:600;
-                       ">
-                        View All
-                    </a>
-            
-                </div>
-            
-                <div class="portfolio-grid">
-            
-                    {% for project in workshop.completed_projects.all|dictsortreversed:'date_completed'|slice:":6" %}
-            
-                    <div class="portfolio-item" style="
-                            background:#fff;
-                            border:1px solid var(--border-light);
-                            border-radius:14px;
-                            overflow:hidden;
-                         ">
-            
-                        <a href="{% url 'workshop:project_detail_view' project_id=project.id %}"
-                            style="text-decoration:none;color:inherit;">
-            
-                            {% if project.main_image %}
-            
-                            <img src="{{ project.main_image.url }}" alt="{{ project.title }}" style="
-                                    width:100%;
-                                    height:220px;
-                                    object-fit:cover;
-                                 ">
-            
-                            {% else %}
-            
-                            {% with first=project.images.first %}
-            
-                            {% if first %}
-                            <img src="{{ first.image.url }}" alt="{{ project.title }}" style="
-                                            width:100%;
-                                            height:220px;
-                                            object-fit:cover;
-                                         ">
-                            {% else %}
-            
-                            <div style="
-                                            height:220px;
-                                            display:flex;
-                                            align-items:center;
-                                            justify-content:center;
-                                            background:#f7efe7;
-                                            color:#8b7461;
-                                         ">
-                                No Image
-                            </div>
-            
-                            {% endif %}
-            
-                            {% endwith %}
-            
-                            {% endif %}
-            
-                            <div style="padding:16px;">
-            
-                                <div style="
-                                        display:flex;
-                                        justify-content:space-between;
-                                        align-items:center;
-                                        margin-bottom:10px;
-                                     ">
-            
-                                    <span style="
-                                            background:#e7f7ee;
-                                            color:#27ae60;
-                                            padding:4px 10px;
-                                            border-radius:20px;
-                                            font-size:.75rem;
-                                            font-weight:700;
-                                         ">
-                                        ✓ Closed
-                                    </span>
-            
-                                    <span style="
-                                            font-size:.8rem;
-                                            color:var(--text-muted);
-                                         ">
-                                        {{ project.date_completed }}
-                                    </span>
-            
-                                </div>
-            
-                                <h5 style="
-                                        font-size:1rem;
-                                        font-weight:700;
-                                        color:#2c1f1a;
-                                        margin-bottom:8px;
-                                     ">
-                                    {{ project.title }}
-                                </h5>
-            
-                                {% if project.description %}
-                                <p style="
-                                        color:var(--text-muted);
-                                        font-size:.9rem;
-                                        line-height:1.5;
-                                        margin:0;
-                                     ">
-                                    {{ project.description|truncatewords:18 }}
-                                </p>
-                                {% endif %}
-            
-                            </div>
-            
-                        </a>
-            
-                    </div>
-            
-                    {% endfor %}
-            
-                </div>
-            
-            </div>
-            
+            {% else %}
+            <p class="text-muted mb-0">No portfolio images uploaded yet.</p>
             {% endif %}
-
-            <!-- REVIEWS -->
-
-            {% if reviews %}
-
-            <div class="portfolio-section">
-
-                <h2>
-                    Reviews
-                    <span style="font-size:1rem;color:var(--text-muted);">
-                        ({{ reviews|length }})
-                    </span>
-                </h2>
-
-                <div style="display:flex;flex-direction:column;gap:16px;">
-
-                    {% for review in reviews %}
-
-                    <div class="review-card">
-
-                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-
-                            <div class="review-avatar">
-                                {{ review.reviews_given.first_name|slice:":1"|upper }}
-                            </div>
-
-                            <div>
-                                <div style="font-weight:700;">
-                                    {{ review.reviews_given.get_full_name|default:review.reviews_given.username }}
-                                </div>
-
-                                <div style="font-size:.8rem;color:var(--text-muted);">
-                                    {{ review.created_at|date:"N j, Y" }}
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="review-stars">
-
-                            {% for i in "12345" %}
-                            {% if forloop.counter <= review.rating %} ★ {% else %} ☆ {% endif %} {% endfor %} </div>
-
-                                {% if review.comment %}
-                                <p style="margin-top:10px;">
-                                    {{ review.comment }}
-                                </p>
-                                {% endif %}
-
-                        </div>
-
-                        {% endfor %}
-
-                    </div>
-                </div>
-
-                {% endif %}
-
-            </div>
-
-            <!-- RIGHT -->
-
-            <div>
-
-                <div class="artisan-details">
-
-                    <h3 style="font-size:1.1rem;font-weight:700;">
-                        {{ artisan.user.first_name }}
-                    </h3>
-
-                    <p style="color:var(--text-muted);">
-                        {{ workshop.services|truncatewords:10 }}
-                    </p>
-
-                    <div style="margin-top:16px;">
-
-                        <div class="detail-item">
-                            <span class="detail-label">Response time</span>
-                            <span class="detail-value">~2 hours</span>
-                        </div>
-
-                        <div class="detail-item">
-                            <span class="detail-label">Ships KSA</span>
-                            <span class="detail-value check-icon">✓ Yes</span>
-                        </div>
-
-                    </div>
-
-                    <button class="btn-primary-custom">
-                        Request Custom Work
-                    </button>
-
-                    <button class="btn-secondary-custom">
-                        💬 Send Message
-                    </button>
-
-                    <div class="notice-box">
-                        🔒 Payments held safely until work is completed.
-                    </div>
-
-                </div>
-
-            </div>
-
         </div>
+    </div>
+</div>
 
+<!-- Portfolio Modal -->
+{% comment %} Completed Projects showcase for this artisan {% endcomment %}
+{% if workshop.completed_projects.exists %}
+<div class="container" style="max-width:1200px; margin-top:18px;">
+    <div class="portfolio-section">
+        <h2><a href="{% url 'workshop:projects_list_view' artisan_id=artisan.user.id %}"
+                style="text-decoration:none;color:inherit;">Completed Projects</a></h2>
+        {% if can_edit_portfolio %}
+        <a href="{% url 'workshop:create_project_view' %}">add project</a>
+        {% endif %}
+
+        <div class="portfolio-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
+            {% for project in workshop.completed_projects.all|dictsortreversed:'is_featured'|slice:":4" %}
+            <div class="portfolio-item" style="aspect-ratio:4/3;">
+                <a href="{% url 'workshop:project_detail_view' project_id=project.id %}" class="portfolio-trigger">
+                    {% if project.main_image %}
+                    <img src="{{ project.main_image.url }}" alt="{{ project.title }}">
+                    {% else %}
+                    {% with first=project.images.first %}
+                    {% if first %}
+                    <img src="{{ first.image.url }}" alt="{{ project.title }}">
+                    {% else %}
+                    <div class="saaf-workshop-no-image">No image</div>
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+                </a>
+                <div style="padding:8px;">
+                    <strong>{{ project.title }}</strong>
+                    <div class="small text-muted">{{ project.date_completed }}</div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if reviews %}
+<div class="container" style="max-width:1200px; margin-top:18px; margin-bottom:24px;">
+  <div class="portfolio-section">
+    <h2>Reviews <span class="saaf-review-count">({{ reviews|length }})</span></h2>
+    <div style="display:flex; flex-direction:column; gap:16px; margin-top:8px;">
+      {% for review in reviews %}
+            <div class="saaf-review-card">
+                <div class="saaf-review-head">
+                    <div class="saaf-review-avatar">
+            {{ review.reviews_given.first_name|slice:":1"|default:review.reviews_given.username|slice:":1"|upper }}
+          </div>
+          <div>
+                        <div class="saaf-review-author">{{ review.reviews_given.get_full_name|default:review.reviews_given.username }}</div>
+                        <div class="saaf-review-date">{{ review.created_at|date:"N j, Y" }}</div>
+          </div>
+                    <div class="ms-auto">
+                        <span class="saaf-review-verified-pill">
+              <i class="bi bi-patch-check-fill"></i> Verified Completed Project
+            </span>
+          </div>
+        </div>
+                <div class="saaf-review-stars">
+          {% for i in "12345" %}
+            {% if forloop.counter <= review.rating %}&#9733;{% else %}&#9734;{% endif %}
+          {% endfor %}
+                    <span class="saaf-review-rating-label">{{ review.get_rating_display }}</span>
+        </div>
+        {% if review.comment %}
+                <p class="saaf-review-comment">{{ review.comment }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
     </div>
 
     <!-- MODAL -->
@@ -740,51 +176,5 @@
         </div>
 
     </div>
-
-    {% endblock %}
-
-    {% block extra_js %}
-
-    <script>
-        (function () {
-
-            const modal = document.getElementById('portfolioImageModal');
-
-            const modalImage = document.getElementById('portfolioModalImage');
-
-            const modalCaption = document.getElementById('portfolioModalCaption');
-
-            const modalTitle = document.getElementById('portfolioModalTitle');
-
-            if (!modal) return;
-
-            modal.addEventListener('show.bs.modal', function (event) {
-
-                const trigger = event.relatedTarget;
-
-                const image = trigger.getAttribute('data-image');
-
-                const caption = trigger.getAttribute('data-caption') || '';
-
-                const title = trigger.getAttribute('data-title') || 'Portfolio Image';
-
-                modalImage.src = image;
-
-                modalCaption.textContent = caption;
-
-                modalTitle.textContent = title;
-            });
-
-            modal.addEventListener('hidden.bs.modal', function () {
-
-                modalImage.src = '';
-
-                modalCaption.textContent = '';
-
-                modalTitle.textContent = 'Portfolio Image';
-            });
-
-        })();
-    </script>
-
-    {% endblock %}
+</div>
+{% endblock %}

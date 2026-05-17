@@ -4,46 +4,13 @@
 {% block title %}Saaf — Saudi Artisan Marketplace{% endblock %}
 
 {% block sidebar %}
-{% if request.user.is_authenticated %}
-<aside class="saaf-sidebar">
-    <p class="sidebar-label">My Space</p>
-
-    {% if request.user.artisanprofile %}
-        <a href="{% url 'account:artisan_dashboard_view' %}" class="sidebar-btn" aria-label="Dashboard">
-            <i class="bi bi-grid-1x2-fill"></i>
-        </a>
-        <a href="{% url 'proposal:my_proposals_view' %}" class="sidebar-btn" aria-label="My Proposals">
-            <i class="bi bi-send"></i>
-        </a>
-        <a href="{% url 'message:conversation_list_view' %}" class="sidebar-btn" aria-label="Messages">
-            <i class="bi bi-chat-dots"></i>
-        </a>
-        <a href="{% url 'workshop:workshop_detail_view' request.user.id %}" class="sidebar-btn" aria-label="My Workshop">
-            <i class="bi bi-shop"></i>
-        </a>
-    {% else %}
-        <a href="{% url 'main:dashboard_view' %}" class="sidebar-btn" aria-label="Dashboard">
-            <i class="bi bi-grid-1x2-fill"></i>
-        </a>
-        <a href="{% url 'request:request_list_view' %}" class="sidebar-btn" aria-label="My Requests">
-            <i class="bi bi-file-text"></i>
-        </a>
-        <a href="{% url 'message:conversation_list_view' %}" class="sidebar-btn" aria-label="Messages">
-            <i class="bi bi-chat-dots"></i>
-        </a>
-        <div class="sidebar-divider"></div>
-        <a href="{% url 'request:request_create_view' %}" class="sidebar-btn sidebar-btn-new" aria-label="Post New Request">
-            <i class="bi bi-plus-lg"></i>
-        </a>
-    {% endif %}
-</aside>
-{% endif %}
+{% include 'main/_sidebar.html' %}
 {% endblock %}
 
 {% block content %}
 
 <!-- Hero -->
-<section class="saaf-hero">
+<section class="saaf-hero saaf-reveal">
     <div class="container-lg">
         <div class="row align-items-center g-4">
             <!-- Left: Visual Cards -->
@@ -63,12 +30,12 @@
                         <div class="saaf-card-icon-small">
                             <i class="bi bi-pencil-square"></i>
                         </div>
-                        <p class="mb-0 small fw-semibold mt-3">Post your idea in 2 minutes</p>
+                        <p class="mb-0 small fw-semibold mt-3">Post your custom idea</p>
                     </div>
                     <div class="saaf-hero-card saaf-hero-card-small saaf-hero-card-stats">
                         <div class="saaf-card-stats-text">
-                            <p class="mb-0 text-muted">First proposal in</p>
-                            <h6>24 Hours</h6>
+                            <p class="mb-0 text-muted">Direct collaboration</p>
+                            <h6>With Saudi artisans</h6>
                         </div>
                     </div>
                 </div>
@@ -105,10 +72,10 @@
 </section>
 
 <!-- What can be commissioned -->
-<section class="saaf-section py-5">
+<section class="saaf-section py-5 saaf-reveal">
     <div class="container-lg">
-        <p class="saaf-eyebrow text-center mb-2">— What can be made</p>
-        <h2 class="saaf-section-title text-center mb-5">Crafts you can commission</h2>
+        <p class="saaf-eyebrow text-center mb-2">— Categories</p>
+        <h2 class="saaf-section-title text-center mb-5">Craft categories for custom work</h2>
         <div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 g-3">
             <div class="col">
                 <a href="{% url 'main:browse_view' %}" class="saaf-craft-card text-decoration-none">
@@ -151,7 +118,7 @@
 </section>
 
 <!-- How It Works -->
-<section class="saaf-section py-5">
+<section class="saaf-section py-5 saaf-reveal">
     <div class="container-lg">
         <div class="saaf-how-works-box">
             <p class="saaf-eyebrow text-center mb-3">— How Saaf Works</p>
@@ -160,14 +127,14 @@
                     <div class="saaf-step">
                         <h3 class="saaf-step-number">1</h3>
                         <h5 class="mb-2">Post Your Request</h5>
-                        <p class="text-muted small">Describe your piece, upload reference images, and set your budget. Takes 2 minutes.</p>
+                        <p class="text-muted small">Describe your piece, upload reference images, and set your budget.</p>
                     </div>
                 </div>
                 <div class="col">
                     <div class="saaf-step">
                         <h3 class="saaf-step-number">2</h3>
                         <h5 class="mb-2">Receive Proposals</h5>
-                        <p class="text-muted small">Vetted artisans send tailored offers with timelines and pricing within 24 hours.</p>
+                        <p class="text-muted small">Artisans send tailored offers with timelines and pricing.</p>
                     </div>
                 </div>
                 <div class="col">
@@ -182,9 +149,45 @@
     </div>
 </section>
 
+<!-- Latest published workshops -->
+<section class="saaf-section py-5 saaf-reveal">
+    <div class="container-lg">
+        <p class="saaf-eyebrow text-center mb-2">— Latest workshops</p>
+        <h2 class="saaf-section-title text-center mb-5">Published workshops on Saaf</h2>
+        {% if latest_workshops %}
+        <div class="row g-4">
+            {% for workshop in latest_workshops %}
+            <div class="col-md-6 col-xl-3">
+                <a href="{% url 'workshop:workshop_detail_view' workshop.artisan.user.id %}" class="text-decoration-none">
+                    <div class="saaf-featured-card h-100">
+                        <div class="saaf-product-media">
+                            {% if workshop.cover_image %}
+                                <img src="{{ workshop.cover_image.url }}" alt="{{ workshop.workshop_name }}" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                            {% else %}
+                                <i class="bi bi-shop"></i>
+                            {% endif %}
+                        </div>
+                        <div class="saaf-product-body">
+                            <h5 class="mb-2">{{ workshop.workshop_name }}</h5>
+                            <p class="text-muted small mb-2">{{ workshop.tagline|default:"Saudi artisan workshop"|truncatechars:70 }}</p>
+                            <p class="saaf-price-tag mb-0">{{ workshop.location|default:"Saudi Arabia" }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="saaf-featured-card text-center p-4">
+            <p class="mb-0 text-muted">No published workshops yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
 <!-- Artisan CTA (hidden for logged-in artisans) -->
 {% if not request.user.artisanprofile %}
-<section class="saaf-section py-5">
+<section class="saaf-section py-5 saaf-reveal">
     <div class="container-lg">
         <div class="saaf-artisan-cta-banner">
             <div>
@@ -198,4 +201,26 @@
 </section>
 {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    var revealItems = document.querySelectorAll('.saaf-reveal');
+    if (!revealItems.length || !('IntersectionObserver' in window)) {
+        revealItems.forEach(function (el) { el.classList.add('is-visible'); });
+        return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.14 });
+
+    revealItems.forEach(function (el) { observer.observe(el); });
+})();
+</script>
 {% endblock %}

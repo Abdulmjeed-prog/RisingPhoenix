@@ -1,0 +1,63 @@
+{% if request.user.is_authenticated %}
+<aside class="saaf-sidebar">
+    <p class="sidebar-label">{% if LANGUAGE_CODE == 'ar' %}مساحتي{% else %}My Space{% endif %}</p>
+
+    {% if request.user.is_staff %}
+    <a href="{% url 'staff:staff_dashboard_view' %}" class="sidebar-btn {% if active == 'staff' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}لوحة الموظف{% else %}Staff Dashboard{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}لوحة الموظف{% else %}Staff Dashboard{% endif %}">
+        <i class="bi bi-shield-lock"></i>
+        {% if active == 'staff' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+    {% endif %}
+
+    {% if request.user.artisanprofile %}
+    <a href="{% url 'account:artisan_dashboard_view' %}" class="sidebar-btn {% if active == 'artisan_dashboard' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}لوحة الحرفي{% else %}Artisan Dashboard{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}لوحة الحرفي{% else %}Artisan Dashboard{% endif %}">
+        <i class="bi bi-grid-1x2-fill"></i>
+        {% if active == 'artisan_dashboard' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+
+    <a href="{% url 'proposal:my_proposals_view' %}" class="sidebar-btn {% if active == 'my_proposals' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}عروضي{% else %}My Proposals{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}عروضي{% else %}My Proposals{% endif %}">
+        <i class="bi bi-send"></i>
+        {% if active == 'my_proposals' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+
+    <a href="{% url 'message:conversation_list_view' %}" class="sidebar-btn {% if active == 'messages' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}الرسائل{% else %}Messages{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}الرسائل{% else %}Messages{% endif %}">
+        <i class="bi bi-chat-dots"></i>
+        {% if active == 'messages' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+
+    <a href="{% url 'workshop:workshop_detail_view' request.user.id %}" class="sidebar-btn {% if active == 'workshop' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}ورشتي{% else %}My Workshop{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}ورشتي{% else %}My Workshop{% endif %}">
+        <i class="bi bi-shop"></i>
+        {% if active == 'workshop' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+    {% else %}
+    <a href="{% url 'main:dashboard_view' %}" class="sidebar-btn {% if active == 'dashboard' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}لوحة التحكم{% else %}Dashboard{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}لوحة التحكم{% else %}Dashboard{% endif %}">
+        <i class="bi bi-grid-1x2-fill"></i>
+        {% if active == 'dashboard' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+
+    <a href="{% url 'request:request_list_view' %}" class="sidebar-btn {% if active == 'requests' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}طلباتي{% else %}My Requests{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}طلباتي{% else %}My Requests{% endif %}">
+        <i class="bi bi-file-text"></i>
+        {% if active == 'requests' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+
+    <a href="{% url 'message:conversation_list_view' %}" class="sidebar-btn {% if active == 'messages' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}الرسائل{% else %}Messages{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}الرسائل{% else %}Messages{% endif %}">
+        <i class="bi bi-chat-dots"></i>
+        {% if active == 'messages' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+
+    <div class="sidebar-divider"></div>
+
+    <a href="{% url 'request:request_create_view' %}" class="sidebar-btn sidebar-btn-new {% if active == 'post_request' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}أضف طلبًا جديدًا{% else %}Post New Request{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}أضف طلبًا جديدًا{% else %}Post New Request{% endif %}">
+        <i class="bi bi-plus-lg"></i>
+        {% if active == 'post_request' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+    {% endif %}
+
+    <div class="sidebar-divider"></div>
+
+    <a href="{% url 'account:profile_view' request.user.username %}" class="sidebar-btn {% if active == 'profile' %}sidebar-btn-active{% endif %}" aria-label="{% if LANGUAGE_CODE == 'ar' %}الملف الشخصي{% else %}Profile{% endif %}" title="{% if LANGUAGE_CODE == 'ar' %}الملف الشخصي{% else %}Profile{% endif %}">
+        <i class="bi bi-person-circle"></i>
+        {% if active == 'profile' %}<span class="sidebar-active-indicator"></span>{% endif %}
+    </a>
+</aside>
+{% endif %}

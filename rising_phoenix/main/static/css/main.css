@@ -3,13 +3,25 @@
    ============================================ */
 
 :root {
-    --saaf-bg: #F1E8D5;                    /* Light beige — main background */
-    --saaf-beige: #E0D2B4;                 /* Medium beige — sections, badges */
-    --saaf-brown-light: #B08C5A;           /* Light brown — secondary visuals */
-    --saaf-brown: #6B4826;                 /* Regular brown — buttons, headings */
-    --saaf-text-muted: #8B6841;            /* Muted brown — secondary text */
-    --saaf-white: #ffffff;
-    --saaf-border: rgba(107, 72, 38, 0.12);
+    --saaf-bg: #F5E6D3;
+    --saaf-beige: #F8EDDF;
+    --saaf-brown-light: #7A8B5A;
+    --saaf-brown: #4A3428;
+    --saaf-text-muted: #6B5548;
+    --saaf-white: #FFF8F0;
+    --saaf-border: rgba(74, 52, 40, 0.12);
+    --saaf-focus: rgba(122, 139, 90, 0.28);
+    --saaf-surface-soft: rgba(255, 248, 240, 0.9);
+    --saaf-btn: #C97B63;
+    --saaf-btn-hover: #A95E49;
+    --saaf-accent: #7A8B5A;
+    --sand: var(--saaf-beige);
+    --clay: var(--saaf-btn);
+    --ink: var(--saaf-brown);
+    --ink-light: var(--saaf-text-muted);
+    --cream: var(--saaf-bg);
+    --white: var(--saaf-white);
+    --saaf-sidebar-bg: rgba(245, 230, 211, 0.42);
 }
 
 /* ============================================
@@ -27,23 +39,34 @@ html {
 }
 
 body {
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background-color: var(--saaf-bg);
-    color: #333;
+    background-image: radial-gradient(circle at 2% 8%, rgba(122, 139, 90, 0.08), transparent 24%), radial-gradient(circle at 94% 14%, rgba(74, 52, 40, 0.04), transparent 26%);
+    color: var(--saaf-text-muted);
     line-height: 1.6;
     text-align: left;
 }
 
+:lang(ar) {
+    font-family: 'Cairo', sans-serif;
+}
+
+:focus-visible {
+    outline: 3px solid var(--saaf-focus);
+    outline-offset: 2px;
+}
+
 h1, h2, h3, h4, h5, h6,
 .brand-name {
-    font-family: 'Playfair Display', 'Georgia', serif;
-    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
     letter-spacing: -0.015em;
     color: var(--saaf-brown);
 }
 
 p, span, button {
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Poppins', sans-serif;
+    color: var(--saaf-text-muted);
 }
 
 a {
@@ -62,9 +85,12 @@ a:hover {
 
 .saaf-navbar,
 .saaf-nav-wrapper {
-    background-color: var(--saaf-bg);
+    background-color: rgba(241, 232, 213, 0.42) !important;
+    backdrop-filter: blur(6px);
     border-bottom: 1px solid var(--saaf-border);
     padding: 1rem 0;
+    position: relative;
+    z-index: 1040;
 }
 
 .saaf-nav-wrapper .saaf-nav-container {
@@ -109,18 +135,19 @@ a:hover {
     color: var(--saaf-brown);
     font-weight: 500;
     position: relative;
-    padding-bottom: 0.5rem;
-    transition: color 0.3s ease;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    transition: color 0.3s ease, background-color 0.25s ease;
 }
 
 .saaf-nav-link:hover {
     color: var(--saaf-brown-light);
+    background-color: rgba(224, 210, 180, 0.6);
 }
 
 .saaf-nav-link.active {
     color: var(--saaf-brown);
-    border-bottom: 2px solid var(--saaf-brown);
-    padding-bottom: calc(0.5rem - 2px);
+    background-color: rgba(224, 210, 180, 0.7);
 }
 
 .saaf-account-toggle {
@@ -173,18 +200,18 @@ a:hover {
 }
 
 .btn-saaf-primary {
-    background-color: var(--saaf-brown);
+    background-color: var(--saaf-btn);
     color: var(--saaf-white);
     border: none;
     font-weight: 500;
-    box-shadow: 0 2px 0 var(--saaf-text-muted);
+    box-shadow: 0 3px 10px rgba(169, 94, 73, 0.18);
 }
 
 .btn-saaf-primary:hover {
-    background-color: var(--saaf-brown-light);
+    background-color: var(--saaf-btn-hover);
     color: var(--saaf-white);
     transform: translateY(-2px);
-    box-shadow: 0 4px 0 var(--saaf-text-muted);
+    box-shadow: 0 8px 16px rgba(169, 94, 73, 0.24);
 }
 
 .btn-saaf-primary:active {
@@ -211,6 +238,117 @@ a:hover {
 }
 
 /* ============================================
+   BOOTSTRAP OVERRIDES - Button Colors
+   ============================================ */
+
+/* Override Bootstrap primary (blue) buttons */
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--saaf-btn);
+    border-color: var(--saaf-btn);
+    color: var(--saaf-white);
+}
+
+.btn-primary:hover {
+    background-color: var(--saaf-btn-hover);
+    border-color: var(--saaf-btn-hover);
+}
+
+/* Override Bootstrap info (cyan) buttons */
+.btn-info,
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:active {
+    background-color: var(--saaf-brown-light);
+    border-color: var(--saaf-brown-light);
+    color: var(--saaf-white);
+}
+
+.btn-info:hover {
+    background-color: var(--saaf-brown);
+    border-color: var(--saaf-brown);
+}
+
+/* Override text-info color utility */
+.text-info {
+    color: var(--saaf-brown-light) !important;
+}
+
+[data-theme="dark"] {
+    --saaf-bg: #221A16;
+    --saaf-beige: #2D2420;
+    --saaf-brown-light: #9CAA7B;
+    --saaf-brown: #F5E6D3;
+    --saaf-text-muted: #D8C1AE;
+    --saaf-white: #2B221E;
+    --saaf-border: rgba(245, 230, 211, 0.14);
+    --saaf-focus: rgba(154, 170, 123, 0.34);
+    --saaf-surface-soft: rgba(43, 34, 30, 0.9);
+    --saaf-btn: #C97B63;
+    --saaf-btn-hover: #D5876E;
+    --sand: var(--saaf-beige);
+    --clay: var(--saaf-btn);
+    --ink: var(--saaf-brown);
+    --ink-light: var(--saaf-text-muted);
+    --cream: var(--saaf-bg);
+    --white: var(--saaf-white);
+    --saaf-sidebar-bg: rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .saaf-navbar,
+[data-theme="dark"] .saaf-nav-wrapper {
+    background-color: var(--saaf-sidebar-bg) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.09);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .saaf-dashboard-card,
+[data-theme="dark"] .saaf-info-card,
+[data-theme="dark"] .saaf-featured-card,
+[data-theme="dark"] .saaf-testimonial-card,
+[data-theme="dark"] .results-toolbar,
+[data-theme="dark"] .filter-panel {
+    background: var(--saaf-white) !important;
+    border-color: var(--saaf-border) !important;
+}
+
+[data-theme="dark"] .bg-light,
+[data-theme="dark"] .text-bg-light,
+[data-theme="dark"] .badge.text-bg-light,
+[data-theme="dark"] .rating-slider-card,
+[data-theme="dark"] .active-filter-chip,
+[data-theme="dark"] .category-chip {
+    background: var(--saaf-beige) !important;
+    color: var(--saaf-brown) !important;
+    border-color: var(--saaf-border) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .input-group-text {
+    background-color: #352b26 !important;
+    color: var(--saaf-brown) !important;
+    border-color: var(--saaf-border) !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--saaf-text-muted) !important;
+}
+
+[data-theme="dark"] .table,
+[data-theme="dark"] .table th,
+[data-theme="dark"] .table td {
+    color: var(--saaf-brown);
+    border-color: var(--saaf-border);
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-accent-bg: rgba(255, 255, 255, 0.03);
+}
+
+/* ============================================
    SECTION STYLES
    ============================================ */
 
@@ -222,7 +360,7 @@ a:hover {
 
 .saaf-section {
     padding: 4rem 0;
-    background-color: var(--saaf-white);
+    background-color: var(--saaf-bg);
 }
 
 .saaf-eyebrow {
@@ -254,11 +392,11 @@ a:hover {
 .saaf-sidebar {
     width: 68px;
     flex-shrink: 0;
-    background-color: var(--saaf-bg);
+    background-color: var(--saaf-sidebar-bg) !important;
     padding: 18px 12px;
     position: sticky;
-    top: 80px;
-    height: calc(100vh - 80px);
+    top: 16px;
+    height: calc(100vh - 32px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -375,6 +513,9 @@ a:hover {
 .saaf-dashboard-card {
     border: 0.5px solid var(--saaf-border);
     background-color: var(--saaf-white);
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(30, 20, 10, 0.06);
+    transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
 }
 
 .saaf-see-all {
@@ -411,7 +552,7 @@ a:hover {
 .saaf-description {
     font-size: 1rem;
     line-height: 1.7;
-    color: #555;
+    color: var(--saaf-text-muted);
     margin-bottom: 2rem;
 }
 
@@ -728,9 +869,10 @@ a:hover {
 
 .saaf-step-number {
     font-size: 2.25rem;
-    font-family: 'Playfair Display', 'Georgia', serif;
+    font-family: 'Poppins', sans-serif;
     color: var(--saaf-brown);
     margin-bottom: 1rem;
+    font-weight: 700;
 }
 
 .saaf-step-number.saaf-step-accent {
@@ -791,9 +933,10 @@ a:hover {
 }
 
 .saaf-artisan-cta-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 1.6rem;
     color: var(--saaf-brown);
+    font-weight: 700;
 }
 
 /* ============================================
@@ -818,7 +961,7 @@ a:hover {
     top: -4px;
     right: -4px;
     background: var(--clay, #c2724f);
-    color: #fff;
+    color: var(--saaf-white);
     font-size: 0.62rem;
     font-weight: 700;
     border-radius: 10px;
@@ -839,7 +982,7 @@ a:hover {
     right: 0;
     width: 320px;
     max-width: calc(100vw - 1.5rem);
-    background: #fff;
+    background: var(--saaf-white);
     border: 1px solid var(--sand, #e8ddd3);
     border-radius: 14px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.12);
@@ -888,7 +1031,7 @@ a:hover {
 }
 
 .saaf-notif-mark-btn:hover {
-    color: #a85c3a;
+    color: var(--saaf-btn-hover);
 }
 
 .saaf-notif-dd-list {
@@ -917,12 +1060,12 @@ a.saaf-notif-dd-item {
 }
 
 .saaf-notif-dd-item--unread {
-    background: #fdfaf5;
+    background: var(--saaf-beige);
     opacity: 1;
 }
 
 .saaf-notif-dd-item:hover {
-    background: #f9f5ef;
+    background: var(--saaf-beige);
     color: inherit;
 }
 
@@ -955,9 +1098,12 @@ a.saaf-notif-dd-item {
     font-size: 0.77rem;
     color: var(--ink-light, #8a7a6e);
     margin: 0 0 0.2rem;
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.45;
 }
 
 .saaf-notif-dd-item-time {
@@ -992,13 +1138,13 @@ a.saaf-notif-dd-item {
     color: var(--clay, #c2724f);
     text-decoration: none;
     border-top: 1px solid var(--sand, #e8ddd3);
-    background: #fdfaf5;
+    background: var(--saaf-beige);
     transition: background 0.12s;
 }
 
 .saaf-notif-dd-footer:hover {
-    background: #f5ede4;
-    color: #a85c3a;
+    background: var(--saaf-bg);
+    color: var(--saaf-btn-hover);
 }
 
 /* Toast notifications */
@@ -1015,12 +1161,12 @@ a.saaf-notif-dd-item {
 }
 
 .saaf-toast {
-    background: #fff;
+    background: var(--saaf-beige);
     border-radius: 12px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
     font-size: 0.9rem;
     font-weight: 500;
-    color: #2a1a0e;
+    color: var(--saaf-brown);
     animation: saaf-toast-in 0.25s ease;
 }
 
@@ -1030,9 +1176,9 @@ a.saaf-notif-dd-item {
 }
 
 .saaf-footer {
-    background-color: var(--saaf-white);
+    background-color: var(--saaf-beige);
     border-top: 1px solid var(--saaf-border);
-    color: #555;
+    color: var(--saaf-text-muted);
 }
 
 .saaf-footer h6 {
@@ -1072,6 +1218,444 @@ a.saaf-notif-dd-item {
     border-color: var(--saaf-border);
 }
 
+/* Shared card/link helpers for standardized templates */
+.saaf-tile-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.saaf-tile-link:hover .saaf-dashboard-card {
+    border-color: rgba(107, 72, 38, 0.25);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(28, 18, 8, 0.1);
+}
+
+.saaf-dashboard-hero {
+    background: linear-gradient(145deg, rgba(245, 240, 230, 0.95), rgba(224, 210, 180, 0.6));
+}
+
+.saaf-dashboard-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.15rem;
+}
+
+.saaf-quick-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--saaf-border);
+    background: var(--saaf-surface-soft);
+    color: var(--saaf-brown);
+    font-weight: 600;
+    font-size: 0.88rem;
+}
+
+.saaf-quick-action-btn:hover {
+    background: rgba(224, 210, 180, 0.8);
+    color: var(--saaf-brown);
+}
+
+.saaf-dashboard-tile-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 0.35rem;
+}
+
+.saaf-dashboard-tile-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(224, 210, 180, 0.62);
+    color: var(--saaf-brown);
+    font-size: 1rem;
+}
+
+.saaf-info-card {
+    background: var(--saaf-white);
+    border: 1px solid var(--saaf-border);
+    border-radius: 14px;
+    padding: 1rem;
+}
+
+.saaf-info-label {
+    display: block;
+    color: var(--saaf-text-muted);
+    font-size: 0.82rem;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.saaf-avatar-preview {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--saaf-white);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.saaf-avatar-fallback {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: var(--saaf-beige);
+    color: var(--saaf-brown);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    border: 3px solid var(--saaf-white);
+}
+
+.saaf-check-card {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--saaf-border);
+    border-radius: 12px;
+    background: var(--saaf-white);
+    cursor: pointer;
+}
+
+.saaf-check-card input {
+    margin: 0;
+}
+
+.saaf-portfolio-item {
+    background: var(--saaf-white);
+    border: 1px solid var(--saaf-border);
+    border-radius: 12px;
+    padding: 0.45rem;
+}
+
+/* Profile page */
+.saaf-profile-shell {
+    position: relative;
+    overflow: hidden;
+}
+
+.saaf-profile-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 90% 10%, rgba(176, 140, 90, 0.16), transparent 36%),
+        radial-gradient(circle at 12% 82%, rgba(107, 72, 38, 0.1), transparent 30%);
+}
+
+.saaf-profile-hero,
+.saaf-profile-bio-card,
+.saaf-profile-info-card {
+    position: relative;
+    z-index: 1;
+}
+
+.saaf-profile-hero {
+    background: linear-gradient(135deg, rgba(224, 210, 180, 0.62), rgba(245, 240, 230, 0.75));
+    border: 1px solid rgba(107, 72, 38, 0.16);
+    border-radius: 20px;
+    padding: 1.1rem 1.1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.saaf-profile-hero-main {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.saaf-profile-avatar-wrap {
+    flex-shrink: 0;
+}
+
+.saaf-profile-avatar {
+    width: 112px;
+    height: 112px;
+    margin: 0;
+    border-width: 4px;
+    box-shadow: 0 8px 22px rgba(38, 22, 8, 0.14);
+}
+
+.saaf-profile-heading-block {
+    min-width: 0;
+}
+
+.saaf-profile-heading-block .saaf-section-title {
+    margin-bottom: 0.35rem;
+    line-height: 1.2;
+}
+
+.saaf-profile-username {
+    color: var(--saaf-brown);
+    font-weight: 600;
+}
+
+.saaf-profile-joined {
+    color: var(--saaf-text-muted);
+    font-size: 0.9rem;
+}
+
+.saaf-profile-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    align-items: flex-end;
+}
+
+.saaf-profile-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    background: rgba(245, 240, 230, 0.95);
+    border: 1px solid rgba(107, 72, 38, 0.18);
+    color: var(--saaf-brown);
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.saaf-profile-pill--ok {
+    background: rgba(74, 124, 89, 0.14);
+    border-color: rgba(74, 124, 89, 0.28);
+    color: #3e654a;
+}
+
+.saaf-profile-info-card {
+    border-radius: 16px;
+    padding: 1rem 1rem 1.1rem;
+}
+
+.saaf-profile-info-card p {
+    color: var(--saaf-brown);
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.saaf-profile-bio-card {
+    background: rgba(245, 240, 230, 0.75);
+    border: 1px solid var(--saaf-border);
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+}
+
+.saaf-profile-subtitle {
+    font-size: 1rem;
+    color: var(--saaf-brown);
+    margin: 0;
+}
+
+.saaf-profile-bio-card p {
+    color: var(--saaf-text-muted);
+}
+
+.saaf-theme-toggle {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.saaf-page-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(245, 230, 211, 0.72);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.saaf-page-loader[aria-hidden="true"] {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.saaf-loader-dot {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 4px solid rgba(201, 123, 99, 0.25);
+    border-top-color: var(--saaf-btn);
+    animation: saaf-spin 0.85s linear infinite;
+}
+
+@keyframes saaf-spin {
+    to { transform: rotate(360deg); }
+}
+
+.saaf-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.saaf-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.saaf-featured-card,
+.saaf-testimonial-card {
+    background: var(--saaf-white);
+    border: 1px solid var(--saaf-border);
+    border-radius: 20px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.saaf-featured-card {
+    overflow: hidden;
+    transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.saaf-featured-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.09);
+}
+
+.saaf-product-media {
+    height: 190px;
+    background: linear-gradient(140deg, rgba(201, 123, 99, 0.14), rgba(122, 139, 90, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+    color: var(--saaf-brown);
+}
+
+.saaf-product-body {
+    padding: 1rem 1.1rem 1.2rem;
+}
+
+.saaf-price-tag {
+    font-size: 0.92rem;
+    color: var(--saaf-accent);
+    font-weight: 600;
+}
+
+.saaf-testimonial-card {
+    padding: 1.15rem;
+    height: 100%;
+}
+
+.saaf-stars {
+    color: #D4A92D;
+    font-size: 0.95rem;
+    margin-bottom: 0.7rem;
+}
+
+.saaf-testimonial-author {
+    margin-top: 0.75rem;
+    color: var(--saaf-brown);
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+
+.saaf-workshop-no-image {
+    padding: 24px;
+    color: var(--saaf-text-muted);
+}
+
+.saaf-review-count {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--saaf-text-muted);
+}
+
+.saaf-review-card {
+    background: var(--saaf-beige);
+    border: 1px solid var(--saaf-border);
+    border-radius: 12px;
+    padding: 20px 24px;
+}
+
+.saaf-review-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.saaf-review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--saaf-btn);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.saaf-review-author {
+    font-weight: 700;
+    color: var(--saaf-brown);
+}
+
+.saaf-review-date {
+    font-size: 0.8rem;
+    color: var(--saaf-text-muted);
+}
+
+.saaf-review-verified-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #2e7d5a;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.saaf-review-stars {
+    color: #D4A92D;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.saaf-review-rating-label {
+    font-size: 0.85rem;
+    color: var(--saaf-text-muted);
+    margin-left: 6px;
+}
+
+.saaf-review-comment {
+    color: var(--saaf-text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+[data-theme="dark"] .saaf-review-card {
+    background: #2f2621;
+    border-color: rgba(245, 230, 211, 0.16);
+}
+
+[data-theme="dark"] .saaf-review-verified-pill {
+    background: #2f8f64;
+}
+
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
@@ -1083,6 +1667,7 @@ a.saaf-notif-dd-item {
 
     .saaf-nav-wrapper .navbar-nav {
         align-items: flex-start;
+        margin-inline-start: 0;
         margin-bottom: 0.8rem;
     }
 
@@ -1101,6 +1686,18 @@ a.saaf-notif-dd-item {
     .saaf-how-works-box {
         padding: 2rem;
     }
+
+    .saaf-profile-hero-main {
+        grid-template-columns: auto 1fr;
+    }
+
+    .saaf-profile-status-list {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1110,6 +1707,7 @@ a.saaf-notif-dd-item {
 
     .saaf-main {
         padding: 16px;
+        margin-inline-start: 0;
     }
 
     .saaf-hero-grid {
@@ -1160,6 +1758,41 @@ a.saaf-notif-dd-item {
     .saaf-footer .row {
         text-align: center;
     }
+
+    .saaf-dashboard-hero-actions {
+        gap: 0.5rem;
+    }
+
+    .saaf-quick-action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .saaf-dashboard-tile-head {
+        margin-bottom: 0.55rem;
+    }
+
+    .saaf-profile-hero {
+        padding: 0.95rem;
+    }
+
+    .saaf-profile-hero-main {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .saaf-profile-avatar-wrap {
+        display: flex;
+        justify-content: center;
+    }
+
+    .saaf-profile-status-list {
+        justify-content: center;
+    }
+
+    .saaf-profile-joined {
+        font-size: 0.85rem;
+    }
 }
 
 /* ============================================
@@ -1172,6 +1805,116 @@ a.saaf-notif-dd-item {
 
 .container-lg {
     max-width: 1200px;
+}
+
+html[dir="rtl"] body {
+    text-align: right;
+}
+
+html[dir="rtl"] .saaf-layout {
+    flex-direction: row-reverse !important;
+}
+
+html[dir="rtl"] .saaf-layout > .saaf-sidebar {
+    order: 2;
+}
+
+html[dir="rtl"] .saaf-layout > .saaf-main {
+    order: 1;
+}
+
+html[dir="rtl"] .saaf-sidebar {
+    border-right: none;
+    border-left: 0.5px solid var(--saaf-border);
+}
+
+html[dir="rtl"] .saaf-nav-wrapper .ms-auto {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+html[dir="rtl"] .saaf-nav-wrapper .ms-lg-3 {
+    margin-left: 0 !important;
+    margin-right: 1rem !important;
+}
+
+html[dir="rtl"] .saaf-nav-wrapper .navbar-collapse {
+    text-align: right;
+}
+
+html[dir="rtl"] .saaf-notif-dropdown {
+    right: auto;
+    left: 0;
+    direction: rtl;
+    text-align: right;
+    width: min(360px, calc(100vw - 1rem));
+}
+
+html[dir="rtl"] .saaf-notif-dd-item {
+    text-align: right;
+}
+
+html[dir="rtl"] .saaf-notif-dd-item-time {
+    display: inline-block;
+}
+
+/* Auth pages readability */
+.saaf-auth-card {
+    background: var(--saaf-white);
+    border: 1px solid var(--saaf-border);
+}
+
+.saaf-auth-card .form-label {
+    color: var(--saaf-brown);
+    font-weight: 600;
+}
+
+.saaf-auth-card p,
+.saaf-auth-card .form-text,
+.saaf-auth-card .text-muted {
+    color: var(--saaf-text-muted) !important;
+}
+
+.saaf-auth-card a {
+    color: var(--saaf-brown);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.saaf-auth-card a:hover {
+    color: var(--saaf-btn-hover);
+}
+
+.saaf-auth-card a:visited {
+    color: var(--saaf-brown);
+}
+
+[data-theme="dark"] .saaf-auth-card {
+    background: #2f2621;
+    border-color: rgba(245, 230, 211, 0.16);
+}
+
+[data-theme="dark"] .saaf-auth-card p,
+[data-theme="dark"] .saaf-auth-card .form-text,
+[data-theme="dark"] .saaf-auth-card .text-muted {
+    color: #dec8b4 !important;
+}
+
+[data-theme="dark"] .saaf-auth-card .form-label {
+    color: #f4deca;
+}
+
+[data-theme="dark"] .saaf-auth-card a {
+    color: var(--saaf-brown);
+}
+
+[data-theme="dark"] .saaf-auth-card a:hover {
+    color: var(--saaf-brown);
+}
+
+[data-theme="dark"] .saaf-auth-card a:visited {
+    color: var(--saaf-brown);
 }
 
 /* ── In-site confirmation modal ── */
@@ -1193,7 +1936,7 @@ a.saaf-notif-dd-item {
 }
 
 .saaf-confirm-card {
-    background: #fff;
+    background: var(--saaf-beige);
     border-radius: 16px;
     padding: 2rem;
     max-width: 440px;
@@ -1208,10 +1951,11 @@ a.saaf-notif-dd-item {
 }
 
 .saaf-confirm-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 1.25rem;
     color: var(--ink, #1c1712);
     margin: 0 0 0.6rem;
+    font-weight: 700;
 }
 
 .saaf-confirm-body {

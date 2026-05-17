@@ -9,7 +9,7 @@
 
 {% block content %}
 <section class="browse-hero py-5">
-    <div class="container">
+    <div class="container-fluid px-0">
         <div class="text-center mx-auto browse-hero-content">
             <span class="badge rounded-pill browse-badge px-3 py-2 mb-3">Saaf Directory</span>
             <h1 class="fw-bold mb-3">Browse Artisans</h1>
@@ -24,14 +24,14 @@
     <div class="container">
         <div class="row g-4 align-items-start">
             <div class="col-12 col-xl-3">
-                <form method="get" class="filter-panel card border-0 shadow-sm rounded-4 overflow-hidden">
+                <form method="get" class="filter-panel card border-0 shadow-sm rounded-4 overflow-hidden" id="browse-filter-form">
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div>
                                 <h5 class="fw-bold mb-1">Filter results</h5>
                                 <p class="text-muted small mb-0">Refine artisans quickly</p>
                             </div>
-                            <a href="{% url 'main:browse_view' %}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                            <a href="{% url 'main:browse_view' %}" class="btn btn-sm btn-saaf-outline rounded-pill">
                                 Reset
                             </a>
                         </div>
@@ -47,13 +47,14 @@
                                     class="form-control rounded-3 ps-5"
                                     placeholder="Workshop, artisan, service..."
                                     value="{{ search_query|default:'' }}"
+                                    aria-label="Search artisans"
                                 >
                             </div>
                         </div>
 
                         <div class="mb-4">
                             <label for="category" class="form-label fw-semibold">Category</label>
-                            <select name="category" id="category" class="form-select rounded-3">
+                            <select name="category" id="category" class="form-select rounded-3" aria-label="Filter by category">
                                 <option value="">All categories</option>
                                 {% for category in categories %}
                                     <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
@@ -65,7 +66,7 @@
 
                         <div class="mb-4">
                             <label for="city" class="form-label fw-semibold">City</label>
-                            <select name="city" id="city" class="form-select rounded-3">
+                            <select name="city" id="city" class="form-select rounded-3" aria-label="Filter by city">
                                 <option value="">All cities</option>
                                 {% for city in cities %}
                                     <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>
@@ -138,7 +139,7 @@
 
                         <div class="mb-4">
                             <label for="sort" class="form-label fw-semibold">Sort by</label>
-                            <select name="sort" id="sort" class="form-select rounded-3">
+                            <select name="sort" id="sort" class="form-select rounded-3" aria-label="Sort artisans">
                                 <option value="newest" {% if selected_sort == "newest" %}selected{% endif %}>Newest</option>
                                 <option value="oldest" {% if selected_sort == "oldest" %}selected{% endif %}>Oldest</option>
                                 <option value="name_az" {% if selected_sort == "name_az" %}selected{% endif %}>Name A-Z</option>
@@ -153,7 +154,7 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary rounded-pill py-2">
+                            <button type="submit" class="btn btn-saaf-primary rounded-pill py-2">
                                 Apply Filters
                             </button>
                         </div>
@@ -172,13 +173,13 @@
 
                             <div class="d-flex flex-wrap gap-2">
                                 {% if selected_category %}
-                                    <span class="badge rounded-pill text-bg-light px-3 py-2">Category selected</span>
+                                    <span class="badge rounded-pill active-filter-chip px-3 py-2">Category selected</span>
                                 {% endif %}
                                 {% if selected_city %}
-                                    <span class="badge rounded-pill text-bg-light px-3 py-2">{{ selected_city }}</span>
+                                    <span class="badge rounded-pill active-filter-chip px-3 py-2">{{ selected_city }}</span>
                                 {% endif %}
                                 {% if search_query %}
-                                    <span class="badge rounded-pill text-bg-light px-3 py-2">“{{ search_query }}”</span>
+                                    <span class="badge rounded-pill active-filter-chip px-3 py-2">“{{ search_query }}”</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -196,7 +197,7 @@
                                                      class="rounded-circle border shadow-sm flex-shrink-0"
                                                      style="width: 72px; height: 72px; object-fit: cover;">
                                             {% else %}
-                                                <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
+                                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm flex-shrink-0 artisan-avatar-fallback"
                                                      style="width: 72px; height: 72px; font-size: 1.5rem; font-weight: 700;">
                                                     {{ artisan.username|first|upper }}
                                                 </div>
@@ -214,7 +215,7 @@
                                                 <p class="text-muted small mb-2">@{{ artisan.username }}</p>
 
                                                 <div class="d-flex flex-wrap gap-2">
-                                                    <span class="badge rounded-pill text-bg-light px-3 py-2">
+                                                    <span class="badge rounded-pill active-filter-chip px-3 py-2">
                                                         <i class="bi bi-geo-alt me-1"></i>
                                                         {{ artisan.artisanprofile.workshop_profile.location|default:"Saudi Arabia" }}
                                                     </span>
@@ -274,7 +275,7 @@
 
                                         <div class="mt-auto d-grid">
                                             <a href="{% url 'workshop:workshop_detail_view' artisan.id %}"
-                                               class="btn btn-outline-primary rounded-pill">
+                                               class="btn btn-saaf-outline rounded-pill">
                                                 View Workshop
                                             </a>
                                         </div>
@@ -293,7 +294,7 @@
                             <p class="text-muted mb-3">
                                 Try changing your search keywords, city, category, or rating range.
                             </p>
-                            <a href="{% url 'main:browse_view' %}" class="btn btn-outline-primary rounded-pill px-4">
+                            <a href="{% url 'main:browse_view' %}" class="btn btn-saaf-outline rounded-pill px-4">
                                 Clear filters
                             </a>
                         </div>
@@ -307,6 +308,24 @@
 
 {% block extra_js %}
 <script>
+(function () {
+    const filterForm = document.getElementById('browse-filter-form');
+    const categorySelect = document.getElementById('category');
+    const citySelect = document.getElementById('city');
+    const sortSelect = document.getElementById('sort');
+    const ratingToggle = document.getElementById('use_rating');
+
+    if (!filterForm) return;
+
+    [categorySelect, citySelect, sortSelect, ratingToggle].forEach(function (el) {
+        if (!el) return;
+        el.addEventListener('change', function () {
+            filterForm.submit();
+        });
+    });
+})();
+
+
 (function () {
     const minInput = document.getElementById('rating_min');
     const maxInput = document.getElementById('rating_max');

@@ -1,23 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-	--sand: #f5efe4;
-	--sand-dark: #eae0cc;
-	--clay: #c2724f;
-	--clay-dark: #a55a38;
-	--ink: #1c1712;
-	--ink-mid: #4a3f33;
-	--ink-light: #8c7b6b;
-	--cream: #fdfaf5;
-	--white: #ffffff;
-	--border: #d8ccba;
+	--sand: var(--saaf-bg, #F1E8D5);
+	--sand-dark: var(--saaf-beige, #E0D2B4);
+	--clay: var(--saaf-brown-light, #B08C5A);
+	--clay-dark: #9a7647;
+	--ink: var(--saaf-brown, #6B4826);
+	--ink-mid: #6f5436;
+	--ink-light: #8B6841;
+	--cream: var(--saaf-bg, #F1E8D5);
+	--white: var(--saaf-beige, #E0D2B4);
+	--border: rgba(107, 72, 38, 0.14);
 	--success: #4a7c59;
 }
 
 body {
-	background: var(--cream);
-	color: var(--ink);
-	font-family: 'DM Sans', sans-serif;
+	background: var(--saaf-bg, var(--cream));
+	color: var(--ink-light);
+	font-family: 'Inter', sans-serif;
 }
 
 h1,
@@ -25,7 +25,8 @@ h2,
 h3,
 h4,
 h5 {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: 'Inter', sans-serif;
+	font-weight: 700;
 }
 
 .request-shell {
@@ -47,7 +48,7 @@ h5 {
 }
 
 .request-eyebrow {
-	color: var(--clay);
+	color: var(--ink-light);
 	font-size: 0.72rem;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
@@ -56,7 +57,7 @@ h5 {
 }
 
 .request-sub {
-	color: #afa094;
+	color: var(--ink-light);
 	margin-bottom: 0;
 }
 
@@ -320,7 +321,7 @@ h5 {
 }
 
 .status-in-review {
-	background: #fff3ee;
+	background: var(--sand);
 	color: var(--clay);
 }
 
@@ -604,7 +605,7 @@ h5 {
 	grid-template-rows: 1fr auto;
 	gap: 0.4rem 0.75rem;
 	align-items: start;
-	background: #fffdfa;
+	background: var(--white);
 	border: 1.5px solid var(--border);
 	border-radius: 9px;
 	padding: 0.6rem;
@@ -646,7 +647,7 @@ h5 {
 
 .suggested-card {
 	border: 1.5px solid var(--border);
-	background: #fffdf9;
+	background: var(--white);
 	border-radius: 10px;
 	padding: 0.7rem;
 	text-decoration: none;
@@ -656,7 +657,7 @@ h5 {
 
 .suggested-card:hover {
 	border-color: var(--clay);
-	background: #fff7ed;
+	background: var(--sand);
 }
 
 .suggested-name {
@@ -692,7 +693,7 @@ h5 {
 	display: flex;
 	gap: 0.75rem;
 	align-items: flex-start;
-	background: #fff;
+	background: var(--white);
 	border: 1px solid var(--border);
 	border-radius: 10px;
 	padding: 0.55rem;
@@ -730,7 +731,7 @@ h5 {
 
 .img-preview-action {
 	border: 1px solid var(--border);
-	background: #fffaf2;
+	background: var(--sand);
 	color: var(--ink-mid);
 	border-radius: 6px;
 	font-size: 0.7rem;
@@ -771,7 +772,7 @@ h5 {
 	padding: 0.35rem 0.5rem;
 	font-size: 0.8rem;
 	color: var(--ink-mid);
-	background: #fffdfa;
+	background: var(--white);
 	resize: none;
 	font-family: inherit;
 	line-height: 1.45;
@@ -805,7 +806,7 @@ h5 {
 	max-height: 94vh;
 	height: 94vh;
 	overflow: hidden;
-	background: #fff;
+	background: var(--white);
 	border-radius: 12px;
 	border: 1px solid var(--border);
 	padding: 0.9rem;
@@ -849,7 +850,7 @@ h5 {
 
 .image-editor-btn {
 	border: 1px solid var(--border);
-	background: #fffaf2;
+	background: var(--sand);
 	color: var(--ink-mid);
 	border-radius: 7px;
 	padding: 0.35rem 0.6rem;
@@ -933,7 +934,7 @@ h5 {
 	border: 1px dashed var(--border);
 	border-radius: 10px;
 	padding: 0.4rem;
-	background: #fffcf7;
+	background: var(--sand);
 	overflow: hidden;
 	flex: 1 1 auto;
 	min-height: 320px;
@@ -1011,7 +1012,7 @@ h5 {
 	border: 1.5px solid var(--border);
 	border-radius: 10px;
 	padding: 0.9rem;
-	background: #fffdf9;
+	background: var(--white);
 }
 
 .ai-review-title {
@@ -1075,7 +1076,7 @@ h5 {
 	border: 1px dashed #d8c9b4;
 	border-radius: 8px;
 	padding: 0.65rem 0.8rem;
-	background: #fdfaf4;
+	background: var(--sand);
 }
 
 .ai-missing-list {
