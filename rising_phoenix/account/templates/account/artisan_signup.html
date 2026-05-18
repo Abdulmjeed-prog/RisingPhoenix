@@ -97,12 +97,14 @@
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone</label>
                             <input
-                                type="text"
+                                type="tel"
                                 name="phone"
                                 id="phone"
                                 class="form-control {% if profile_form.phone.errors %}is-invalid{% endif %}"
+                                placeholder="+966501234567"
                                 value="{{ profile_form.phone.value|default_if_none:'' }}"
                             >
+                                <div class="form-text">Use digits only, with optional + and country code.</div>
                             {% for error in profile_form.phone.errors %}
                                 <div class="invalid-feedback d-block">{{ error }}</div>
                             {% endfor %}
