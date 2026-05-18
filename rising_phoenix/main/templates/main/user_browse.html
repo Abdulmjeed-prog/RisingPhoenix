@@ -300,6 +300,73 @@
                         </div>
                     </div>
                 {% endif %}
+{% if page_obj.has_other_pages %}
+<nav class="pagination-wrap mt-5" aria-label="Browse artisans pages">
+    <ul class="pagination justify-content-center align-items-center flex-wrap gap-2 mb-0">
+
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link saaf-page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page=1">
+                    <i class="bi bi-chevron-double-left me-1"></i> First
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link saaf-page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                    <i class="bi bi-chevron-left me-1"></i> Previous
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link saaf-page-link">
+                    <i class="bi bi-chevron-double-left me-1"></i> First
+                </span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link saaf-page-link">
+                    <i class="bi bi-chevron-left me-1"></i> Previous
+                </span>
+            </li>
+        {% endif %}
+
+        <li class="page-item active" aria-current="page">
+            <span class="page-link saaf-page-link saaf-page-current">
+                {{ page_obj.number }}
+            </span>
+        </li>
+
+        <li class="page-item disabled d-none d-md-block">
+            <span class="page-link saaf-page-link saaf-page-status">
+                of {{ page_obj.paginator.num_pages }}
+            </span>
+        </li>
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link saaf-page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.next_page_number }}">
+                    Next <i class="bi bi-chevron-right ms-1"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link saaf-page-link" href="?{% if query_params %}{{ query_params }}&{% endif %}page={{ page_obj.paginator.num_pages }}">
+                    Last <i class="bi bi-chevron-double-right ms-1"></i>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link saaf-page-link">
+                    Next <i class="bi bi-chevron-right ms-1"></i>
+                </span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link saaf-page-link">
+                    Last <i class="bi bi-chevron-double-right ms-1"></i>
+                </span>
+            </li>
+        {% endif %}
+
+    </ul>
+</nav>
+{% endif %}
             </div>
         </div>
     </div>

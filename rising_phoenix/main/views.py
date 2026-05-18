@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group, User
 from workshop.models import Category
 from workshop.models import WorkshopProfile
 from django.db.models import Q, Avg
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -123,6 +124,10 @@ def browse_view(request: HttpRequest):
             '-artisanprofile__workshop_profile__created_at'
         ).distinct()
 
+    paginator = Paginator(artisans, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     categories = Category.objects.all().order_by('name')
 
     cities = User.objects.filter(
@@ -135,8 +140,13 @@ def browse_view(request: HttpRequest):
         'artisanprofile__workshop_profile__location', flat=True
     ).distinct().order_by('artisanprofile__workshop_profile__location')
 
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        query_params.pop('page')
+
     context = {
-        'artisans': artisans,
+        'artisans': page_obj,
+        'page_obj': page_obj,
         'categories': categories,
         'cities': cities,
         'selected_category': category_id,
@@ -146,8 +156,10 @@ def browse_view(request: HttpRequest):
         'selected_rating_min': str(min_value),
         'selected_rating_max': str(max_value),
         'use_rating': use_rating,
+        'query_params': query_params.urlencode(),
     }
     return render(request, 'main/user_browse.html', context)
+
 
 
 def about_us_view(request: HttpRequest):

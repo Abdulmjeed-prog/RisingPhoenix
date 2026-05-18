@@ -26,27 +26,56 @@ from request.models import Request
 from staff.views import submit_report_view, my_reports_view  # re-export for account URLs
 # Create your views here.
 
-def signup_view(request:HttpRequest):
+def signup_view(request: HttpRequest):
     if request.user.is_authenticated:
         return redirect('main:home_view')
+
     if request.method == 'POST':
         user_form = CustomUserCreationForm(request.POST)
-        profile_form = ProfileForm(request.POST,request.FILES)
+        profile_form = ProfileForm(request.POST, request.FILES)
+
         if user_form.is_valid() and profile_form.is_valid():
             with transaction.atomic():
                 new_user = user_form.save()
                 profile = profile_form.save(commit=False)
                 profile.user = new_user
+
+                selected_default_avatar = request.POST.get('default_avatar')
+
+                if not request.FILES.get('avatar') and selected_default_avatar:
+                    profile.avatar = f'images/avatars/defaults/{selected_default_avatar}'
+
                 profile.save()
                 messages.success(request, "You have been register")
+
             send_welcome_email(new_user)
             return redirect('account:login_view')
         else:
             print(user_form.errors)
+            print(profile_form.errors)
             messages.error(request, "something goes Wrong")
-            return render(request, 'account/signup.html', {'user_form': user_form, 'profile_form': profile_form})
-        
-    return render(request, 'account/signup.html')
+            return render(request, 'account/signup.html', {
+                'user_form': user_form,
+                'profile_form': profile_form,
+                'default_avatar_choices': [
+                    'avatar1.png',
+                    'avatar2.png',
+                    'avatar3.png',
+                    'avatar4.png',
+                ]
+            })
+
+    return render(request, 'account/signup.html', {
+        'user_form': CustomUserCreationForm(),
+        'profile_form': ProfileForm(),
+        'default_avatar_choices': [
+            'avatar1.png',
+            'avatar2.png',
+            'avatar3.png',
+            'avatar4.png',
+        ]
+    })
+
 
 def artisan_signup_view(request:HttpRequest):
     if request.user.is_authenticated:

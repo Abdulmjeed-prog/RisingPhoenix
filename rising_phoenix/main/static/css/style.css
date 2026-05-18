@@ -218,3 +218,79 @@
     opacity: 0.5;
     pointer-events: none;
 }
+
+
+.pagination-wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-wrap .pagination {
+    background: #fff;
+    padding: 0.75rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.saaf-page-link {
+    border: none;
+    border-radius: 999px !important;
+    padding: 0.7rem 1rem;
+    min-width: 48px;
+    text-align: center;
+    font-weight: 600;
+    color: #23423a;
+    background-color: #f8faf9;
+    transition: all 0.2s ease;
+}
+
+.saaf-page-link:hover {
+    color: #0f2e27;
+    background-color: #e8f3ef;
+    transform: translateY(-1px);
+}
+
+.page-item.active .saaf-page-current {
+    color: #fff;
+    background: linear-gradient(135deg, #1f6f5f, #2e8b78);
+    box-shadow: 0 8px 18px rgba(31, 111, 95, 0.28);
+}
+
+.page-item.disabled .saaf-page-link {
+    color: #a0a8a4;
+    background-color: #f3f5f4;
+    opacity: 1;
+}
+
+.saaf-page-status {
+    background-color: transparent;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+@media (max-width: 576px) {
+    .pagination-wrap .pagination {
+        width: 100%;
+        justify-content: center;
+        padding: 0.65rem;
+    }
+
+    .saaf-page-link {
+        padding: 0.6rem 0.85rem;
+        font-size: 0.92rem;
+    }
+}
+
+
+.default-avatar-option input:checked + .default-avatar-preview {
+    border: 3px solid #198754 !important;
+    transform: scale(1.05);
+}
+
+.default-avatar-preview {
+    transition: all 0.2s ease;
+}
+
+.default-avatar-option:hover .default-avatar-preview {
+    transform: scale(1.05);
+}
