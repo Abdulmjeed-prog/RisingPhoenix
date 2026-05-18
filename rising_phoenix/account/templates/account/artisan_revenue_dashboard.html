@@ -1,0 +1,575 @@
+{% extends "main/base.html" %}
+
+{% block title %}Artisan Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #c96f52;
+        --light-bg: #faf3ec;
+        --card-bg: #fff;
+        --text-muted: #8b7461;
+        --border-light: #efe6dd;
+        --dark-header: #4d2f22;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--light-bg);
+        font-family: 'Manrope', sans-serif;
+        overflow-x: hidden;
+    }
+
+    .dashboard-container {
+        display: flex;
+        min-height: calc(100vh - 56px);
+        padding-top: 0;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 56px;
+        width: 230px;
+        height: calc(100vh - 56px);
+        background: var(--card-bg);
+        border-right: 1px solid var(--border-light);
+        padding: 24px 14px;
+        overflow-y: auto;
+        z-index: 100;
+    }
+
+    .sidebar-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .sidebar-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #d9b9a8;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .sidebar-profile-text h5 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #2c1f1a;
+        margin: 0;
+    }
+
+    .sidebar-profile-text small {
+        color: #8b7461;
+        font-size: 0.75rem;
+        display: block;
+        margin-top: 2px;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .sidebar-nav a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #3d3430;
+        font-size: 0.95rem;
+        transition: background 0.2s;
+        position: relative;
+    }
+
+    .sidebar-nav a:hover {
+        background: #f7efe7;
+    }
+
+    .sidebar-nav a.active {
+        background: #f0e5d9;
+        font-weight: 600;
+    }
+
+    .sidebar-nav a i {
+        font-size: 1.1rem;
+        min-width: 20px;
+    }
+
+    .sidebar-badge {
+        margin-left: auto;
+        background: var(--primary);
+        color: #fff;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .main-content {
+        margin-left: 230px;
+        flex: 1;
+        padding: 24px 32px;
+        width: calc(100% - 230px);
+        overflow-y: auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+        gap: 20px;
+    }
+
+    .header-left h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #2c1f1a;
+        margin-top: 12px;
+        margin-bottom: 8px;
+    }
+
+    .header-label {
+        display: inline-block;
+        background: var(--dark-header);
+        color: var(--primary);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .header-subtitle {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-top: 4px;
+    }
+
+    .header-right {
+        text-align: right;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 0 rgba(0, 0, 0, 0.01);
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: #f7efe7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c1f1a;
+        margin-bottom: 6px;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+
+    .stat-detail {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .stat-detail.positive {
+        color: #27ae60;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2c1f1a;
+        margin: 28px 0 16px 0;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .section-header .see-all {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .chart-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 32px;
+    }
+
+    #earningsChart {
+        max-height: 240px;
+    }
+
+    .order-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-light);
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .order-card.highlight {
+        border-left: 4px solid var(--primary);
+    }
+
+    .order-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #f7efe7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8b7461;
+        flex-shrink: 0;
+    }
+
+    .order-info h6 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #2c1f1a;
+        margin: 0 0 4px 0;
+    }
+
+    .order-info p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .order-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-left: auto;
+    }
+
+    .badge-status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .badge-earned {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .badge-paid {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .badge-canceled {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .badge-other {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    @media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 80px;
+            padding: 12px 6px;
+        }
+
+        .sidebar-profile {
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .sidebar-profile-text {
+            display: none;
+        }
+
+        .sidebar-nav a span {
+            display: none;
+        }
+
+        .sidebar-badge {
+            display: none;
+        }
+
+        .main-content {
+            margin-left: 80px;
+            width: calc(100% - 80px);
+            padding: 16px;
+        }
+
+        .page-header {
+            flex-direction: column;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            padding: 16px;
+        }
+
+        .order-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .order-right {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar">{{ request.user.first_name|slice:":1"|default:'A' }}</div>
+            <div class="sidebar-profile-text">
+                <h5>{{ request.user.first_name }} {{ request.user.last_name }}</h5>
+                <small>ARTISAN</small>
+                
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'account:artisan_revenue_dashboard_view' %}" class="active">
+                <i class="bi bi-house-door-fill"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'request:request_list_view' %}">
+                <i class="bi bi-search"></i>
+                <span>Browse Requests</span>
+            </a>
+            <a href="{% url 'proposal:my_proposals_view' %}">
+                <i class="bi bi-clipboard-check"></i>
+                <span>My Proposals</span>
+            </a>
+            <a href="{% url 'message:conversation_list_view' %}">
+                <i class="bi bi-chat-dots"></i>
+                <span>Messages</span>
+            </a>
+            <a href="{% url 'account:logout_view' %}">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Sign Out</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div class="header-left">
+                <div class="header-label">ARTISAN EARNINGS DASHBOARD</div>
+                <h1>Welcome back, {{ request.user.first_name|default:request.user.username }}</h1>
+                <p class="header-subtitle">Track your earnings, available balance, and completed work.</p>
+            </div>
+            <div class="header-right">
+                <a href="{% url 'request:request_list_view' %}" class="btn btn-outline-primary">
+                    Browse Open Requests →
+                </a>
+                <a href="{% url 'account:artisan_connect_stripe_view' %}" class="btn btn-primary">
+    Connect Stripe
+</a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-number">SAR {{ this_month_total|floatformat:0 }}</div>
+                <div class="stat-label">Earned This Month</div>
+                <div class="stat-detail">{{ this_month_jobs }} completed job{{ this_month_jobs|pluralize }}</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">💼</div>
+                <div class="stat-number">SAR {{ current_balance|floatformat:0 }}</div>
+                <div class="stat-label">Available Balance</div>
+                <div class="stat-detail">Ready for payout</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-number">SAR {{ total_paid|floatformat:0 }}</div>
+                <div class="stat-label">Paid Out</div>
+                <div class="stat-detail">Transferred to you</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-number">{{ total_jobs }}</div>
+                <div class="stat-label">Total Jobs</div>
+                <div class="stat-detail">Confirmed completed contracts</div>
+            </div>
+        </div>
+
+        <div class="section-title">Earnings (by month)</div>
+        <div class="chart-card">
+            <canvas id="earningsChart" height="110"></canvas>
+        </div>
+
+        <div class="section-header">
+            <div class="section-title" style="margin: 0;">Recent Earnings</div>
+        </div>
+
+        {% for revenue in recent_revenues %}
+        <div class="order-card {% if forloop.first %}highlight{% endif %}">
+            <div class="order-icon">💳</div>
+            <div class="order-info">
+                <h6>
+                    {% if revenue.contract.proposal.request %}
+                        {{ revenue.contract.proposal.request.title }}
+                    {% else %}
+                        Contract #{{ revenue.contract.id }}
+                    {% endif %}
+                </h6>
+                <p>
+                    Contract #{{ revenue.contract.id }} ·
+                    SAR {{ revenue.net_amount|floatformat:2 }} ·
+                    {{ revenue.created_at|date:"M d, Y" }}
+                </p>
+            </div>
+            <div class="order-right">
+                {% if revenue.status == 'earned' %}
+                    <span class="badge-status badge-earned">Earned</span>
+                {% elif revenue.status == 'paid' %}
+                    <span class="badge-status badge-paid">Paid</span>
+                {% elif revenue.status == 'canceled' %}
+                    <span class="badge-status badge-canceled">Canceled</span>
+                {% else %}
+                    <span class="badge-status badge-other">{{ revenue.status }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p class="stat-detail">No earnings recorded yet.</p>
+        {% endfor %}
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ chart_labels|json_script:"earnings-chart-labels" }}
+{{ chart_totals|json_script:"earnings-chart-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+    const labels = JSON.parse(document.getElementById('earnings-chart-labels').textContent);
+    const data = JSON.parse(document.getElementById('earnings-chart-data').textContent);
+
+    const ctx = document.getElementById('earningsChart');
+    if (!ctx) return;
+
+    const colors = labels.map((_, i) => i === labels.length - 1 ? '#c96f52' : '#e9dccf');
+
+    new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Earnings',
+                data: data,
+                backgroundColor: colors,
+                borderRadius: 8,
+                borderSkipped: false,
+                barThickness: 36
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#8b7461' }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#8b7461',
+                        callback: function(value) {
+                            return 'SAR ' + value;
+                        }
+                    },
+                    grid: {
+                        color: '#f1e6dc'
+                    }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+})();
+</script>
+{% endblock %}

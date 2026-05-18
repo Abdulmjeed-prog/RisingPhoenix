@@ -139,10 +139,16 @@
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-3">Contract action</h5>
                     <p class="text-muted small mb-4">
-                        Accept this contract to confirm the project terms and begin the work.
+                        Accept this contract to confirm the project terms and begin the work, or reject it to cancel the payment hold.
                     </p>
 
-                    <form method="post" action="{% url 'payment:artisan_accept_contract_view' contract.id %}">
+                    <div class="alert alert-warning border-0 rounded-4 mb-4">
+                        <p class="mb-0 small">
+                            If you reject this contract, the requester’s payment hold will be canceled and the contract will not move forward.
+                        </p>
+                    </div>
+
+                    <form method="post" action="{% url 'payment:artisan_accept_contract_view' contract.id %}" class="mb-3">
                         {% csrf_token %}
 
                         <div class="form-check mb-4">
@@ -154,6 +160,16 @@
 
                         <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-semibold">
                             Accept Contract
+                        </button>
+                    </form>
+
+                    <form method="post" action="{% url 'payment:artisan_reject_contract_view' contract.id %}">
+                        {% csrf_token %}
+                        <button
+                            type="submit"
+                            class="btn btn-outline-danger w-100 rounded-pill py-3 fw-semibold"
+                            onclick="return confirm('Are you sure you want to reject this contract? This will cancel the payment hold.')">
+                            Reject Contract
                         </button>
                     </form>
                 </div>

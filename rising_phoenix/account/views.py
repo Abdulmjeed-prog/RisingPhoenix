@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.shortcuts import get_object_or_404, render, redirect
 from .forms import CustomUserCreationForm, ProfileForm, ArtisanProfileForm, CustomUserUpdateForm, ReviewForm
 from django.http import HttpRequest, HttpResponse
@@ -5,9 +7,10 @@ from django.contrib import messages
 from django.db import transaction
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import ArtisanProfile, Review
+from .models import ArtisanProfile, Review, ArtisanRevenue
 from django.contrib.auth.models import Group, User
 from django.db.models import Avg, Sum, Count, Q
+from django.db.models.functions import TruncMonth
 from django.utils import timezone
 import datetime
 import calendar
@@ -15,6 +18,9 @@ from twilio.rest import Client
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from notification.utils import send_welcome_email, send_artisan_welcome_email
+import stripe
+from django.urls import reverse
+
 # Create your views here.
 
 def signup_view(request:HttpRequest):
@@ -537,5 +543,190 @@ def password_reset_view(request: HttpRequest):
         form = PasswordResetForm()
 
     return render(request, 'account/password_reset.html', {'form': form})
+
+
+@login_required
+def artisan_revenue_dashboard_view(request):
+    artisan = request.user
+    now = timezone.now()
+
+    revenues = (
+        ArtisanRevenue.objects
+        .filter(artisan=artisan)
+        .select_related('contract', 'escrow_payment')
+        .order_by('-created_at')
+    )
+
+    total_earned = revenues.filter(
+        status__in=[ArtisanRevenue.Status.EARNED, ArtisanRevenue.Status.PAID]
+    ).aggregate(total=Sum('net_amount'))['total'] or Decimal('0.00')
+
+    total_paid = revenues.filter(
+        status=ArtisanRevenue.Status.PAID
+    ).aggregate(total=Sum('net_amount'))['total'] or Decimal('0.00')
+
+    current_balance = revenues.filter(
+        status=ArtisanRevenue.Status.EARNED
+    ).aggregate(total=Sum('net_amount'))['total'] or Decimal('0.00')
+
+    this_month_total = revenues.filter(
+        created_at__year=now.year,
+        created_at__month=now.month,
+        status__in=[ArtisanRevenue.Status.EARNED, ArtisanRevenue.Status.PAID]
+    ).aggregate(total=Sum('net_amount'))['total'] or Decimal('0.00')
+
+    this_month_jobs = revenues.filter(
+        created_at__year=now.year,
+        created_at__month=now.month,
+        status__in=[ArtisanRevenue.Status.EARNED, ArtisanRevenue.Status.PAID]
+    ).aggregate(count=Count('id'))['count'] or 0
+
+    recent_revenues = revenues[:10]
+
+    monthly_revenues = (
+        revenues.filter(status__in=[ArtisanRevenue.Status.EARNED, ArtisanRevenue.Status.PAID])
+        .annotate(month=TruncMonth('created_at'))
+        .values('month')
+        .annotate(
+            total=Sum('net_amount'),
+            jobs=Count('id')
+        )
+        .order_by('month')
+    )
+
+    chart_labels = [item['month'].strftime('%b %Y') for item in monthly_revenues if item['month']]
+    chart_totals = [float(item['total'] or 0) for item in monthly_revenues]
+
+    context = {
+        'total_earned': total_earned,
+        'total_paid': total_paid,
+        'current_balance': current_balance,
+        'this_month_total': this_month_total,
+        'this_month_jobs': this_month_jobs,
+        'recent_revenues': recent_revenues,
+        'monthly_revenues': monthly_revenues,
+        'chart_labels': chart_labels,
+        'chart_totals': chart_totals,
+        'page_title': 'Earnings Dashboard',
+    }
+    return render(request, 'account/artisan_revenue_dashboard.html', context)
+
+
+@login_required
+def artisan_connect_stripe_view(request):
+    try:
+        profile = request.user.artisanprofile
+    except ArtisanProfile.DoesNotExist:
+        messages.error(request, 'Artisan profile not found.')
+        return redirect('main:home_view')
+
+    try:
+        account = None
+
+        if profile.stripe_connected_account_id:
+            try:
+                account = stripe.Account.retrieve(profile.stripe_connected_account_id)
+            except stripe.error.InvalidRequestError:
+                profile.stripe_connected_account_id = None
+                profile.save(update_fields=['stripe_connected_account_id'])
+
+        if not account:
+            account = stripe.Account.create(
+                type='express',
+                country='SA',
+                email=request.user.email or None,
+                capabilities={
+                    'transfers': {'requested': True},
+                },
+                tos_acceptance={
+                    'service_agreement': 'recipient',
+                },
+                metadata={
+                    'user_id': str(request.user.id),
+                    'username': request.user.username,
+                }
+            )
+            profile.stripe_connected_account_id = account.id
+            profile.save(update_fields=['stripe_connected_account_id'])
+
+        account_link = stripe.AccountLink.create(
+            account=account.id,
+            refresh_url=request.build_absolute_uri(
+                reverse('account:artisan_connect_stripe_refresh_view')
+            ),
+            return_url=request.build_absolute_uri(
+                reverse('account:artisan_connect_stripe_return_view')
+            ),
+            type='account_onboarding',
+        )
+
+        return redirect(account_link.url)
+
+    except stripe.error.StripeError as e:
+        messages.error(request, str(e))
+        return redirect('account:artisan_dashboard_view')
+
+
+@login_required
+def artisan_connect_stripe_refresh_view(request):
+    try:
+        profile = request.user.artisanprofile
+    except ArtisanProfile.DoesNotExist:
+        messages.error(request, 'Artisan profile not found.')
+        return redirect('main:home_view')
+
+    if not profile.stripe_connected_account_id:
+        messages.error(request, 'Stripe connected account not found.')
+        return redirect('account:artisan_dashboard_view')
+
+    try:
+        account_link = stripe.AccountLink.create(
+            account=profile.stripe_connected_account_id,
+            refresh_url=request.build_absolute_uri(
+                reverse('account:artisan_connect_stripe_refresh_view')
+            ),
+            return_url=request.build_absolute_uri(
+                reverse('account:artisan_connect_stripe_return_view')
+            ),
+            type='account_onboarding',
+        )
+        return redirect(account_link.url)
+
+    except stripe.error.StripeError as e:
+        messages.error(request, str(e))
+        return redirect('account:artisan_dashboard_view')
+
+@login_required
+def artisan_connect_stripe_return_view(request):
+    try:
+        profile = request.user.artisanprofile
+    except ArtisanProfile.DoesNotExist:
+        messages.error(request, 'Artisan profile not found.')
+        return redirect('main:home_view')
+
+    if not profile.stripe_connected_account_id:
+        messages.error(request, 'Stripe connected account not found.')
+        return redirect('account:artisan_dashboard_view')
+
+    try:
+        account = stripe.Account.retrieve(profile.stripe_connected_account_id)
+
+        if account.details_submitted and account.payouts_enabled:
+            messages.success(request, 'Stripe payout setup completed successfully.')
+        elif account.details_submitted:
+            messages.warning(
+                request,
+                'Your Stripe account details were submitted, but payouts are not enabled yet.'
+            )
+        else:
+            messages.warning(
+                request,
+                'Stripe onboarding is not complete yet. Please finish the required details.'
+            )
+
+    except stripe.error.StripeError as e:
+        messages.error(request, str(e))
+
+    return redirect('account:artisan_dashboard_view')
 
 

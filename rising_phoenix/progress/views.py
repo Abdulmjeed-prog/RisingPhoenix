@@ -1,3 +1,4 @@
+from decimal import Decimal
 import logging
 
 from django.conf import settings
@@ -14,6 +15,7 @@ from .forms import ProgressCommentForm
 from .models import Contract, ContractEvent, ContractEventImage, ProgressComment, ProgressCommentImage, ProgressImage, ProgressUpdate
 import stripe
 from django.db import transaction
+from account.models import ArtisanRevenue
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -62,7 +64,15 @@ def contract_detail_view(request, contract_id):
         ),
         id=contract_id,
     )
-    if contract.status != Contract.Status.ACTIVE or not (contract.requester_accepted_at and contract.artisan_accepted_at):
+    allowed_statuses = (
+        Contract.Status.IN_PROGRESS,
+        Contract.Status.COMPLETION_REQUESTED,
+        Contract.Status.COMPLETED
+    )
+
+    if contract.status not in allowed_statuses or not (
+        contract.requester_accepted_at and contract.artisan_accepted_at
+    ):
         messages.error(request, 'This contract is not active yet. Both parties must accept the contract first.')
         return redirect('main:home_view')
 
@@ -225,52 +235,16 @@ def request_completion_view(request, contract_id):
     return redirect('progress:contract_detail_view', contract_id=contract_id)
 
 
-# @login_required
-# @require_POST
-# def confirm_completion_view(request, contract_id):
-#     contract = get_object_or_404(Contract, id=contract_id)
-
-#     if request.user != contract.requester:
-#         messages.error(request, 'Only the requester can confirm completion.')
-#         return redirect('progress:contract_detail_view', contract_id=contract_id)
-
-#     if not contract.is_completion_requested:
-#         messages.error(request, 'There is no pending completion request.')
-#         return redirect('progress:contract_detail_view', contract_id=contract_id)
-
-#     contract.status = Contract.Status.COMPLETED
-#     contract.completed_at = timezone.now()
-#     contract.save(update_fields=['status', 'completed_at', 'updated_at'])
-#     ContractEvent.objects.create(
-#         contract=contract,
-#         event_type=ContractEvent.EventType.COMPLETED,
-#         actor=request.user,
-#     )
-#     messages.success(request, 'Project confirmed as complete. Thank you!')
-#     notify(
-#         contract.artisan,
-#         Notification.NotifType.COMPLETION_CONFIRMED,
-#         'Your project has been confirmed as complete',
-#         body='Congratulations! The requester has confirmed the work is done.',
-#         link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract_id}),
-#     )
-#     # TODO Escrow: contract.completed_at is the trigger for payment release
-#     return redirect('progress:contract_detail_view', contract_id=contract_id)
-
+@login_required
 def confirm_completion_view(request, contract_id):
     contract = get_object_or_404(
         Contract.objects.select_related(
             'proposal',
-            'proposal__request',
             'proposal__artisan',
-            'escrow_payment',
+            'proposal__request',
         ),
         id=contract_id
     )
-
-    if request.method != 'POST':
-        messages.error(request, 'Invalid action.')
-        return redirect('progress:contract_detail_view', contract_id=contract_id)
 
     if request.user != contract.requester:
         messages.error(request, 'Only the requester can confirm completion.')
@@ -282,30 +256,14 @@ def confirm_completion_view(request, contract_id):
 
     escrow_payment = getattr(contract, 'escrow_payment', None)
     if not escrow_payment:
-        messages.error(request, 'No escrow payment was found for this contract.')
+        messages.error(request, 'No payment record was found for this contract.')
         return redirect('progress:contract_detail_view', contract_id=contract_id)
 
-    if escrow_payment.captured:
-        messages.info(request, 'This payment has already been captured.')
-        return redirect('progress:contract_detail_view', contract_id=contract_id)
-
-    try:
-        payment_intent = stripe.PaymentIntent.capture(
-            escrow_payment.stripe_payment_intent_id
-        )
-    except stripe.error.StripeError:
-        messages.error(request, 'Unable to release the escrow payment right now. Please try again.')
-        return redirect('progress:contract_detail_view', contract_id=contract_id)
-
-    if payment_intent.status != 'succeeded':
-        messages.error(request, f'Payment capture was not completed. Stripe status: {payment_intent.status}')
-        return redirect('progress:contract_detail_view', contract_id=contract_id)
+    gross_amount = contract.proposal.price
+    platform_fee = Decimal('0.00')   # replace later with your fee logic
+    net_amount = gross_amount - platform_fee
 
     with transaction.atomic():
-        escrow_payment.status = 'captured'
-        escrow_payment.captured = True
-        escrow_payment.save(update_fields=['status', 'captured', 'updated_at'])
-
         contract.status = Contract.Status.COMPLETED
         contract.completed_at = timezone.now()
         contract.save(update_fields=['status', 'completed_at', 'updated_at'])
@@ -316,17 +274,100 @@ def confirm_completion_view(request, contract_id):
             actor=request.user,
         )
 
-    messages.success(request, 'Project confirmed as complete and payment has been released successfully.')
+        ArtisanRevenue.objects.get_or_create(
+            contract=contract,
+            defaults={
+                'artisan': contract.artisan,
+                'escrow_payment': escrow_payment,
+                'amount': gross_amount,
+                'platform_fee': platform_fee,
+                'net_amount': net_amount,
+                'status': ArtisanRevenue.Status.EARNED,
+            }
+        )
+
+    messages.success(request, 'Project confirmed as complete. Thank you!')
 
     notify(
         contract.artisan,
         Notification.NotifType.COMPLETION_CONFIRMED,
         'Your project has been confirmed as complete',
-        body='Congratulations! The requester has confirmed the work is done and the payment has been released.',
+        body='Congratulations! The requester has confirmed the work is done.',
         link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract_id}),
     )
 
     return redirect('progress:contract_detail_view', contract_id=contract_id)
+
+# def confirm_completion_view(request, contract_id):
+#     contract = get_object_or_404(
+#         Contract.objects.select_related(
+#             'proposal',
+#             'proposal__request',
+#             'proposal__artisan',
+#             'escrow_payment',
+#         ),
+#         id=contract_id
+#     )
+
+#     if request.method != 'POST':
+#         messages.error(request, 'Invalid action.')
+#         return redirect('progress:contract_detail_view', contract_id=contract_id)
+
+#     if request.user != contract.requester:
+#         messages.error(request, 'Only the requester can confirm completion.')
+#         return redirect('progress:contract_detail_view', contract_id=contract_id)
+
+#     if not contract.is_completion_requested:
+#         messages.error(request, 'There is no pending completion request.')
+#         return redirect('progress:contract_detail_view', contract_id=contract_id)
+
+#     escrow_payment = getattr(contract, 'escrow_payment', None)
+#     if not escrow_payment:
+#         messages.error(request, 'No escrow payment was found for this contract.')
+#         return redirect('progress:contract_detail_view', contract_id=contract_id)
+
+#     if escrow_payment.captured:
+#         messages.info(request, 'This payment has already been captured.')
+#         return redirect('progress:contract_detail_view', contract_id=contract_id)
+
+#     try:
+#         payment_intent = stripe.PaymentIntent.capture(
+#             escrow_payment.stripe_payment_intent_id
+#         )
+#     except stripe.error.StripeError:
+#         messages.error(request, 'Unable to release the escrow payment right now. Please try again.')
+#         return redirect('progress:contract_detail_view', contract_id=contract_id)
+
+#     if payment_intent.status != 'succeeded':
+#         messages.error(request, f'Payment capture was not completed. Stripe status: {payment_intent.status}')
+#         return redirect('progress:contract_detail_view', contract_id=contract_id)
+
+#     with transaction.atomic():
+#         escrow_payment.status = 'captured'
+#         escrow_payment.captured = True
+#         escrow_payment.save(update_fields=['status', 'captured', 'updated_at'])
+
+#         contract.status = Contract.Status.COMPLETED
+#         contract.completed_at = timezone.now()
+#         contract.save(update_fields=['status', 'completed_at', 'updated_at'])
+
+#         ContractEvent.objects.create(
+#             contract=contract,
+#             event_type=ContractEvent.EventType.COMPLETED,
+#             actor=request.user,
+#         )
+
+#     messages.success(request, 'Project confirmed as complete and payment has been released successfully.')
+
+#     notify(
+#         contract.artisan,
+#         Notification.NotifType.COMPLETION_CONFIRMED,
+#         'Your project has been confirmed as complete',
+#         body='Congratulations! The requester has confirmed the work is done and the payment has been released.',
+#         link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract_id}),
+#     )
+
+#     return redirect('progress:contract_detail_view', contract_id=contract_id)
 
 
 

@@ -22,6 +22,7 @@ class Profile(models.Model):
 
 class ArtisanProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    stripe_connected_account_id = models.CharField(max_length=255, blank=True, null=True)
     phone = PhoneNumberField()
     bio = models.TextField(blank=True)
     avatar = models.ImageField(upload_to="images/avatars/", default="images/avatars/default_avatar.jpg")
@@ -84,3 +85,47 @@ def review_saved(sender, instance, **kwargs):
 @receiver(post_delete, sender=Review)
 def review_deleted(sender, instance, **kwargs):
     _recalc_artisan_rating(instance.reviews_received)
+
+
+
+class ArtisanRevenue(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        EARNED = 'earned', 'Earned'
+        PAID = 'paid', 'Paid'
+        CANCELED = 'canceled', 'Canceled'
+
+    artisan = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='revenues'
+    )
+    contract = models.OneToOneField(
+        'progress.Contract',
+        on_delete=models.CASCADE,
+        related_name='revenue'
+    )
+    
+    escrow_payment = models.OneToOneField(
+        'payment.EscrowPayment',
+        on_delete=models.CASCADE,
+        related_name='revenue'
+    )
+
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    platform_fee = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    net_amount = models.DecimalField(max_digits=12, decimal_places=2)
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.EARNED
+    )
+
+    paid_out_at = models.DateTimeField(null=True, blank=True)
+    payout_reference = models.CharField(max_length=255, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.artisan.username} - {self.net_amount}"

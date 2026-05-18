@@ -7,7 +7,6 @@ class Contract(models.Model):
     class Status(models.TextChoices):
         PENDING_REQUESTER = 'pending_requester', 'Pending Requester Acceptance'
         PENDING_ARTISAN = 'pending_artisan', 'Pending Artisan Acceptance'
-        ACTIVE = 'active', 'Active'
         IN_PROGRESS           = 'in_progress',          'In Progress'
         COMPLETION_REQUESTED  = 'completion_requested', 'Completion Requested'
         COMPLETED             = 'completed',            'Completed'

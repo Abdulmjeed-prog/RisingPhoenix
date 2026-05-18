@@ -1,6 +1,6 @@
+from datetime import timedelta
 from django.utils import timezone
 from decimal import Decimal
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -15,6 +15,10 @@ from proposal.models import Proposal
 from django.db import transaction
 from progress.models import Contract, ContractEvent
 from notification.models import Notification
+from .services import process_monthly_artisan_payouts
+from django.views.decorators.http import require_POST
+from django.contrib.admin.views.decorators import staff_member_required
+import logging
 
 
 # Create your views here.
@@ -299,7 +303,7 @@ def artisan_accept_contract_view(request, contract_id):
 
     if request.method != 'POST':
         messages.error(request, 'Invalid request method.')
-        return redirect('progress:artisan_contract_review_view', contract_id=contract.id)
+        return redirect('payment:artisan_contract_review_view', contract_id=contract.id)
 
     if request.user != contract.artisan:
         messages.error(request, 'Only the artisan can accept this contract.')
@@ -311,11 +315,11 @@ def artisan_accept_contract_view(request, contract_id):
 
     if contract.status == Contract.Status.CANCELED:
         messages.error(request, 'This contract has been canceled.')
-        return redirect('progress:contract_detail_view', contract_id=contract.id)
+        return redirect('request:request_detail_view', request_id=contract.proposal.request.id)
 
     if not contract.requester_accepted_at:
         messages.error(request, 'The requester must accept the contract first.')
-        return redirect('progress:artisan_contract_review_view', contract_id=contract.id)
+        return redirect('payment:artisan_contract_review_view', contract_id=contract.id)
 
     if contract.artisan_accepted_at:
         messages.info(request, 'You already accepted this contract.')
@@ -323,36 +327,167 @@ def artisan_accept_contract_view(request, contract_id):
 
     if contract.status != Contract.Status.PENDING_ARTISAN:
         messages.error(request, 'This contract is not waiting for artisan acceptance.')
-        return redirect('progress:contract_detail_view', contract_id=contract.id)
+        return redirect('request:request_detail_view', request_id=contract.proposal.request.id)
 
     escrow_payment = getattr(contract, 'escrow_payment', None)
     if not escrow_payment:
         messages.error(request, 'No authorized escrow payment was found for this contract.')
-        return redirect('progress:artisan_contract_review_view', contract_id=contract.id)
+        return redirect('payment:artisan_contract_review_view', contract_id=contract.id)
 
     if escrow_payment.status != 'authorized' or escrow_payment.captured:
         messages.error(request, 'This escrow payment is not in a valid authorized state.')
-        return redirect('progress:artisan_contract_review_view', contract_id=contract.id)
+        return redirect('payment:artisan_contract_review_view', contract_id=contract.id)
+
+    expires_at = escrow_payment.created_at + timedelta(days=7)
+    if timezone.now() > expires_at:
+        try:
+            stripe.PaymentIntent.cancel(
+                escrow_payment.stripe_payment_intent_id,
+                cancellation_reason='abandoned',
+            )
+        except stripe.error.StripeError:
+            pass
+
+        escrow_payment.status = 'canceled'
+        escrow_payment.save(update_fields=['status', 'updated_at'])
+
+        contract.status = Contract.Status.CANCELED
+        contract.save(update_fields=['status', 'updated_at'])
+
+        messages.error(request, 'This payment hold expired after 7 days. The contract can no longer be accepted.')
+        return redirect('request:request_detail_view', request_id=contract.proposal.request.id)
+
+    try:
+        captured_intent = stripe.PaymentIntent.capture(
+            escrow_payment.stripe_payment_intent_id
+        )
+    except stripe.error.StripeError:
+        messages.error(request, 'The payment could not be captured. Please try again.')
+        return redirect('payment:artisan_contract_review_view', contract_id=contract.id)
 
     with transaction.atomic():
         contract.artisan_accepted_at = timezone.now()
-        contract.status = Contract.Status.ACTIVE
+        contract.status = Contract.Status.IN_PROGRESS
         contract.save(update_fields=['artisan_accepted_at', 'status', 'updated_at'])
 
         proposal = contract.proposal
         proposal.status = Proposal.Status.ACCEPTED
         proposal.save(update_fields=['status', 'updated_at'])
 
-    # notify(
-    #     contract.requester,
-    #     Notification.NotifType.CONTRACT_ACTIVE,
-    #     'The artisan accepted the contract',
-    #     body=f'The contract for "{contract.proposal.request.title}" is now active and work can begin.',
-    #     link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract.id}),
-    # )
+        escrow_payment.status = 'captured'
+        escrow_payment.captured = True
+        escrow_payment.save(update_fields=['status', 'captured', 'updated_at'])
 
-    messages.success(request, 'Contract accepted successfully. You can now begin the work.')
+    messages.success(request, 'Contract accepted and payment captured successfully.')
     return redirect('progress:contract_detail_view', contract_id=contract.id)
+
+
+def artisan_reject_contract_view(request, contract_id):
+    contract = get_object_or_404(
+        Contract.objects.select_related('proposal__request', 'escrow_payment'),
+        id=contract_id
+    )
+
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request method.')
+        return redirect('payment:artisan_contract_review_view', contract_id=contract.id)
+
+    if request.user != contract.artisan:
+        messages.error(request, 'Only the artisan can reject this contract.')
+        return redirect('request:request_detail_view', request_id=contract.proposal.request.id)
+
+    escrow_payment = getattr(contract, 'escrow_payment', None)
+    if not escrow_payment:
+        messages.error(request, 'No escrow payment was found for this contract.')
+        return redirect('payment:artisan_contract_review_view', contract_id=contract.id)
+
+    if escrow_payment.status == 'authorized' and not escrow_payment.captured:
+        try:
+            stripe.PaymentIntent.cancel(
+                escrow_payment.stripe_payment_intent_id,
+                cancellation_reason='abandoned',
+            )
+        except stripe.error.StripeError:
+            messages.error(request, 'Unable to cancel the payment hold right now.')
+            return redirect('payment:artisan_contract_review_view', contract_id=contract.id)
+
+    with transaction.atomic():
+        escrow_payment.status = 'canceled'
+        escrow_payment.save(update_fields=['status', 'updated_at'])
+
+        contract.status = Contract.Status.CANCELED
+        contract.save(update_fields=['status', 'updated_at'])
+
+        proposal = contract.proposal
+        proposal.status = Proposal.Status.REJECTED
+        proposal.save(update_fields=['status', 'updated_at'])
+
+    messages.success(request, 'Contract rejected and payment hold canceled.')
+    return redirect('request:request_detail_view', request_id=contract.proposal.request.id)
+
+logger = logging.getLogger(__name__)
+
+
+def _handle_payout_result(request, result):
+    try:
+        balance = stripe.Balance.retrieve()
+        logger.info("Stripe balance: %s", balance)
+    except stripe.error.StripeError as e:
+        logger.warning("Unable to retrieve Stripe balance: %s", str(e))
+
+    artisan_count = len(result['processed'])
+    failed_count = len(result['failed'])
+
+    total_paid_sar = sum(
+        (item['total_sar'] for item in result['processed']),
+        Decimal('0.00')
+    )
+    total_paid_usd = sum(
+        (item['total_usd'] for item in result['processed']),
+        Decimal('0.00')
+    )
+
+    period_label = "current month" if result['period_type'] == 'current' else "previous month"
+
+    if artisan_count:
+        messages.success(
+            request,
+            f"{period_label.capitalize()} payout processed for {artisan_count} artisan(s). "
+            f"Earned: {total_paid_sar} SAR. Paid out: {total_paid_usd} USD."
+        )
+
+    if failed_count:
+        for item in result['failed']:
+            messages.warning(
+                request,
+                f"Artisan {item['artisan_username']} payout failed: {item['reason']}"
+            )
+
+    if not artisan_count and not failed_count:
+        messages.warning(
+            request,
+            f"No artisan payouts were processed for the {period_label}."
+        )
+
+    return redirect('account:artisan_revenue_dashboard_view')
+
+
+def run_current_month_artisan_payout_view(request):
+    result = process_monthly_artisan_payouts(
+        target_date=timezone.localdate(),
+        period_type='current'
+    )
+    return _handle_payout_result(request, result)
+
+
+def run_previous_month_artisan_payout_view(request):
+    result = process_monthly_artisan_payouts(
+        target_date=timezone.localdate(),
+        period_type='previous'
+    )
+    return _handle_payout_result(request, result)
+
+
 
 
 

@@ -9,7 +9,7 @@ urlpatterns = [
     path('login/', views.login_view, name="login_view"),
     path('logout/', views.logout_view, name='logout_view'),
     path('artisan_signup/', views.artisan_signup_view, name='artisan_signup_view'),
-
+    path('dashboard-artisan/', views.artisan_revenue_dashboard_view, name='artisan_revenue_dashboard_view'),
     path('dashboard_artisan/', views.artisan_dashboard_view, name='artisan_dashboard_view'),
     path('review/submit/<int:contract_id>/', views.submit_review_view, name='submit_review_view'),
     path('review/history/', views.review_history_view, name='review_history_view'),
@@ -17,6 +17,9 @@ urlpatterns = [
     path('profile/<user_name>/update', views.update_profile_view, name='update_profile_view'),
     path('profile/<user_name>/verified_phone', views.verify_phone_view, name='verify_phone_view'),
     path('account/profile/<str:user_name>/send-phone-verification/', views.send_phone_verification_view, name='send_phone_verification'),
+    path('artisan/connect-stripe/',views.artisan_connect_stripe_view,name='artisan_connect_stripe_view',),
+    path('artisan/connect-stripe/refresh/',views.artisan_connect_stripe_refresh_view,name='artisan_connect_stripe_refresh_view',),
+    path('artisan/connect-stripe/return/',views.artisan_connect_stripe_return_view,name='artisan_connect_stripe_return_view',),
     path(
         'password-reset/',
         auth_views.PasswordResetView.as_view(
