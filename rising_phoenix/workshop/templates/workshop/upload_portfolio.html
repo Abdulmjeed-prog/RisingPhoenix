@@ -54,6 +54,13 @@
                         <div class="col-6">
                             <div class="saaf-portfolio-item">
                                 <img src="{{ image.image.url }}" alt="{{ image.caption|default:'Portfolio image' }}" class="img-fluid rounded-3 w-100">
+                                <form method="post" class="mt-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="toggle_pin_image_id" value="{{ image.id }}">
+                                    <button type="submit" class="btn btn-sm {% if image.is_pinned %}btn-saaf-primary{% else %}btn-saaf-outline{% endif %} rounded-pill">
+                                        {% if image.is_pinned %}Unpin{% else %}Pin{% endif %}
+                                    </button>
+                                </form>
                                 {% if image.caption %}<p class="small text-muted mt-1 mb-0">{{ image.caption }}</p>{% endif %}
                             </div>
                         </div>

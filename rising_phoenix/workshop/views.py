@@ -189,6 +189,44 @@ def workshop_detail_view(request, artisan_id):
             )
 
 
+        elif 'toggle_pin_image_id' in request.POST:
+
+            image_id = request.POST.get(
+                'toggle_pin_image_id'
+            )
+
+            portfolio_image = (
+                workshop.portfolio_images.filter(
+                    id=image_id
+                ).first()
+            )
+
+            if portfolio_image:
+
+                portfolio_image.is_pinned = not portfolio_image.is_pinned
+
+                portfolio_image.save(
+                    update_fields=['is_pinned']
+                )
+
+                messages.success(
+                    request,
+                    f"Image {'pinned' if portfolio_image.is_pinned else 'unpinned'} successfully."
+                )
+
+            else:
+
+                messages.error(
+                    request,
+                    "Portfolio image not found."
+                )
+
+            return redirect(
+                'workshop:workshop_detail_view',
+                artisan_id=artisan_id
+            )
+
+
         elif 'delete_portfolio_image_id' in request.POST:
 
             image_id = request.POST.get(
@@ -282,6 +320,20 @@ def workshop_detail_view(request, artisan_id):
         .count()
     )    
 
+    active_orders_count = (
+        Request.objects.filter(
+            proposals__artisan=artisan_profile.user,
+            proposals__contract__status__in=[
+                Contract.Status.IN_PROGRESS,
+                Contract.Status.COMPLETION_REQUESTED,
+            ]
+        )
+        .distinct()
+        .count()
+    )
+
+
+    portfolio_images = workshop.portfolio_images.all()
 
     context = {
 
@@ -289,7 +341,9 @@ def workshop_detail_view(request, artisan_id):
         'artisan': artisan_profile,
 
         'portfolio_images':
-        workshop.portfolio_images.all(),
+        portfolio_images,
+        'portfolio_images_count':
+        portfolio_images.count(),
 
         'can_edit_portfolio':
         can_edit_portfolio,
@@ -300,6 +354,8 @@ def workshop_detail_view(request, artisan_id):
         completed_orders,
         'completed_orders_count':
         completed_orders_count,
+        'active_orders_count':
+        active_orders_count,
         'workshop_details': workshop_details,
         'detail_form': detail_form,
 
@@ -308,6 +364,145 @@ def workshop_detail_view(request, artisan_id):
     return render(
         request,
         'workshop/workshop_detail.html',
+        context
+    )
+
+
+def portfolio_list_view(request, artisan_id):
+    """List all portfolio images for an artisan workshop."""
+
+    try:
+        artisan_profile = ArtisanProfile.objects.get(
+            user_id=artisan_id
+        )
+
+        workshop = WorkshopProfile.objects.get(
+            artisan=artisan_profile
+        )
+
+    except ArtisanProfile.DoesNotExist:
+
+        messages.error(
+            request,
+            "Artisan profile not found."
+        )
+
+        return redirect(
+            'main:home_view'
+        )
+
+    except WorkshopProfile.DoesNotExist:
+
+        messages.error(
+            request,
+            "Workshop profile not found."
+        )
+
+        return redirect(
+            'main:home_view'
+        )
+
+    can_edit_portfolio = (
+        request.user.is_authenticated
+        and request.user == artisan_profile.user
+    )
+
+    if request.method == 'POST' and can_edit_portfolio:
+
+        if 'toggle_pin_image_id' in request.POST:
+
+            image_id = request.POST.get(
+                'toggle_pin_image_id'
+            )
+
+            portfolio_image = (
+                workshop.portfolio_images.filter(
+                    id=image_id
+                ).first()
+            )
+
+            if portfolio_image:
+
+                portfolio_image.is_pinned = not portfolio_image.is_pinned
+
+                portfolio_image.save(
+                    update_fields=['is_pinned']
+                )
+
+                messages.success(
+                    request,
+                    f"Image {'pinned' if portfolio_image.is_pinned else 'unpinned'} successfully."
+                )
+
+            else:
+
+                messages.error(
+                    request,
+                    "Portfolio image not found."
+                )
+
+            return redirect(
+                'workshop:portfolio_list_view',
+                artisan_id=artisan_id
+            )
+
+        if 'delete_portfolio_image_id' in request.POST:
+
+            image_id = request.POST.get(
+                'delete_portfolio_image_id'
+            )
+
+            portfolio_image = (
+                workshop.portfolio_images.filter(
+                    id=image_id
+                ).first()
+            )
+
+            if portfolio_image:
+
+                portfolio_image.delete()
+
+                messages.success(
+                    request,
+                    "Portfolio image deleted successfully."
+                )
+
+            else:
+
+                messages.error(
+                    request,
+                    "Portfolio image not found."
+                )
+
+            return redirect(
+                'workshop:portfolio_list_view',
+                artisan_id=artisan_id
+            )
+
+    paginator = Paginator(
+        workshop.portfolio_images.all(),
+        6
+    )
+
+    page_number = request.GET.get(
+        'page'
+    )
+
+    page_obj = paginator.get_page(
+        page_number
+    )
+
+    context = {
+        'workshop': workshop,
+        'artisan': artisan_profile,
+        'portfolio_images': page_obj,
+        'page_obj': page_obj,
+        'can_edit_portfolio': can_edit_portfolio,
+    }
+
+    return render(
+        request,
+        'workshop/portfolio_list.html',
         context
     )
 
