@@ -100,6 +100,9 @@
     font-size:.75rem;
     font-weight:700;
 }
+    .portfolio-pin-form { position:absolute; left:8px; bottom:8px; z-index:10; }
+    .portfolio-pin-btn { background:rgba(255,255,255,.95); border:1px solid var(--border-light); border-radius:999px; color:#4d2f22; font-size:.78rem; font-weight:700; padding:6px 12px; box-shadow:0 4px 12px rgba(0,0,0,.08); }
+    .portfolio-pin-btn.is-pinned { background:var(--primary); border-color:var(--primary); color:#fff; }
     .portfolio-delete-btn { position:absolute; top:8px; right:8px; z-index:10; background:rgba(255,255,255,.95); border:none; border-radius:50%; width:34px; height:34px; font-size:18px; color:var(--primary); }
     .portfolio-badge { position:absolute; top:8px; left:8px; background:var(--primary); color:#fff; padding:4px 10px; border-radius:6px; font-size:.75rem; font-weight:700; }
     .portfolio-empty { padding:20px; border:1px dashed #e0ccb9; border-radius:10px; color:var(--text-muted); background:#fcf8f4; }
@@ -154,19 +157,26 @@
                 <div class="stats-grid">
                     <div class="stat-item"><div class="stat-number">{{ completed_orders_count }}</div><div class="stat-label">Completed orders</div></div>
                     <div class="stat-item"><div class="stat-number">⭐ {{ artisan.average_rating }}</div><div class="stat-label">Average rating</div></div>
-                    <div class="stat-item"><div class="stat-number">~2h</div><div class="stat-label">Avg.response time</div></div>
+                    <!-- <div class="stat-item"><div class="stat-number">~2h</div><div class="stat-label">Avg.response time</div></div> -->
                 </div>
             </div>
 
             <div class="portfolio-section">
             
-                <h2>Portfolio</h2>
-            
-                {% if can_edit_portfolio %}
-                <a href="{% url 'workshop:upload_portfolio_view' %}">
-                    add images
-                </a>
-                {% endif %}
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <div>
+                        <h2 style="margin:0;">Portfolio</h2>
+                        {% if can_edit_portfolio %}
+                        <a href="{% url 'workshop:upload_portfolio_view' %}">
+                            add images
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    {% if portfolio_images_count > 3 %}
+                    <a href="{% url 'workshop:portfolio_list_view' artisan.user.id %}">View all</a>
+                    {% endif %}
+                </div>
             
             
                 {% if portfolio_images %}
@@ -198,6 +208,24 @@
                         
                         </form>
             
+                        {% endif %}
+
+                        {% if can_edit_portfolio %}
+
+                        <form method="post" class="portfolio-pin-form">
+
+                            {% csrf_token %}
+
+                            <input type="hidden" name="toggle_pin_image_id" value="{{ img.id }}">
+
+                            <button type="submit" class="portfolio-pin-btn {% if img.is_pinned %}is-pinned{% endif %}">
+
+                                {% if img.is_pinned %}Unpin{% else %}Pin{% endif %}
+
+                            </button>
+
+                        </form>
+
                         {% endif %}
             
             
@@ -328,13 +356,15 @@
 
             <div style="margin-bottom:12px;"><h4 style="margin:0 0 6px 0;">{{ artisan.user.get_full_name|default:artisan.user.username }}</h4><div style="color:var(--text-muted);">{{ workshop.tagline }}</div></div>
 
-            <div class="detail-item"><div class="detail-label">Response time</div><div class="detail-value">{{ workshop.details.response_time|default:"~2 hours" }}</div></div>
+            <!-- <div class="detail-item"><div class="detail-label">Response time</div><div class="detail-value">{{ workshop.details.response_time|default:"~2 hours" }}</div></div> -->
             <div class="detail-item"><div class="detail-label">Typical turnaround</div><div class="detail-value">{{ workshop.details.typical_turnaround|default:"3–10 days" }}</div></div>
-            <div class="detail-item"><div class="detail-label">Active orders</div><div class="detail-value">{{ workshop.details.active_orders|default:"2 (available)" }}</div></div>
-            <div class="detail-item"><div class="detail-label">Item drop-off</div><div class="detail-value">{% if workshop.details.item_drop_off %}✅ Accepted{% else %}—{% endif %}</div></div>
+            <div class="detail-item"><div class="detail-label">Active orders</div><div class="detail-value">{{ active_orders_count }}</div></div>
+            <!-- <div class="detail-item"><div class="detail-label">Item drop-off</div><div class="detail-value">{% if workshop.details.item_drop_off %}✅ Accepted{% else %}—{% endif %}</div></div> -->
             <div class="detail-item"><div class="detail-label">Ships KSA</div><div class="detail-value">{% if workshop.details.ships_ksa %}✅ Yes{% else %}—{% endif %}</div></div>
 
-            <div style="margin-top:18px;"><a href="#" class="btn btn-primary-custom">Request Custom Work</a><a href="#" class="btn btn-secondary-custom" style="margin-top:10px;display:block;">Send Message</a></div>
+            <div style="margin-top:18px;"><a href="#" class="btn btn-primary-custom">Request Custom Work</a>
+                <!-- <a href="#" class="btn btn-secondary-custom" style="margin-top:10px;display:block;">Send Message</a> -->
+            </div>
 
             {% if workshop.details.protection_text %}<div class="notice-box" style="margin-top:16px;">{{ workshop.details.protection_text }}</div>{% else %}<div class="notice-box" style="margin-top:16px;">🔒 All payments held in escrow and released only when you approve the finished work.</div>{% endif %}
 

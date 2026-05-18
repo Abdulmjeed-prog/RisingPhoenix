@@ -1,0 +1,263 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Portfolio
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #c96f52;
+        --light-bg: #faf3ec;
+        --card-bg: #fff;
+        --text-muted: #8b7461;
+        --border-light: #efe6dd;
+    }
+
+    body {
+        background: var(--light-bg);
+    }
+
+    .portfolio-shell {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 0 16px;
+    }
+
+    .portfolio-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c1f1a;
+        margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+    }
+
+    .portfolio-card {
+        position: relative;
+        background: var(--card-bg);
+        border: 1px solid var(--border-light);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .portfolio-card img {
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .portfolio-caption {
+        padding: 14px 16px;
+        color: #5d5149;
+        line-height: 1.6;
+        min-height: 56px;
+    }
+
+    .portfolio-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: var(--primary);
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: .75rem;
+        font-weight: 700;
+    }
+
+    .portfolio-delete-form {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 10;
+    }
+
+    .portfolio-delete-btn {
+        background: rgba(255,255,255,.95);
+        border: none;
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+        color: var(--primary);
+    }
+
+    .portfolio-actions {
+        padding: 0 16px 16px;
+    }
+
+    .empty-portfolio {
+        background: #fff;
+        border: 1px dashed #dccbbb;
+        border-radius: 16px;
+        color: var(--text-muted);
+        padding: 50px;
+        text-align: center;
+    }
+
+    .browse-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        margin-top: 32px;
+        flex-wrap: wrap;
+    }
+
+    .page-link {
+        padding: 8px 16px;
+        border: 1px solid var(--border-light);
+        border-radius: 999px;
+        text-decoration: none;
+        color: #4d2f22;
+        background: #fff;
+        font-weight: 600;
+    }
+
+    .page-current {
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="portfolio-shell">
+
+    <div class="portfolio-header">
+        <div>
+            <h1 class="page-title">
+                Portfolio
+            </h1>
+
+            <p class="page-subtitle">
+                Explore portfolio images by {{ workshop.workshop_name }}
+            </p>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+            {% if can_edit_portfolio %}
+            <a href="{% url 'workshop:upload_portfolio_view' %}" class="btn btn-saaf-primary rounded-pill">
+                add images
+            </a>
+            {% endif %}
+
+            <a href="{% url 'workshop:workshop_detail_view' artisan.user.id %}" class="btn btn-saaf-outline rounded-pill">
+                Back to Workshop
+            </a>
+        </div>
+    </div>
+
+    {% if portfolio_images %}
+
+    <div class="portfolio-grid">
+
+        {% for image in portfolio_images %}
+
+        <div class="portfolio-card">
+
+            {% if can_edit_portfolio %}
+            <form method="post" class="portfolio-delete-form" onsubmit="return confirm('Are you sure you want to delete this image?')">
+                {% csrf_token %}
+                <input type="hidden" name="delete_portfolio_image_id" value="{{ image.id }}">
+                <button type="submit" class="portfolio-delete-btn">
+                    ×
+                </button>
+            </form>
+            {% endif %}
+
+            {% if image.is_pinned %}
+            <span class="portfolio-badge">
+                Pinned
+            </span>
+            {% endif %}
+
+            <img src="{{ image.image.url }}" alt="{{ image.caption|default:workshop.workshop_name }}">
+
+            <div class="portfolio-caption">
+                {{ image.caption|default:"No description." }}
+            </div>
+
+            {% if can_edit_portfolio %}
+            <form method="post" class="portfolio-actions">
+                {% csrf_token %}
+                <input type="hidden" name="toggle_pin_image_id" value="{{ image.id }}">
+                <button type="submit" class="btn btn-sm {% if image.is_pinned %}btn-saaf-primary{% else %}btn-saaf-outline{% endif %} rounded-pill">
+                    {% if image.is_pinned %}Unpin{% else %}Pin{% endif %}
+                </button>
+            </form>
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% if page_obj.has_other_pages %}
+
+    <nav class="browse-pagination">
+
+        {% if page_obj.has_previous %}
+
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+
+            Previous
+
+        </a>
+
+        {% endif %}
+
+        <span class="page-current">
+
+            Page {{ page_obj.number }}
+            of
+            {{ page_obj.paginator.num_pages }}
+
+        </span>
+
+        {% if page_obj.has_next %}
+
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+
+            Next
+
+        </a>
+
+        {% endif %}
+
+    </nav>
+
+    {% endif %}
+
+    {% else %}
+
+    <div class="empty-portfolio">
+        No portfolio images uploaded yet.
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
