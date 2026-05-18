@@ -15,9 +15,12 @@
             <h2 class="notif-page-title">Notification Settings</h2>
             <p class="notif-settings-sub">Choose how and when you want to be notified.</p>
         </div>
-        <a href="{% url 'notification:notification_list_view' %}" class="notif-back-link">
-            <i class="bi bi-arrow-left"></i> Back to notifications
-        </a>
+        <div class="notif-settings-header-actions">
+            <a href="{% url 'notification:notification_list_view' %}" class="notif-back-link">
+                <i class="bi bi-arrow-left"></i> Back to notifications
+            </a>
+            <button type="submit" form="notif-settings-form" class="notif-save-btn notif-save-btn--top">Save preferences</button>
+        </div>
     </div>
 
     {% if messages %}
@@ -26,7 +29,7 @@
         {% endfor %}
     {% endif %}
 
-    <form method="POST">
+    <form method="POST" id="notif-settings-form">
         {% csrf_token %}
         <div class="notif-settings-grid">
 

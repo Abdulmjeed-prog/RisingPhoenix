@@ -6,6 +6,7 @@ app_name = 'request'
 
 urlpatterns = [
     path('', views.request_list_view, name='request_list_view'),
+    path('mine/', views.my_requests_view, name='my_requests_view'),
     path('create/', views.request_create_view, name='request_create_view'),
     path('<int:request_id>/', views.request_detail_view, name='request_detail_view'),
     path('<int:request_id>/edit/', views.request_edit_view, name='request_edit_view'),

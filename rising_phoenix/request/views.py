@@ -201,6 +201,22 @@ def request_list_view(request: HttpRequest):
     return render(request, 'request/request_list.html', context)
 
 
+@login_required
+def my_requests_view(request: HttpRequest):
+    _refresh_time_based_statuses()
+    qs = (
+        Request.objects
+        .filter(requester=request.user)
+        .select_related('category')
+        .prefetch_related('images')
+        .annotate(proposal_count=Count('proposals'))
+        .order_by('-created_at')
+    )
+    paginator = Paginator(qs, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, 'request/my_requests.html', {'page_obj': page_obj})
+
+
 def suggested_artisans_view(request: HttpRequest):
     category_id = request.GET.get('category_id', '').strip()
     if not category_id.isdigit():

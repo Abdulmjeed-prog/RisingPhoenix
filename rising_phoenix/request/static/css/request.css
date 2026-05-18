@@ -47,6 +47,27 @@ h5 {
 	border: 1px solid #312920;
 }
 
+.request-hero--row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.request-hero-cta {
+	flex-shrink: 0;
+	background: rgba(255, 255, 255, 0.12);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	color: #fff;
+}
+
+.request-hero-cta:hover {
+	background: var(--clay);
+	border-color: var(--clay);
+	color: #fff;
+}
+
 .request-eyebrow {
 	color: #ffffff;
 	font-size: 0.72rem;
@@ -368,10 +389,25 @@ h5 {
 	border-bottom: 1px solid var(--sand-dark);
 }
 
+.request-report-link {
+	font-size: 0.85rem;
+	color: #842029;
+	text-decoration: none;
+	transition: opacity 0.15s;
+}
+
+.request-report-link:hover { opacity: 0.75; }
+
 .request-detail-title {
 	font-size: 2.1rem;
 	margin-bottom: 0.25rem;
 	line-height: 1.2;
+}
+
+.request-detail-by {
+	font-size: 0.88rem;
+	color: var(--ink-light);
+	margin: 0.15rem 0 0;
 }
 
 .request-detail-actions {
@@ -576,6 +612,7 @@ h5 {
 	height: 100%;
 	opacity: 0;
 	cursor: pointer;
+	z-index: 2;
 }
 
 .request-image-caption {
@@ -1200,6 +1237,7 @@ h5 {
 	margin: 0.2rem 0 0;
 	transition: color 0.15s;
 }
+
 
 .desc-char-counter.is-long {
 	color: var(--clay);

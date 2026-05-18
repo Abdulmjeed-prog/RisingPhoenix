@@ -1,5 +1,6 @@
 from decimal import Decimal
 import logging
+import mimetypes
 
 from django.conf import settings
 from django.contrib import messages
@@ -11,7 +12,6 @@ from django.utils import timezone
 from notification.models import Notification
 from notification.utils import notify
 from rising_phoenix.moderation import image_is_clean, text_is_clean
-from .forms import ProgressCommentForm
 from .models import Contract, ContractEvent, ContractEventImage, ProgressComment, ProgressCommentImage, ProgressImage, ProgressUpdate
 import stripe
 from django.db import transaction
@@ -36,7 +36,10 @@ def _save_images(model_cls, fk_field, fk_obj, request_files, captions=None):
         if image_file.size > max_size_bytes:
             skipped.append(f'"{image_file.name}" exceeds the size limit.')
             continue
-        if (getattr(image_file, 'content_type', '') or '').lower() not in allowed_types:
+        ct = (getattr(image_file, 'content_type', '') or '').lower()
+        if not ct or ct == 'application/octet-stream':
+            ct = (mimetypes.guess_type(image_file.name)[0] or '').lower()
+        if ct not in allowed_types:
             skipped.append(f'"{image_file.name}" is not an accepted image type.')
             continue
         if not image_is_clean(image_file):
@@ -129,11 +132,13 @@ def post_update_view(request, contract_id):
         return redirect('progress:contract_detail_view', contract_id=contract_id)
 
     body = request.POST.get('body', '').strip()
-    if not body:
-        messages.error(request, 'Update text is required.')
+    has_images = bool(request.FILES.getlist('images'))
+
+    if not body and not has_images:
+        messages.error(request, 'Please add a message or at least one image.')
         return redirect('progress:contract_detail_view', contract_id=contract_id)
 
-    if not text_is_clean(body):
+    if body and not text_is_clean(body):
         messages.error(request, 'Your update contains inappropriate language. Please revise it.')
         return redirect('progress:contract_detail_view', contract_id=contract_id)
 
@@ -169,27 +174,34 @@ def add_comment_view(request, update_id):
         messages.error(request, 'This project is already completed.')
         return redirect('progress:contract_detail_view', contract_id=contract.id)
 
-    form = ProgressCommentForm(request.POST)
-    if form.is_valid():
-        comment = ProgressComment.objects.create(
-            update=update,
-            author=request.user,
-            body=form.cleaned_data['body'],
-        )
-        captions = request.POST.getlist('image_captions')
-        for msg in _save_images(ProgressCommentImage, 'comment', comment, request.FILES, captions):
-            messages.warning(request, f'Image skipped: {msg}')
-        other_party = contract.artisan if request.user == contract.requester else contract.requester
-        notify(
-            other_party,
-            Notification.NotifType.COMMENT_ADDED,
-            'New feedback on your project',
-            body=form.cleaned_data['body'][:200],
-            link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract.id}),
-        )
-    else:
-        messages.error(request, 'Feedback cannot be empty.')
+    body = request.POST.get('body', '').strip()
+    has_images = bool(request.FILES.getlist('images'))
 
+    if not body and not has_images:
+        messages.error(request, 'Please add a message or at least one image.')
+        return redirect('progress:contract_detail_view', contract_id=contract.id)
+
+    if body and not text_is_clean(body):
+        messages.error(request, 'Your feedback contains inappropriate language. Please revise it.')
+        return redirect('progress:contract_detail_view', contract_id=contract.id)
+
+    comment = ProgressComment.objects.create(
+        update=update,
+        author=request.user,
+        body=body,
+    )
+    captions = request.POST.getlist('image_captions')
+    for msg in _save_images(ProgressCommentImage, 'comment', comment, request.FILES, captions):
+        messages.warning(request, f'Image skipped: {msg}')
+    messages.success(request, 'Feedback posted.')
+    other_party = contract.artisan if request.user == contract.requester else contract.requester
+    notify(
+        other_party,
+        Notification.NotifType.COMMENT_ADDED,
+        'New feedback on your project',
+        body=body[:200] if body else '',
+        link=reverse('progress:contract_detail_view', kwargs={'contract_id': contract.id}),
+    )
     return redirect('progress:contract_detail_view', contract_id=contract.id)
 
 
