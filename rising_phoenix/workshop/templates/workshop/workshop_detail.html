@@ -224,7 +224,7 @@
 
                     {% if portfolio_images %}
                     <div class="saaf-workshop-portfolio-grid">
-                        {% for img in portfolio_images|slice:":6" %}
+                        {% for img in portfolio_images %}
                         <article class="saaf-workshop-portfolio-item">
                             {% if can_edit_portfolio %}
                             <form method="post" class="saaf-workshop-pin-form">
@@ -251,6 +251,14 @@
                         </article>
                         {% endfor %}
                     </div>
+
+                    {% if portfolio_images.has_other_pages %}
+                    <div class="saaf-workshop-pagination mt-4">
+                        {% if portfolio_images.has_previous %}<a href="?portfolio_page={{ portfolio_images.previous_page_number }}{% if reviews.number %}&review_page={{ reviews.number }}{% endif %}{% if completed_orders.number %}&closed_page={{ completed_orders.number }}{% endif %}" class="btn btn-sm btn-saaf-outline rounded-pill">Previous</a>{% endif %}
+                        <span>Page {{ portfolio_images.number }} of {{ portfolio_images.paginator.num_pages }}</span>
+                        {% if portfolio_images.has_next %}<a href="?portfolio_page={{ portfolio_images.next_page_number }}{% if reviews.number %}&review_page={{ reviews.number }}{% endif %}{% if completed_orders.number %}&closed_page={{ completed_orders.number }}{% endif %}" class="btn btn-sm btn-saaf-outline rounded-pill">Next</a>{% endif %}
+                    </div>
+                    {% endif %}
                     {% else %}
                     <div class="saaf-workshop-empty-box">No portfolio images uploaded yet.</div>
                     {% endif %}
@@ -286,6 +294,14 @@
                         </article>
                         {% endfor %}
                     </div>
+
+                    {% if completed_orders.has_other_pages %}
+                    <div class="saaf-workshop-pagination mt-4">
+                        {% if completed_orders.has_previous %}<a href="?closed_page={{ completed_orders.previous_page_number }}{% if portfolio_images.number %}&portfolio_page={{ portfolio_images.number }}{% endif %}{% if reviews.number %}&review_page={{ reviews.number }}{% endif %}" class="btn btn-sm btn-saaf-outline rounded-pill">Previous</a>{% endif %}
+                        <span>Page {{ completed_orders.number }} of {{ completed_orders.paginator.num_pages }}</span>
+                        {% if completed_orders.has_next %}<a href="?closed_page={{ completed_orders.next_page_number }}{% if portfolio_images.number %}&portfolio_page={{ portfolio_images.number }}{% endif %}{% if reviews.number %}&review_page={{ reviews.number }}{% endif %}" class="btn btn-sm btn-saaf-outline rounded-pill">Next</a>{% endif %}
+                    </div>
+                    {% endif %}
                     {% else %}
                     <div class="saaf-workshop-empty-box">No completed orders yet.</div>
                     {% endif %}
@@ -315,9 +331,9 @@
 
                     {% if reviews.has_other_pages %}
                     <div class="saaf-workshop-pagination mt-4">
-                        {% if reviews.has_previous %}<a href="?review_page={{ reviews.previous_page_number }}" class="btn btn-sm btn-saaf-outline rounded-pill">Previous</a>{% endif %}
+                        {% if reviews.has_previous %}<a href="?review_page={{ reviews.previous_page_number }}{% if portfolio_images.number %}&portfolio_page={{ portfolio_images.number }}{% endif %}{% if completed_orders.number %}&closed_page={{ completed_orders.number }}{% endif %}" class="btn btn-sm btn-saaf-outline rounded-pill">Previous</a>{% endif %}
                         <span>Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}</span>
-                        {% if reviews.has_next %}<a href="?review_page={{ reviews.next_page_number }}" class="btn btn-sm btn-saaf-outline rounded-pill">Next</a>{% endif %}
+                        {% if reviews.has_next %}<a href="?review_page={{ reviews.next_page_number }}{% if portfolio_images.number %}&portfolio_page={{ portfolio_images.number }}{% endif %}{% if completed_orders.number %}&closed_page={{ completed_orders.number }}{% endif %}" class="btn btn-sm btn-saaf-outline rounded-pill">Next</a>{% endif %}
                     </div>
                     {% endif %}
                 </div>
