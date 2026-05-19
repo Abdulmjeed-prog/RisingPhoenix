@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     'progress',
     'notification',
     'django.contrib.humanize',
+    'invitation',
+    'dispute',
 ]
 
 MIDDLEWARE = [
