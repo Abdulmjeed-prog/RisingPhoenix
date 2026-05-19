@@ -148,7 +148,7 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Riyadh'
 
 USE_I18N = True
 
