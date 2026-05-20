@@ -6,701 +6,761 @@
 
 {% block extra_css %}
 <style>
-  /* ── Revenue Dashboard — Saaf-native styles ── */
+/* ═══════════════════════════════════════════════
+   REVENUE DASHBOARD — fully responsive rewrite
+   Works at 320px → 2560px, RTL-safe
+═══════════════════════════════════════════════ */
 
-  .rev-shell {
-    position: relative;
-    padding-left: 80px; /* clear the 68px floating sidebar + its left offset */
-  }
+/* ── Shell / layout ── */
+.rev-page {
+  width: 100%;
+  min-height: 100%;
+  padding: clamp(12px, 3vw, 28px);
+  box-sizing: border-box;
+  /* Account for the fixed sidebar (68px) + its left offset (10px) + gap */
+  padding-left: calc(68px + 10px + clamp(12px, 2vw, 24px));
+}
+/* Sidebar is hidden on mobile — remove its offset */
+@media (max-width: 768px) {
+  .rev-page { padding-left: clamp(12px, 4vw, 20px); }
+}
 
-  @media (max-width: 768px) {
-    .rev-shell {
-      padding-left: 0; /* sidebar is hidden on mobile */
-    }
-  }
-  .rev-shell::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto auto 1.5rem;
-    width: 18rem; height: 18rem;
-    background: radial-gradient(circle, rgba(199,122,92,.15) 0%, transparent 70%);
-    pointer-events: none;
-    filter: blur(6px);
-    z-index: 0;
-  }
+/* ── Decorative blob — contained, non-blocking ── */
+.rev-page::before {
+  content: "";
+  position: fixed;
+  top: 10vh; left: 5vw;
+  width: clamp(180px, 25vw, 320px);
+  height: clamp(180px, 25vw, 320px);
+  background: radial-gradient(circle, rgba(199,122,92,.12) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(40px);
+  z-index: 0;
+}
 
-  /* ── Stat cards ── */
-  .rev-stat-card {
-    position: relative;
-    z-index: 1;
-    background: var(--saaf-card-bg);
-    border: 1px solid var(--saaf-border);
-    border-radius: 18px;
-    padding: 1.35rem 1.4rem;
-    box-shadow: var(--saaf-shadow-sm);
-    transition: transform .22s ease, box-shadow .22s ease;
-    overflow: hidden;
+/* ── Page Header ── */
+.rev-header {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(145deg, rgba(245,240,230,.97), rgba(224,210,180,.65));
+  border: 1px solid var(--saaf-border);
+  border-radius: 20px;
+  padding: clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 1.6rem);
+  margin-bottom: clamp(16px, 3vw, 24px);
+  overflow: hidden;
+}
+.rev-header::after {
+  content: "";
+  position: absolute;
+  right: -3rem; bottom: -4rem;
+  width: 14rem; height: 14rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(199,122,92,.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+[data-theme="dark"] .rev-header {
+  background: linear-gradient(145deg, rgba(56,41,30,.92), rgba(44,33,26,.94));
+  border-color: rgba(219,191,155,.14);
+}
+.rev-header-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.rev-header-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--saaf-heading);
+  margin: 0 0 .2rem;
+  line-height: 1.2;
+}
+.rev-header-sub {
+  font-size: clamp(.78rem, 1.8vw, .88rem);
+  color: var(--saaf-text-muted);
+  margin: 0;
+}
+.rev-header-actions {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .rev-header-actions {
+    width: 100%;
   }
-  .rev-stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--saaf-shadow-lg);
+  .rev-header-actions .btn {
+    flex: 1;
+    justify-content: center;
+    font-size: .82rem !important;
   }
-  .rev-stat-card::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0;
-    width: 4px; height: 100%;
-    background: var(--saaf-btn);
-    border-radius: 4px 0 0 4px;
-  }
-  .rev-stat-card.accent-green::before  { background: #4caf7d; }
-  .rev-stat-card.accent-blue::before   { background: #5b8dee; }
-  .rev-stat-card.accent-amber::before  { background: #d4a92d; }
+}
 
-  .rev-stat-icon {
-    width: 42px; height: 42px;
-    border-radius: 11px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem;
-    background: rgba(199,122,92,.12);
-    color: var(--saaf-btn);
-    margin-bottom: .9rem;
-  }
-  .rev-stat-card.accent-green .rev-stat-icon { background: rgba(76,175,125,.12); color: #4caf7d; }
-  .rev-stat-card.accent-blue  .rev-stat-icon { background: rgba(91,141,238,.12); color: #5b8dee; }
-  .rev-stat-card.accent-amber .rev-stat-icon { background: rgba(212,169,45,.12); color: #b8900a; }
+/* ── Stat cards grid ── */
+.rev-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(10px, 2vw, 16px);
+  margin-bottom: clamp(16px, 3vw, 24px);
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 991px) {
+  .rev-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 400px) {
+  .rev-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+}
 
-  .rev-stat-value {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--saaf-heading);
-    line-height: 1.1;
-  }
-  .rev-stat-label {
-    font-size: .74rem;
-    color: var(--saaf-text-muted);
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    font-weight: 600;
-    margin-top: .3rem;
-  }
+.rev-stat {
+  background: var(--saaf-card-bg);
+  border: 1px solid var(--saaf-border);
+  border-radius: 16px;
+  padding: clamp(.85rem, 2.5vw, 1.35rem) clamp(.85rem, 2.5vw, 1.4rem);
+  box-shadow: var(--saaf-shadow-sm);
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease;
+  min-width: 0; /* allow shrinking */
+}
+.rev-stat:hover { transform: translateY(-2px); box-shadow: var(--saaf-shadow-lg); }
+.rev-stat::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--saaf-btn);
+  border-radius: 4px 0 0 4px;
+}
+.rev-stat.green::before  { background: #4caf7d; }
+.rev-stat.blue::before   { background: #5b8dee; }
+.rev-stat.amber::before  { background: #d4a92d; }
+
+[data-theme="dark"] .rev-stat {
+  background: linear-gradient(180deg, rgba(74,56,39,.88), rgba(56,41,30,.9));
+  border-color: rgba(219,191,155,.12);
+}
+
+.rev-stat-icon {
+  width: clamp(32px, 5vw, 42px);
+  height: clamp(32px, 5vw, 42px);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  background: rgba(199,122,92,.12);
+  color: var(--saaf-btn);
+  margin-bottom: .75rem;
+  flex-shrink: 0;
+}
+.rev-stat.green .rev-stat-icon { background: rgba(76,175,125,.12); color: #4caf7d; }
+.rev-stat.blue  .rev-stat-icon { background: rgba(91,141,238,.12); color: #5b8dee; }
+.rev-stat.amber .rev-stat-icon { background: rgba(212,169,45,.12); color: #b8900a; }
+
+.rev-stat-num {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.1rem, 2.8vw, 1.75rem);
+  font-weight: 700;
+  color: var(--saaf-heading);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+[data-theme="dark"] .rev-stat-num { color: var(--saaf-cream-text); }
+
+.rev-stat-lbl {
+  font-size: clamp(.65rem, 1.4vw, .74rem);
+  color: var(--saaf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  font-weight: 600;
+  margin-top: .25rem;
+}
+
+/* Badge inside stat — inline on mobile, absolute on desktop */
+.rev-stat-badge {
+  display: inline-block;
+  font-size: .66rem;
+  padding: .2rem .55rem;
+  border-radius: 20px;
+  font-weight: 700;
+  margin-top: .5rem;
+  white-space: nowrap;
+}
+@media (min-width: 576px) {
   .rev-stat-badge {
     position: absolute;
-    top: 1.1rem; right: 1.1rem;
-    font-size: .68rem;
-    padding: .22rem .6rem;
-    border-radius: 20px;
-    font-weight: 700;
+    top: .9rem; right: .9rem;
+    margin-top: 0;
   }
-  .rbadge-up   { background: rgba(76,175,125,.14); color: #2e7a56; }
-  .rbadge-info { background: rgba(91,141,238,.13); color: #2a54b8; }
+}
+.rbadge-up   { background: rgba(76,175,125,.14); color: #2e7a56; }
+.rbadge-info { background: rgba(91,141,238,.13); color: #2a54b8; }
+[data-theme="dark"] .rbadge-up  { background: rgba(76,175,125,.2); color: #68d4a0; }
+[data-theme="dark"] .rbadge-info { background: rgba(91,141,238,.2); color: #8eb3f5; }
 
-  /* ── Panel card (chart / table) ── */
-  .rev-panel {
-    position: relative;
-    z-index: 1;
-    background: var(--saaf-card-bg);
-    border: 1px solid var(--saaf-border);
-    border-radius: 18px;
-    padding: 1.5rem 1.6rem;
-    box-shadow: var(--saaf-shadow-sm);
-  }
-  .rev-panel-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--saaf-heading);
-    margin-bottom: 1.1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: .5rem;
-  }
-  .rev-panel-title small {
-    font-size: .76rem;
-    font-weight: 400;
-    color: var(--saaf-text-muted);
-    text-transform: uppercase;
-    letter-spacing: .07em;
-  }
+/* ── Chart + sidebar row ── */
+.rev-mid-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: clamp(10px, 2vw, 16px);
+  margin-bottom: clamp(16px, 3vw, 24px);
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 991px) {
+  .rev-mid-row { grid-template-columns: 1fr; }
+}
 
-  /* ── Progress bar ── */
-  .rev-goal-bar {
-    height: 6px;
-    border-radius: 4px;
-    background: var(--saaf-beige);
-    overflow: hidden;
-    margin: .5rem 0 .35rem;
-  }
-  .rev-goal-fill {
-    height: 100%;
-    border-radius: 4px;
-    background: linear-gradient(90deg, var(--saaf-btn), #e8a870);
-    transition: width 1.2s cubic-bezier(.4,0,.2,1);
-  }
+/* ── Panel (shared card) ── */
+.rev-panel {
+  background: var(--saaf-card-bg);
+  border: 1px solid var(--saaf-border);
+  border-radius: 18px;
+  padding: clamp(1rem, 2.5vw, 1.5rem) clamp(1rem, 2.5vw, 1.6rem);
+  box-shadow: var(--saaf-shadow-sm);
+  position: relative;
+  z-index: 1;
+}
+[data-theme="dark"] .rev-panel {
+  background: linear-gradient(180deg, rgba(74,56,39,.9), rgba(56,41,30,.92));
+  border-color: rgba(219,191,155,.12);
+}
 
-  /* ── Table ── */
-  .rev-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-  .rev-table thead th {
-    font-size: .72rem;
-    text-transform: uppercase;
-    letter-spacing: .09em;
-    color: var(--saaf-text-muted);
-    font-weight: 700;
-    padding: .6rem 1rem;
-    border-bottom: 1px solid var(--saaf-border);
-    background: var(--saaf-beige);
-    white-space: nowrap;
-  }
-  .rev-table thead th:first-child { border-radius: 8px 0 0 8px; }
-  .rev-table thead th:last-child  { border-radius: 0 8px 8px 0; }
-  .rev-table tbody tr { transition: background .15s; }
-  .rev-table tbody tr:hover td { background: rgba(250,241,229,.6); }
-  .rev-table tbody td {
-    padding: .9rem 1rem;
-    font-size: .87rem;
-    border-bottom: 1px solid rgba(96,70,51,.07);
-    color: var(--saaf-body);
-    vertical-align: middle;
-  }
-  .rev-table tbody tr:last-child td { border-bottom: none; }
+.rev-panel-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-bottom: 1rem;
+}
+.rev-panel-hd-title {
+  font-size: clamp(.88rem, 2vw, 1rem);
+  font-weight: 700;
+  color: var(--saaf-heading);
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+[data-theme="dark"] .rev-panel-hd-title { color: var(--saaf-cream-text); }
+.rev-panel-hd-title i { color: var(--saaf-btn); }
+.rev-panel-hd small {
+  font-size: .73rem;
+  color: var(--saaf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
 
-  /* Status pills */
-  .rev-pill {
-    display: inline-flex; align-items: center; gap: .3rem;
-    padding: .25rem .7rem;
-    border-radius: 20px;
-    font-size: .72rem;
-    font-weight: 700;
-  }
-  .rev-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .pill-earned  { background: rgba(76,175,125,.13);  color: #2b7a52; }
-  .pill-paid    { background: rgba(91,141,238,.12);  color: #2244a8; }
-  .pill-pending { background: rgba(212,169,45,.13);  color: #7a5a00; }
+/* ── Chart canvas ── */
+.rev-chart-box {
+  position: relative;
+  height: clamp(160px, 30vw, 230px);
+  width: 100%;
+}
 
-  /* ── Empty state ── */
-  .rev-empty {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--saaf-text-muted);
-  }
-  .rev-empty i { font-size: 2.2rem; opacity: .35; margin-bottom: .65rem; display: block; }
+/* ── Sidebar panel (progress + quick stats) ── */
+.rev-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
 
-  /* ── Quick stats inside panel ── */
-  .rev-qs-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: .5rem 0;
-    border-bottom: 1px solid rgba(96,70,51,.07);
-    font-size: .87rem;
-  }
-  .rev-qs-row:last-child { border-bottom: none; }
-  .rev-qs-row span { color: var(--saaf-body); }
-  .rev-qs-row strong { color: var(--saaf-heading); font-weight: 700; }
+/* Progress bar */
+.rev-progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .35rem;
+}
+.rev-progress-label span {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--saaf-text-muted);
+}
+.rev-progress-label strong {
+  font-size: .8rem;
+  color: var(--saaf-btn);
+  font-weight: 700;
+}
+.rev-bar {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--saaf-beige);
+  overflow: hidden;
+  margin-bottom: .3rem;
+}
+[data-theme="dark"] .rev-bar { background: rgba(219,191,155,.18); }
+.rev-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--saaf-btn), #e8a870);
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
+.rev-bar-sub {
+  font-size: .72rem;
+  color: var(--saaf-text-muted);
+}
 
-  /* ── Dark mode overrides ── */
-  [data-theme="dark"] .rev-stat-card,
-  [data-theme="dark"] .rev-panel {
-    background: linear-gradient(180deg, rgba(74,56,39,.9), rgba(56,41,30,.92));
-    border-color: rgba(219,191,155,.12);
-  }
-  [data-theme="dark"] .rev-stat-label,
-  [data-theme="dark"] .rev-panel-title small,
-  [data-theme="dark"] .rev-empty,
-  [data-theme="dark"] .rev-empty p {
-    color: rgba(242, 228, 209, .82) !important;
-  }
-  [data-theme="dark"] .rev-stat-value,
-  [data-theme="dark"] .rev-panel-title { color: var(--saaf-cream-text); }
-  [data-theme="dark"] .rev-table thead th {
-    background: rgba(56,41,30,.9);
-    color: rgba(242, 228, 209, .86);
-    border-bottom-color: rgba(232, 199, 164, .2);
-  }
-  [data-theme="dark"] .rev-table tbody tr:hover td { background: rgba(255,248,238,.04); }
-  [data-theme="dark"] .rev-goal-bar { background: rgba(219,191,155,.18); }
-  [data-theme="dark"] .rbadge-up  { background: rgba(76,175,125,.18); color: #68d4a0; }
-  [data-theme="dark"] .rbadge-info { background: rgba(91,141,238,.18); color: #8eb3f5; }
-  [data-theme="dark"] .rev-qs-row span  { color: var(--saaf-body); }
-  [data-theme="dark"] .rev-qs-row strong { color: var(--saaf-cream-text); }
-  [data-theme="dark"] .rev-table tbody td { color: var(--saaf-body); border-color: rgba(219,191,155,.07); }
-  [data-theme="dark"] .pill-earned  { background: rgba(76,175,125,.18);  color: #68d4a0; }
-  [data-theme="dark"] .pill-paid    { background: rgba(91,141,238,.18);  color: #8eb3f5; }
-  [data-theme="dark"] .pill-pending { background: rgba(212,169,45,.18);  color: #f0c84a; }
-  [data-theme="dark"] .saaf-dashboard-linkline {
-    color: #E3D1BA;
-  }
-  [data-theme="dark"] .saaf-dashboard-linkline:hover {
-    color: #F2E4D1;
-  }
-  [data-theme="dark"] .rev-page-header .saaf-section-title,
-  [data-theme="dark"] .rev-page-header .saaf-eyebrow,
-  [data-theme="dark"] .rev-page-header p {
-    color: #F2E4D1 !important;
-  }
-  [data-theme="dark"] .rev-page-header {
-    box-shadow: 0 10px 22px rgba(8, 5, 4, .32);
-  }
+/* Quick stats list */
+.rev-qs-title {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--saaf-heading);
+  margin-bottom: .6rem;
+}
+[data-theme="dark"] .rev-qs-title { color: var(--saaf-cream-text); }
 
-  /* ── Page header ── */
-  .rev-page-header {
-    background: linear-gradient(145deg, rgba(245,240,230,.96), rgba(224,210,180,.6));
-    border: 1px solid var(--saaf-border);
-    border-radius: 20px;
-    padding: 1.4rem 1.6rem;
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-  }
-  .rev-page-header::after {
-    content: "";
-    position: absolute;
-    inset: auto -3rem -4rem auto;
-    width: 14rem; height: 14rem;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(199,122,92,.18) 0%, transparent 70%);
-  }
-  [data-theme="dark"] .rev-page-header {
-    background: linear-gradient(145deg, rgba(56,41,30,.9), rgba(44,33,26,.92));
-    border-color: rgba(219,191,155,.14);
-  }
+.rev-qs-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .45rem 0;
+  border-bottom: 1px solid rgba(96,70,51,.07);
+  gap: .5rem;
+  font-size: clamp(.78rem, 1.8vw, .87rem);
+}
+[data-theme="dark"] .rev-qs-row { border-color: rgba(219,191,155,.07); }
+.rev-qs-row:last-child { border-bottom: none; }
+.rev-qs-row span { color: var(--saaf-body); flex: 1; min-width: 0; }
+.rev-qs-row strong { color: var(--saaf-heading); font-weight: 700; white-space: nowrap; text-align: right; }
+[data-theme="dark"] .rev-qs-row span { color: var(--saaf-body); }
+[data-theme="dark"] .rev-qs-row strong { color: var(--saaf-cream-text); }
 
-  @media (max-width: 767.98px) {
-    .rev-stat-value { font-size: 1.5rem; }
-    .rev-page-header { padding: 1.1rem; }
-    .rev-panel { padding: 1.1rem 1rem; }
-  }
+/* ── Table panels ── */
+.rev-table-panel {
+  margin-bottom: clamp(12px, 2.5vw, 20px);
+}
+
+.rev-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.rev-table thead th {
+  font-size: clamp(.65rem, 1.5vw, .72rem);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--saaf-text-muted);
+  font-weight: 700;
+  padding: .55rem .85rem;
+  border-bottom: 1px solid var(--saaf-border);
+  background: var(--saaf-beige);
+  white-space: nowrap;
+}
+[data-theme="dark"] .rev-table thead th { background: rgba(56,41,30,.9); }
+.rev-table thead th:first-child { border-radius: 8px 0 0 8px; }
+.rev-table thead th:last-child  { border-radius: 0 8px 8px 0; }
+
+.rev-table tbody tr { transition: background .12s; }
+.rev-table tbody tr:hover td { background: rgba(250,241,229,.6); }
+[data-theme="dark"] .rev-table tbody tr:hover td { background: rgba(255,248,238,.04); }
+
+.rev-table tbody td {
+  padding: clamp(.55rem, 1.5vw, .9rem) clamp(.55rem, 1.5vw, .85rem);
+  font-size: clamp(.78rem, 1.8vw, .87rem);
+  border-bottom: 1px solid rgba(96,70,51,.07);
+  color: var(--saaf-body);
+  vertical-align: middle;
+}
+[data-theme="dark"] .rev-table tbody td { color: var(--saaf-body); border-color: rgba(219,191,155,.07); }
+.rev-table tbody tr:last-child td { border-bottom: none; }
+
+/* Status pills */
+.rev-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .28rem;
+  padding: .22rem .65rem;
+  border-radius: 20px;
+  font-size: clamp(.65rem, 1.4vw, .72rem);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.rev-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.pill-earned  { background: rgba(76,175,125,.13);  color: #2b7a52; }
+.pill-paid    { background: rgba(91,141,238,.12);  color: #2244a8; }
+.pill-pending { background: rgba(212,169,45,.13);  color: #7a5a00; }
+[data-theme="dark"] .pill-earned  { background: rgba(76,175,125,.18);  color: #68d4a0; }
+[data-theme="dark"] .pill-paid    { background: rgba(91,141,238,.18);  color: #8eb3f5; }
+[data-theme="dark"] .pill-pending { background: rgba(212,169,45,.18);  color: #f0c84a; }
+
+/* ── Empty state ── */
+.rev-empty {
+  text-align: center;
+  padding: clamp(1.5rem, 5vw, 3rem) 1rem;
+  color: var(--saaf-text-muted);
+}
+.rev-empty i { font-size: 2rem; opacity: .3; margin-bottom: .5rem; display: block; }
+.rev-empty p { font-size: .88rem; margin: 0; }
+
+/* ── Table cell: title column ── */
+.rev-td-title { font-weight: 700; color: var(--saaf-heading); }
+[data-theme="dark"] .rev-td-title { color: var(--saaf-cream-text); }
+.rev-td-id { font-size: .72rem; color: var(--saaf-text-muted); margin-top: .1rem; }
+
+/* ── Eyebrow ── */
+.rev-eyebrow {
+  font-size: .78rem;
+  color: var(--saaf-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: .3rem;
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="saaf-main rev-shell">
-  <div class="container-fluid px-0">
+<div class="rev-page">
 
-    <!-- ── Page Header ───────────────────── -->
-    <div class="rev-panel mb-4">
-  <div class="rev-panel-title">
-    <span>
-      <i class="bi bi-stripe me-1" class="text-saaf-btn"></i>
-      {% trans "Stripe Payouts" %}
-    </span>
-    <small>
-      {% if stripe_connected %}
-        {% if stripe_payouts_enabled %}
-          {% trans "Payouts enabled" %}
-        {% else %}
-          {% trans "Setup required" %}
-        {% endif %}
-      {% else %}
-        {% trans "Not connected" %}
-      {% endif %}
-    </small>
-  </div>
+  <!-- ══ Page Header ══ -->
+<div class="rev-header">
+  <div class="rev-header-inner">
 
-  <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+    <!-- Title -->
     <div>
-      {% if stripe_connected %}
-        {% if stripe_payouts_enabled %}
-          <p class="mb-1" class="fw-bold text-saaf-heading">
-            {% trans "Your Stripe account is ready to receive payouts." %}
-          </p>
-          <p class="mb-0" style="font-size:.85rem;color:var(--saaf-text-muted);">
-            {% trans "You can open Stripe to manage payouts, banking, and account details." %}
-          </p>
-        {% else %}
-          <p class="mb-1" class="fw-bold text-saaf-heading">
-            {% trans "Your Stripe account needs some additional information." %}
-          </p>
-          <p class="mb-0" style="font-size:.85rem;color:var(--saaf-text-muted);">
-            {{ stripe_status_message }}
-          </p>
-        {% endif %}
-      {% else %}
-        <p class="mb-1" class="fw-bold text-saaf-heading">
-          {% trans "Connect Stripe to receive earnings and payouts to your bank account." %}
-        </p>
-        <p class="mb-0" style="font-size:.85rem;color:var(--saaf-text-muted);">
-          {% trans "You'll be redirected to Stripe to complete your payout setup." %}
-        </p>
-      {% endif %}
+      <div class="rev-eyebrow">
+        <i class="bi bi-bar-chart-line"></i>
+        {% trans "Earnings Dashboard" %}
+      </div>
+      <h2 class="rev-header-title">
+        {% trans "Welcome back," %}
+        {{ request.user.get_full_name|default:request.user.username }}
+      </h2>
+      <p class="rev-header-sub">{% trans "Here's your financial overview at a glance" %}</p>
     </div>
 
-    <div class="d-flex gap-2 flex-wrap">
-      {% if stripe_connected %}
-        {% if stripe_payouts_enabled %}
-          <a href="{% url 'account:artisan_connect_stripe_view' %}" class="btn btn-saaf-primary rounded-pill">
-            <i class="bi bi-box-arrow-up-right me-1"></i>
-            {% trans "Open Stripe" %}
-          </a>
-        {% else %}
-          <a href="{% url 'account:artisan_connect_stripe_refresh_view' %}" class="btn btn-saaf-primary rounded-pill">
-            <i class="bi bi-arrow-repeat me-1"></i>
-            {% trans "Continue Setup" %}
-          </a>
-        {% endif %}
+    <!-- Actions -->
+    <div class="rev-header-actions">
+
+      <!-- Export -->
+      <a href="{% url 'account:artisan_revenue_pdf_view' %}"
+        download
+        class="btn btn-saaf-outline rounded-pill"
+        style="font-size:.87rem;">
+        <i class="bi bi-download me-1"></i>{% trans "Export" %}
+      </a>
+
+      <!-- Stripe Button -->
+      {% if not stripe_connected %}
+        <a href="{% url 'account:artisan_connect_stripe_view' %}" class="btn btn-saaf-primary rounded-pill" style="font-size:.87rem;">
+          <i class="bi bi-stripe me-1"></i>{% trans "Connect Stripe" %}
+        </a>
+
+      {% elif stripe_payouts_enabled %}
+        <a href="#" class="btn rounded-pill" style="font-size:.87rem;background:rgba(76,175,125,.13);color:#2b7a52;border:1px solid rgba(76,175,125,.3);">
+          <i class="bi bi-check-circle-fill me-1"></i>{% trans "Stripe Active" %}
+        </a>
+
+      {% elif not stripe_details_submitted %}
+        <a href="{% url 'account:artisan_connect_stripe_view' %}" class="btn rounded-pill" style="font-size:.87rem;background:rgba(212,169,45,.13);color:#7a5200;border:1px solid rgba(212,169,45,.3);">
+          <i class="bi bi-exclamation-circle-fill me-1"></i>{% trans "Finish Stripe Setup" %}
+        </a>
+
       {% else %}
-        <a href="{% url 'account:artisan_connect_stripe_view' %}" class="btn btn-saaf-primary rounded-pill">
-          <i class="bi bi-stripe me-1"></i>
-          {% trans "Connect Stripe" %}
+        <a href="{% url 'account:artisan_connect_stripe_view' %}" class="btn rounded-pill" style="font-size:.87rem;background:rgba(91,141,238,.11);color:#2244a8;border:1px solid rgba(91,141,238,.25);">
+          <i class="bi bi-hourglass-split me-1"></i>
+          {% if stripe_requirements_due > 0 %}
+            {% blocktrans count n=stripe_requirements_due %}{{ n }} item required{% plural %}{{ n }} items required{% endblocktrans %}
+          {% else %}
+            {% trans "Stripe Pending" %}
+          {% endif %}
         </a>
       {% endif %}
+
     </div>
+
   </div>
 </div>
+  <!-- ══ Stat Cards ══ -->
+  <div class="rev-stats-grid">
 
-    <div class="rev-page-header mb-4">
-      <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
-        <div>
-          <div class="saaf-eyebrow mb-1">
-            <i class="bi bi-bar-chart-line me-1"></i>
-            {% trans "Earnings Dashboard" %}
-          </div>
-          <h2 class="saaf-section-title mb-1" style="font-size:1.65rem;">
-            {% trans "Welcome back," %}
-            {{ request.user.get_full_name|default:request.user.username }}
-          </h2>
-          <p class="mb-0" style="font-size:.88rem;color:var(--saaf-text-muted);">
-            {% trans "Here's your financial overview at a glance" %}
-          </p>
-        </div>
-        <div class="d-flex gap-2 align-items-center flex-wrap" style="position:relative;z-index:1;">
-          <a href="#" class="btn btn-saaf-outline rounded-pill" style="font-size:.87rem;">
-            <i class="bi bi-download me-1"></i>
-            {% trans "Export" %}
-          </a>
-        </div>
-      </div>
+    <div class="rev-stat">
+      <div class="rev-stat-icon"><i class="bi bi-wallet2"></i></div>
+      <div class="rev-stat-num">{{ current_balance|floatformat:2 }}</div>
+      <div class="rev-stat-lbl">{% trans "Current Balance" %}</div>
+      <span class="rev-stat-badge rbadge-up">
+        <i class="bi bi-check-circle me-1"></i>{% trans "Available" %}
+      </span>
     </div>
 
-    <!-- ── Stat Cards ────────────────────── -->
-    <div class="row g-3 mb-4">
-
-      <div class="col-6 col-lg-3">
-        <div class="rev-stat-card">
-          <div class="rev-stat-icon"><i class="bi bi-wallet2"></i></div>
-          <div class="rev-stat-value">{{ current_balance|floatformat:2 }}</div>
-          <div class="rev-stat-label">{% trans "Current Balance" %}</div>
-          <span class="rev-stat-badge rbadge-up">
-            <i class="bi bi-check-circle me-1"></i>{% trans "Available" %}
-          </span>
-        </div>
-      </div>
-
-      <div class="col-6 col-lg-3">
-        <div class="rev-stat-card accent-green">
-          <div class="rev-stat-icon"><i class="bi bi-currency-dollar"></i></div>
-          <div class="rev-stat-value">{{ total_earned|floatformat:2 }}</div>
-          <div class="rev-stat-label">{% trans "Total Earned" %}</div>
-        </div>
-      </div>
-
-      <div class="col-6 col-lg-3">
-        <div class="rev-stat-card accent-blue">
-          <div class="rev-stat-icon"><i class="bi bi-send-check-fill"></i></div>
-          <div class="rev-stat-value">{{ total_paid|floatformat:2 }}</div>
-          <div class="rev-stat-label">{% trans "Total Paid Out" %}</div>
-          <span class="rev-stat-badge rbadge-info">{% trans "Transferred" %}</span>
-        </div>
-      </div>
-
-      <div class="col-6 col-lg-3">
-        <div class="rev-stat-card accent-amber">
-          <div class="rev-stat-icon"><i class="bi bi-calendar2-week-fill"></i></div>
-          <div class="rev-stat-value">{{ this_month_total|floatformat:2 }}</div>
-          <div class="rev-stat-label">{% trans "This Month" %}</div>
-          <span class="rev-stat-badge" style="background:rgba(212,169,45,.13);color:#7a5a00;">
-            {% blocktrans count jobs=this_month_jobs %}{{ jobs }} job{% plural %}{{ jobs }} jobs{% endblocktrans %}
-          </span>
-        </div>
-      </div>
-
+    <div class="rev-stat green">
+      <div class="rev-stat-icon"><i class="bi bi-currency-dollar"></i></div>
+      <div class="rev-stat-num">{{ total_earned|floatformat:2 }}</div>
+      <div class="rev-stat-lbl">{% trans "Total Earned" %}</div>
     </div>
 
-    <!-- ── Chart + Quick Stats ───────────── -->
-    <div class="row g-3 mb-4">
-
-      <div class="col-12 col-lg-8">
-        <div class="rev-panel h-100">
-          <div class="rev-panel-title">
-            <span>
-              <i class="bi bi-graph-up me-1" class="text-saaf-btn"></i>
-              {% trans "Monthly Revenue" %}
-            </span>
-            <small>{% trans "Last 12 months" %}</small>
-          </div>
-          <div style="position:relative;height:230px;">
-            <canvas id="revChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-lg-4">
-        <div class="rev-panel h-100 d-flex flex-column" style="gap:1.2rem;">
-
-          <div>
-            <div class="d-flex justify-content-between align-items-center mb-1">
-              <span style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--saaf-text-muted);">
-                {% trans "Payout Progress" %}
-              </span>
-              <span style="font-size:.8rem;color:var(--saaf-btn);font-weight:700;">
-                {% if total_earned > 0 %}{{ total_paid|floatformat:0 }} / {{ total_earned|floatformat:0 }}{% else %}—{% endif %}
-              </span>
-            </div>
-            <div class="rev-goal-bar">
-              <div class="rev-goal-fill" id="payoutBar" style="width:0%;"></div>
-            </div>
-            <div style="font-size:.74rem;color:var(--saaf-text-muted);">
-              {% if total_earned > 0 %}
-                {{ total_paid|floatformat:2 }} {% trans "of" %} {{ total_earned|floatformat:2 }}
-              {% else %}
-                {% trans "No earnings yet" %}
-              {% endif %}
-            </div>
-          </div>
-
-          <div>
-            <div class="rev-panel-title" style="margin-bottom:.75rem;font-size:.88rem;">
-              {% trans "This Month at a Glance" %}
-            </div>
-            <div>
-              <div class="rev-qs-row">
-                <span>{% trans "Completed Jobs" %}</span>
-                <strong class="text-saaf-btn">{{ this_month_jobs }}</strong>
-              </div>
-              <div class="rev-qs-row">
-                <span>{% trans "Revenue" %}</span>
-                <strong class="text-saaf-btn">{{ this_month_total|floatformat:2 }}</strong>
-              </div>
-              <div class="rev-qs-row">
-                <span>{% trans "Pending Balance" %}</span>
-                <strong>{{ current_balance|floatformat:2 }}</strong>
-              </div>
-              <div class="rev-qs-row">
-                <span>{% trans "Total Paid Out" %}</span>
-                <strong>{{ total_paid|floatformat:2 }}</strong>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-        <!-- Active Requests -->
-    <div class="rev-panel mb-4">
-      <div class="rev-panel-title">
-        <span>
-          <i class="bi bi-hourglass-split me-1" class="text-saaf-btn"></i>
-          {% trans "Active Requests" %}
-        </span>
-        <small>{{ active_requests|length }}</small>
-      </div>
-
-      {% if active_requests %}
-        <div class="table-responsive">
-          <table class="rev-table">
-            <thead>
-              <tr>
-                <th>{% trans "Title" %}</th>
-                <th>{% trans "Requester" %}</th>
-                <th>{% trans "Price" %}</th>
-                <th>{% trans "Status" %}</th>
-                <th class="text-end">{% trans "Details" %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for contract in active_requests %}
-              <tr>
-                <td>
-                  <div class="fw-bold text-saaf-heading">
-                    {{ contract.proposal.request.title }}
-                  </div>
-                  <div style="font-size:.74rem;color:var(--saaf-text-muted);">
-                    #{{ contract.id }}
-                  </div>
-                </td>
-                <td>{{ contract.proposal.request.requester.get_full_name|default:contract.proposal.request.requester.username }}</td>
-                <td>{{ contract.proposal.price|floatformat:2 }}</td>
-                <td>
-                  <span class="rev-pill pill-pending">
-                    <span class="rev-pill-dot"></span>
-                    {% trans "In Progress" %}
-                  </span>
-                </td>
-                <td class="text-end">
-                  <a href="{% url 'progress:contract_detail_view' contract.id %}" class="saaf-dashboard-linkline">
-                    {% trans "View" %}
-                  </a>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="rev-empty">
-          <i class="bi bi-inbox"></i>
-          <p>{% trans "No active requests right now." %}</p>
-        </div>
-      {% endif %}
+    <div class="rev-stat blue">
+      <div class="rev-stat-icon"><i class="bi bi-send-check-fill"></i></div>
+      <div class="rev-stat-num">{{ total_paid|floatformat:2 }}</div>
+      <div class="rev-stat-lbl">{% trans "Total Paid Out" %}</div>
+      <span class="rev-stat-badge rbadge-info">{% trans "Transferred" %}</span>
     </div>
 
-    <!-- Completed Requests -->
-    <div class="rev-panel mb-4">
-      <div class="rev-panel-title">
-        <span>
-          <i class="bi bi-check2-circle me-1" class="text-saaf-btn"></i>
-          {% trans "Completed Requests" %}
-        </span>
-            <a href="{% url 'account:completed_orders_view' %}" class="saaf-dashboard-linkline" style="font-size:.83rem;">
-          {% trans "View all" %}
-          <i class="bi bi-arrow-{% if LANGUAGE_CODE == 'ar' %}left{% else %}right{% endif %}"></i>
-        </a>
-
-      </div>
-
-      {% if completed_requests %}
-        <div class="table-responsive">
-          <table class="rev-table">
-            <thead>
-              <tr>
-                <th>{% trans "Title" %}</th>
-                <th>{% trans "Requester" %}</th>
-                <th>{% trans "Price" %}</th>
-                <th>{% trans "Status" %}</th>
-                <th class="text-end">{% trans "Details" %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for contract in completed_requests %}
-              <tr>
-                <td>
-                  <div class="fw-bold text-saaf-heading">
-                    {{ contract.proposal.request.title }}
-                  </div>
-                  <div style="font-size:.74rem;color:var(--saaf-text-muted);">
-                    #{{ contract.id }}
-                  </div>
-                </td>
-                <td>{{ contract.proposal.request.requester.get_full_name|default:contract.proposal.request.requester.username }}</td>
-                <td>{{ contract.proposal.price|floatformat:2 }}</td>
-                <td>
-                  <span class="rev-pill pill-paid">
-                    <span class="rev-pill-dot"></span>
-                    {% trans "Completed" %}
-                  </span>
-                </td>
-                <td class="text-end">
-                  <a href="{% url 'progress:contract_detail_view' contract.id %}" class="saaf-dashboard-linkline">
-                    {% trans "View" %}
-                  </a>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="rev-empty">
-          <i class="bi bi-check2-circle"></i>
-          <p>{% trans "No completed requests yet." %}</p>
-        </div>
-      {% endif %}
-    </div>
-    <!-- ── Recent Transactions ───────────── -->
-    <div class="rev-panel">
-      <div class="rev-panel-title">
-        <span>
-          <i class="bi bi-receipt me-1" class="text-saaf-btn"></i>
-          {% trans "Recent Transactions" %}
-        </span>
-        <a href="#" class="saaf-dashboard-linkline" style="font-size:.83rem;">
-          {% trans "View all" %}
-          <i class="bi bi-arrow-{% if LANGUAGE_CODE == 'ar' %}left{% else %}right{% endif %}"></i>
-        </a>
-      </div>
-
-      {% if recent_revenues %}
-      <div class="table-responsive">
-        <table class="rev-table">
-          <thead>
-            <tr>
-              <th>{% trans "Contract" %}</th>
-              <th>{% trans "Net Amount" %}</th>
-              <th>{% trans "Status" %}</th>
-              <th>{% trans "Date" %}</th>
-              <th class="text-end">{% trans "Details" %}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for revenue in recent_revenues %}
-            <tr>
-              <td>
-                <div class="fw-bold text-saaf-heading">
-                  {{ revenue.contract.title|default:"—" }}
-                </div>
-                <div style="font-size:.74rem;color:var(--saaf-text-muted);">#{{ revenue.id }}</div>
-              </td>
-              <td>
-                <span style="font-size:1rem;font-weight:700;color:var(--saaf-heading);">
-                  {{ revenue.net_amount|floatformat:2 }}
-                </span>
-              </td>
-              <td>
-                {% if revenue.status == 'paid' %}
-                  <span class="rev-pill pill-paid">
-                    <span class="rev-pill-dot"></span>
-                    {% trans "Paid" %}
-                  </span>
-                {% elif revenue.status == 'earned' %}
-                  <span class="rev-pill pill-earned">
-                    <span class="rev-pill-dot"></span>
-                    {% trans "Earned" %}
-                  </span>
-                {% elif revenue.status == 'canceled' %}
-                  <span class="rev-pill" style="background:rgba(192,57,43,.12);color:#a93226;">
-                    <span class="rev-pill-dot"></span>
-                    {% trans "Canceled" %}
-                  </span>
-                {% else %}
-                  <span class="rev-pill pill-pending">
-                    <span class="rev-pill-dot"></span>
-                    {% trans "Pending" %}
-                  </span>
-                {% endif %}
-              </td>
-              <td style="color:var(--saaf-text-muted);font-size:.82rem;white-space:nowrap;">
-                {{ revenue.created_at|date:"M d, Y" }}
-              </td>
-              <td class="text-end">
-                <a href="#" class="saaf-dashboard-linkline" style="font-size:.82rem;">
-                  {% trans "View" %}
-                  <i class="bi bi-chevron-{% if LANGUAGE_CODE == 'ar' %}left{% else %}right{% endif %}" style="font-size:.7rem;"></i>
-                </a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-      <div class="rev-empty">
-        <i class="bi bi-inbox"></i>
-        <p style="font-size:.88rem;">
-          {% trans "No transactions yet. Complete a contract to see your earnings here." %}
-        </p>
-      </div>
-      {% endif %}
-
+    <div class="rev-stat amber">
+      <div class="rev-stat-icon"><i class="bi bi-calendar2-week-fill"></i></div>
+      <div class="rev-stat-num">{{ this_month_total|floatformat:2 }}</div>
+      <div class="rev-stat-lbl">{% trans "This Month" %}</div>
+      <span class="rev-stat-badge" style="background:rgba(212,169,45,.13);color:#7a5a00;">
+        {% blocktrans count jobs=this_month_jobs %}{{ jobs }} job{% plural %}{{ jobs }} jobs{% endblocktrans %}
+      </span>
     </div>
 
   </div>
+
+  <!-- ══ Chart + Quick Stats ══ -->
+  <div class="rev-mid-row">
+
+    <div class="rev-panel">
+      <div class="rev-panel-hd">
+        <div class="rev-panel-hd-title">
+          <i class="bi bi-graph-up"></i>{% trans "Monthly Revenue" %}
+        </div>
+        <small>{% trans "Last 12 months" %}</small>
+      </div>
+      <div class="rev-chart-box">
+        <canvas id="revChart"></canvas>
+      </div>
+    </div>
+
+    <div class="rev-panel rev-side-panel">
+
+      <!-- Progress -->
+      <div>
+        <div class="rev-progress-label">
+          <span>{% trans "Payout Progress" %}</span>
+          <strong>
+            {% if total_earned > 0 %}{{ total_paid|floatformat:0 }} / {{ total_earned|floatformat:0 }}{% else %}—{% endif %}
+          </strong>
+        </div>
+        <div class="rev-bar">
+          <div class="rev-bar-fill" id="payoutBar" style="width:0%;"></div>
+        </div>
+        <div class="rev-bar-sub">
+          {% if total_earned > 0 %}
+            {{ total_paid|floatformat:2 }} {% trans "of" %} {{ total_earned|floatformat:2 }}
+          {% else %}
+            {% trans "No earnings yet" %}
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Quick stats -->
+      <div>
+        <div class="rev-qs-title">{% trans "This Month at a Glance" %}</div>
+        <div class="rev-qs-row">
+          <span>{% trans "Completed Jobs" %}</span>
+          <strong style="color:var(--saaf-btn);">{{ this_month_jobs }}</strong>
+        </div>
+        <div class="rev-qs-row">
+          <span>{% trans "Revenue" %}</span>
+          <strong style="color:var(--saaf-btn);">{{ this_month_total|floatformat:2 }}</strong>
+        </div>
+        <div class="rev-qs-row">
+          <span>{% trans "Pending Balance" %}</span>
+          <strong>{{ current_balance|floatformat:2 }}</strong>
+        </div>
+        <div class="rev-qs-row">
+          <span>{% trans "Total Paid Out" %}</span>
+          <strong>{{ total_paid|floatformat:2 }}</strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ Active Requests ══ -->
+<div class="rev-panel rev-table-panel">
+  <div class="rev-panel-hd">
+    <div class="rev-panel-hd-title">
+      <i class="bi bi-hourglass-split"></i>{% trans "Active Requests" %}
+    </div>
+    <small>{{ active_requests|length }}</small>
+  </div>
+
+  {% if active_requests %}
+  <div class="table-responsive">
+    <table class="rev-table">
+      <thead>
+        <tr>
+          <th>{% trans "Title" %}</th>
+          {% comment %} <th>{% trans "Requester" %}</th> {% endcomment %}
+          {% comment %} <th>{% trans "Price" %}</th> {% endcomment %}
+          <th>{% trans "Status" %}</th>
+          <th class="text-end">{% trans "Details" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contract in active_requests %}
+        <tr>
+          <td>
+            <div class="rev-td-title">{{ contract.proposal.request.title }}</div>
+            <div class="rev-td-id">#{{ contract.id }}</div>
+          </td>
+          {% comment %} <td>
+            {{ contract.proposal.request.requester.get_full_name|default:contract.proposal.request.requester.username }}
+          </td> {% endcomment %}
+          {% comment %} <td style="font-weight:700;color:var(--saaf-heading);">
+            {{ contract.proposal.price|floatformat:2 }}
+          </td> {% endcomment %}
+          <td>
+            <span class="rev-pill pill-pending">
+              <span class="rev-pill-dot"></span>{% trans "In Progress" %}
+            </span>
+          </td>
+          <td class="text-end">
+            <a href="{% url 'progress:contract_detail_view' contract.id %}" class="saaf-dashboard-linkline">
+              {% trans "View" %}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="rev-empty">
+    <i class="bi bi-inbox"></i>
+    <p>{% trans "No active requests right now." %}</p>
+  </div>
+  {% endif %}
+</div>
+
+  <!-- ══ Completed Requests ══ -->
+  <div class="rev-panel rev-table-panel">
+    <div class="rev-panel-hd">
+      <div class="rev-panel-hd-title">
+        <i class="bi bi-check2-circle"></i>{% trans "Completed Requests" %}
+      </div>
+      <a href="{% url 'account:completed_orders_view' %}" class="saaf-dashboard-linkline" style="font-size:.83rem;">
+        {% trans "View all" %} <i class="bi bi-arrow-{% if LANGUAGE_CODE == 'ar' %}left{% else %}right{% endif %}"></i>
+      </a>
+    </div>
+
+    {% if completed_requests %}
+    <div class="table-responsive">
+      <table class="rev-table">
+        <thead>
+          <tr>
+            <th>{% trans "Title" %}</th>
+            <th>{% trans "Status" %}</th>
+            <th class="text-end">{% trans "Details" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for contract in completed_requests %}
+          <tr>
+            <td>
+              <div class="rev-td-title">{{ contract.proposal.request.title }}</div>
+              <div class="rev-td-id">#{{ contract.id }}</div>
+            </td>
+            <td>
+              <span class="rev-pill pill-paid">
+                <span class="rev-pill-dot"></span>{% trans "Completed" %}
+              </span>
+            </td>
+            <td class="text-end">
+              <a href="{% url 'progress:contract_detail_view' contract.id %}" class="saaf-dashboard-linkline">
+                {% trans "View" %}
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="rev-empty">
+      <i class="bi bi-check2-circle"></i>
+      <p>{% trans "No completed requests yet." %}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ══ Recent Transactions ══ -->
+<div class="rev-panel rev-table-panel" style="margin-bottom:0;">
+  <div class="rev-panel-hd">
+    <div class="rev-panel-hd-title">
+      <i class="bi bi-receipt"></i>{% trans "Recent Transactions" %}
+    </div>
+  </div>
+
+  {% if recent_revenues %}
+  <div class="table-responsive">
+    <table class="rev-table">
+      <thead>
+        <tr>
+          {% comment %} <th>{% trans "Contract" %}</th> {% endcomment %}
+          <th class="rev-col-mobile-hide">{% trans "Net Amount" %}</th>
+          <th class="rev-col-mobile-hide">{% trans "Status" %}</th>
+          <th class="rev-col-mobile-hide">{% trans "Date" %}</th>
+          {% comment %} <th class="text-end">{% trans "Details" %}</th> {% endcomment %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for revenue in recent_revenues %}
+        <tr>
+          {% comment %} <td>
+            <div class="rev-td-title">{{ revenue.contract.title|default:"—" }}</div>
+            <div class="rev-td-id">#{{ revenue.id }}</div>
+          </td> {% endcomment %}
+          <td class="rev-col-mobile-hide">
+            <span style="font-size:1rem;font-weight:700;color:var(--saaf-heading);">
+              {{ revenue.net_amount|floatformat:2 }}
+            </span>
+          </td>
+          <td class="rev-col-mobile-hide">
+            {% if revenue.status == 'paid' %}
+              <span class="rev-pill pill-paid">
+                <span class="rev-pill-dot"></span>{% trans "Paid" %}
+              </span>
+            {% elif revenue.status == 'earned' %}
+              <span class="rev-pill pill-earned">
+                <span class="rev-pill-dot"></span>{% trans "Earned" %}
+              </span>
+            {% elif revenue.status == 'canceled' %}
+              <span class="rev-pill" style="background:rgba(192,57,43,.12);color:#a93226;">
+                <span class="rev-pill-dot"></span>{% trans "Canceled" %}
+              </span>
+            {% else %}
+              <span class="rev-pill pill-pending">
+                <span class="rev-pill-dot"></span>{% trans "Pending" %}
+              </span>
+            {% endif %}
+          </td>
+          <td class="rev-col-mobile-hide" style="color:var(--saaf-text-muted);white-space:nowrap;">
+            {{ revenue.created_at|date:"M d, Y" }}
+          </td>
+          {% comment %} <td class="text-end">
+            <a href="#" class="saaf-dashboard-linkline" style="font-size:.82rem;">
+              {% trans "View" %}
+              <i class="bi bi-chevron-{% if LANGUAGE_CODE == 'ar' %}left{% else %}right{% endif %}" style="font-size:.7rem;"></i>
+            </a>
+          </td> {% endcomment %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="rev-empty">
+    <i class="bi bi-inbox"></i>
+    <p>{% trans "No transactions yet. Complete a contract to see your earnings here." %}</p>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
 
@@ -719,14 +779,17 @@
     var existing = Chart.getChart('revChart');
     if (existing) existing.destroy();
 
-    var ctx  = document.getElementById('revChart').getContext('2d');
+    var canvas = document.getElementById('revChart');
+    if (!canvas) return;
+    var ctx  = canvas.getContext('2d');
     var dark = isDark();
+    var h    = canvas.parentElement.offsetHeight || 230;
 
-    var grad = ctx.createLinearGradient(0, 0, 0, 230);
+    var grad = ctx.createLinearGradient(0, 0, 0, h);
     grad.addColorStop(0, dark ? 'rgba(212,139,104,.28)' : 'rgba(199,122,92,.22)');
     grad.addColorStop(1, 'rgba(199,122,92,.00)');
 
-    return new Chart(ctx, {
+    new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels.length ? labels : ['—'],
@@ -740,7 +803,7 @@
           pointBackgroundColor: dark ? '#D48B68' : '#C77A5C',
           pointBorderColor: dark ? '#241B15' : '#FAF1E5',
           pointBorderWidth: 2.5,
-          pointRadius: 5,
+          pointRadius: 4,
           tension: 0.42
         }]
       },
@@ -762,7 +825,13 @@
         scales: {
           x: {
             grid: { display: false },
-            ticks: { color: dark ? '#c9b79f' : '#6A5648', font: { size: 11 } }
+            ticks: {
+              color: dark ? '#c9b79f' : '#6A5648',
+              font: { size: 11 },
+              maxRotation: 45,
+              autoSkip: true,
+              maxTicksLimit: 6
+            }
           },
           y: {
             grid: { color: dark ? 'rgba(219,191,155,.1)' : 'rgba(96,70,51,.07)' },
@@ -779,19 +848,21 @@
 
   buildChart();
 
-  // Re-render when theme toggles
+  /* Re-render on theme toggle */
   var themeBtn = document.getElementById('saaf-theme-toggle');
-  if (themeBtn) {
-    themeBtn.addEventListener('click', function () {
-      setTimeout(buildChart, 80);
-    });
-  }
+  if (themeBtn) themeBtn.addEventListener('click', function () { setTimeout(buildChart, 80); });
 
-  // Payout progress bar
-  var pct = 0;
+  /* Re-render on resize (handles orientation change) */
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(buildChart, 200);
+  });
+
+  /* Payout progress bar */
   var earned = parseFloat("{{ total_earned }}") || 0;
   var paid   = parseFloat("{{ total_paid }}")   || 0;
-  if (earned > 0) pct = Math.min((paid / earned) * 100, 100);
+  var pct    = earned > 0 ? Math.min((paid / earned) * 100, 100) : 0;
   setTimeout(function () {
     var bar = document.getElementById('payoutBar');
     if (bar) bar.style.width = pct + '%';
