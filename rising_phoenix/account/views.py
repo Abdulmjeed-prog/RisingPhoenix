@@ -113,6 +113,8 @@ def artisan_signup_view(request:HttpRequest):
                     'avatar2.png',
                     'avatar3.png',
                     'avatar4.png',
+                    'avatar5.png',
+                    'avatar6.png',
                 ]
 })
         
@@ -122,6 +124,8 @@ def artisan_signup_view(request:HttpRequest):
             'avatar2.png',
             'avatar3.png',
             'avatar4.png',
+            'avatar5.png',
+            'avatar6.png',
         ]
 
     })
