@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'request',
     'proposal',
     'phonenumber_field',
+    'storages',
     'payment',
     'message',
     'progress',
@@ -159,12 +160,37 @@ USE_TZ = True
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Cloudflare R2 — activated when AWS_ACCESS_KEY_ID and AWS_S3_ENDPOINT_URL are set in .env
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
+R2_PUBLIC_URL = os.environ.get('R2_PUBLIC_URL')  # e.g. https://pub-xxx.r2.dev or custom domain
+
+if AWS_ACCESS_KEY_ID and AWS_S3_ENDPOINT_URL:
+    STORAGES = {
+        'default': {'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage'},
+        'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
+    }
+    AWS_S3_REGION_NAME = 'auto'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+    if R2_PUBLIC_URL:
+        _public = R2_PUBLIC_URL.rstrip('/')
+        AWS_S3_CUSTOM_DOMAIN = _public.removeprefix('https://').removeprefix('http://')
+        MEDIA_URL = _public + '/'
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
