@@ -164,10 +164,10 @@ def workshop_detail_view(request, artisan_id):
                     update_fields=['is_pinned']
                 )
 
-                messages.success(
-                    request,
-                    f"Image {'pinned' if portfolio_image.is_pinned else 'unpinned'} successfully."
-                )
+                if portfolio_image.is_pinned:
+                    messages.success(request, _("Image pinned successfully."))
+                else:
+                    messages.success(request, _("Image unpinned successfully."))
 
             else:
 
@@ -247,10 +247,10 @@ def workshop_detail_view(request, artisan_id):
                     update_fields=['is_pinned']
                 )
 
-                messages.success(
-                    request,
-                    f"Image {'pinned' if portfolio_image.is_pinned else 'unpinned'} successfully."
-                )
+                if portfolio_image.is_pinned:
+                    messages.success(request, _("Image pinned successfully."))
+                else:
+                    messages.success(request, _("Image unpinned successfully."))
 
             else:
 
@@ -432,7 +432,7 @@ def closed_requests_view(request, artisan_id):
         artisan_profile = ArtisanProfile.objects.get(user_id=artisan_id)
         workshop = WorkshopProfile.objects.get(artisan=artisan_profile)
     except (ArtisanProfile.DoesNotExist, WorkshopProfile.DoesNotExist):
-        messages.error(request, "Workshop not found.")
+        messages.error(request, _("Workshop not found."))
         return redirect('main:home_view')
 
     completed_requests = (
@@ -519,10 +519,10 @@ def portfolio_list_view(request, artisan_id):
                     update_fields=['is_pinned']
                 )
 
-                messages.success(
-                    request,
-                    f"Image {'pinned' if portfolio_image.is_pinned else 'unpinned'} successfully."
-                )
+                if portfolio_image.is_pinned:
+                    messages.success(request, _("Image pinned successfully."))
+                else:
+                    messages.success(request, _("Image unpinned successfully."))
 
             else:
 
@@ -646,7 +646,10 @@ def upload_portfolio_view(request):
             if portfolio_image:
                 portfolio_image.is_pinned = not portfolio_image.is_pinned
                 portfolio_image.save(update_fields=['is_pinned'])
-                messages.success(request, f"Image {'pinned' if portfolio_image.is_pinned else 'unpinned'} successfully.")
+                if portfolio_image.is_pinned:
+                    messages.success(request, _("Image pinned successfully."))
+                else:
+                    messages.success(request, _("Image unpinned successfully."))
             else:
                 messages.error(request, _("Portfolio image not found."))
             return redirect('workshop:upload_portfolio_view')
@@ -668,7 +671,7 @@ def upload_portfolio_view(request):
                     for image in images:
                         error = _validate_workshop_image(image)
                         if error:
-                            messages.warning(request, f'Image skipped: {error}')
+                            messages.warning(request, _("Image skipped: %(error)s") % {"error": error})
                             continue
                         PortfolioImage.objects.create(
                             workshop=workshop,
@@ -679,7 +682,7 @@ def upload_portfolio_view(request):
                         saved_count += 1
 
                 if saved_count:
-                    messages.success(request, f"{saved_count} portfolio image(s) uploaded successfully.")
+                    messages.success(request, _("%(count)d portfolio image(s) uploaded successfully.") % {"count": saved_count})
                 return redirect('workshop:upload_portfolio_view')
         else:
             messages.error(request, _("Please correct the errors below."))
@@ -762,7 +765,7 @@ def upload_project_images_view(request, project_id):
                     for img in images:
                         error = _validate_workshop_image(img)
                         if error:
-                            messages.warning(request, f'Image skipped: {error}')
+                            messages.warning(request, _("Image skipped: %(error)s") % {"error": error})
                             continue
                         CompletedProjectImage.objects.create(
                             project=project,
@@ -772,7 +775,7 @@ def upload_project_images_view(request, project_id):
                         )
                         saved_count += 1
                 if saved_count:
-                    messages.success(request, f"{saved_count} project image(s) uploaded successfully.")
+                    messages.success(request, _("%(count)d project image(s) uploaded successfully.") % {"count": saved_count})
                 return redirect('workshop:project_detail_view', project_id=project.id)
         else:
             messages.error(request, _("Please correct the errors below."))

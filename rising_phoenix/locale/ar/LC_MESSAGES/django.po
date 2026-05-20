@@ -3284,3 +3284,99 @@ msgstr "— الحرفيون الأعلى تقييماً"
 
 msgid "✎ annotates & adds the image to your proposal · ↓ downloads a copy"
 msgstr "✎ يُضيف تعليقاً للصورة ويرفقها بعرضك · ↓ يُنزّل نسخة"
+
+msgid "Client Overview"
+msgstr "نظرة عامة على العميل"
+
+msgid "Your alerts and requests"
+msgstr "تنبيهاتك وطلباتك"
+
+msgid "Unread Notifications"
+msgstr "الإشعارات غير المقروءة"
+
+msgid "Go to notification center"
+msgstr "الذهاب إلى مركز الإشعارات"
+
+msgid "Unread Messages"
+msgstr "الرسائل غير المقروءة"
+
+msgid "Active chats"
+msgstr "المحادثات النشطة"
+
+msgid "Pending Proposals"
+msgstr "العروض المعلّقة"
+
+msgid "Total proposals"
+msgstr "إجمالي العروض"
+
+msgid "Latest Notifications"
+msgstr "أحدث الإشعارات"
+
+msgid "No recent notifications."
+msgstr "لا توجد إشعارات حديثة."
+
+msgid "My Latest Requests"
+msgstr "أحدث طلباتي"
+
+msgid "No requests found for this filter."
+msgstr "لم يُعثر على طلبات لهذا الفلتر."
+
+msgid "All closed requests linked to accepted proposals for {{ name }}."
+msgstr "جميع الطلبات المغلقة المرتبطة بالعروض المقبولة لـ {{ name }}."
+
+msgid "by"
+msgstr "بواسطة"
+
+msgid "Page"
+msgstr "صفحة"
+
+msgid "You have no open requests right now."
+msgstr "ليس لديك طلبات مفتوحة الآن."
+
+msgid "Create a new request"
+msgstr "أنشئ طلباً جديداً"
+
+msgid "Could not load your requests. Please try again."
+msgstr "تعذّر تحميل طلباتك. يرجى المحاولة مرة أخرى."
+
+msgid "Invitation sent!"
+msgstr "تم إرسال الدعوة!"
+
+msgid "The artisan will receive a notification."
+msgstr "سيتلقى الحرفي إشعاراً."
+
+msgid "You have already invited this artisan to that request."
+msgstr "لقد دعوت هذا الحرفي لذلك الطلب من قبل."
+
+msgid "Already invited"
+msgstr "تمت الدعوة بالفعل"
+
+msgid "Could not invite:"
+msgstr "تعذّرت الدعوة:"
+
+msgid "Could not send invitation."
+msgstr "تعذّر إرسال الدعوة."
+
+msgid "Sending…"
+msgstr "جار الإرسال..."
+
+msgid "Sent"
+msgstr "تم الإرسال"
+
+msgid "Network error — please try again."
+msgstr "خطأ في الشبكة — يرجى المحاولة مرة أخرى."
+
+msgid "Image pinned successfully."
+msgstr "تم تثبيت الصورة بنجاح."
+
+msgid "Image unpinned successfully."
+msgstr "تم إلغاء تثبيت الصورة بنجاح."
+
+msgid "Image skipped: %(error)s"
+msgstr "تم تخطي الصورة: %(error)s"
+
+msgid "%(count)d portfolio image(s) uploaded successfully."
+msgstr "تم رفع %(count)d صورة للمعرض بنجاح."
+
+msgid "%(count)d project image(s) uploaded successfully."
+msgstr "تم رفع %(count)d صورة للمشروع بنجاح."
