@@ -447,12 +447,12 @@
     <div class="rev-header-actions">
 
       <!-- Export -->
-      <a href="{% url 'account:artisan_revenue_pdf_view' %}"
+      {% comment %} <a href="{% url 'account:artisan_revenue_pdf_view' %}"
         download
         class="btn btn-saaf-outline rounded-pill"
         style="font-size:.87rem;">
         <i class="bi bi-download me-1"></i>{% trans "Export" %}
-      </a>
+      </a> {% endcomment %}
 
       <!-- Stripe Button -->
       {% if not stripe_connected %}
