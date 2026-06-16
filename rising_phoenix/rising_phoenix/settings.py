@@ -30,6 +30,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://saaf.up.railway.app/",
+    "http://127.0.0.1:8000/"
+]
+
 # Render injects RENDER_EXTERNAL_HOSTNAME automatically
 # RENDER_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 # if RENDER_HOSTNAME:
