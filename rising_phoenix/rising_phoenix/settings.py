@@ -31,8 +31,8 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://saaf.up.railway.app/",
-    "http://127.0.0.1:8000/"
+    "https://saaf.up.railway.app",
+    "http://127.0.0.1:8000",
 ]
 
 # Render injects RENDER_EXTERNAL_HOSTNAME automatically
