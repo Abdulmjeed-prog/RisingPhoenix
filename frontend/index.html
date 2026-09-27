@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saaf</title>
+    <link id="bootstrap-css" rel="stylesheet" href="/bootstrap/bootstrap.min.css" />
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- intl-tel-input CSS (for phone inputs later) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.6.0/build/css/intlTelInput.css"
+    />
+
+    <!-- Tabler Icons webfont -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
+    />
+    <script>
+  (function () {
+    var lang = localStorage.getItem('saaf-lang') || 'en'
+    var dir = lang === 'ar' ? 'rtl' : 'ltr'
+    document.documentElement.setAttribute('dir', dir)
+    document.documentElement.setAttribute('lang', lang)
+    var file = lang === 'ar' ? 'bootstrap.rtl.min.css' : 'bootstrap.min.css'
+    document.getElementById('bootstrap-css').href = '/bootstrap/' + file
+  })()
+</script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

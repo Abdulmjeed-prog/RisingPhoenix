@@ -39,4 +39,7 @@ urlpatterns = [
     path('notifications/', include('notification.urls')),
     path('invitations/', include('invitation.urls')),
     path('disputes/', include('dispute.urls')),
+    path('api/v1/', include('api.urls')),   # ← add this
+    path('api/v1/auth/', include('account.api_urls')),
+    path('api/v1/main/', include('main.api_urls')),   # ← add this
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

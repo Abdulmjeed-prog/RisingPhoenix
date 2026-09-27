@@ -1,0 +1,3784 @@
+/* TheYearofHandicrafts — Arabic font */
+@font-face {
+    font-family: 'TheYearofHandicrafts';
+    src: url('/fonts/theyearofhandcrafts/TheYearofHandicrafts-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'TheYearofHandicrafts';
+    src: url('/fonts/theyearofhandcrafts/TheYearofHandicrafts-Medium.otf') format('opentype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'TheYearofHandicrafts';
+    src: url('/fonts/theyearofhandcrafts/TheYearofHandicrafts-SemiBold.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'TheYearofHandicrafts';
+    src: url('/fonts/theyearofhandcrafts/TheYearofHandicrafts-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'TheYearofHandicrafts';
+    src: url('/fonts/theyearofhandcrafts/TheYearofHandicrafts-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ============================================
+   SAAF - Color Variables & Customization
+   ============================================ */
+
+:root {
+    --saaf-bg: #F3E8D8;
+    --saaf-beige: #E9D9C3;
+    --saaf-brown-light: #7E8963;
+    --saaf-brown: #3F2D23;
+    --saaf-text-muted: #6A5648;
+    --saaf-white: #FAF1E5;
+    --saaf-border: rgba(96, 70, 51, 0.16);
+    --saaf-focus: rgba(212, 139, 104, 0.36);
+    --saaf-surface-soft: rgba(250, 241, 229, 0.92);
+    --saaf-btn: #C77A5C;
+    --saaf-btn-hover: #AE6448;
+    --saaf-accent: #7E8963;
+    --saaf-heading: #38261E;
+    --saaf-body: #594638;
+    --saaf-cream-text: #F2E4D1;
+    --saaf-espresso: #1C1511;
+    --saaf-surface-1: #FFF6EA;
+    --saaf-surface-2: #F0E2D1;
+    --saaf-nav-bg: rgba(243, 232, 216, 0.78);
+    --saaf-card-bg: linear-gradient(158deg, #FFF6EA 0%, #F3E4D1 100%);
+    --saaf-sidebar-bg: rgba(245, 232, 214, 0.72);
+    --saaf-modal-bg: #FBF2E6;
+    --saaf-shadow-sm: 0 8px 20px rgba(77, 52, 36, 0.12);
+    --saaf-shadow-lg: 0 18px 38px rgba(65, 44, 31, 0.16);
+    --sand: var(--saaf-beige);
+    --clay: var(--saaf-btn);
+    --ink: var(--saaf-brown);
+    --ink-light: var(--saaf-text-muted);
+    --cream: var(--saaf-bg);
+    --white: var(--saaf-white);
+    --sand-dark: #D8C2A4;
+
+    /* Border-radius scale */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-pill: 999px;
+
+    /* Spacing scale */
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.25rem;
+    --space-xl: 1.5rem;
+    --space-2xl: 2rem;
+
+    /* Extra shadow token */
+    --saaf-shadow-xs: 0 2px 8px rgba(77, 52, 36, 0.08);
+
+    /* Semantic colors */
+    --saaf-success: #4f7150;
+    --saaf-warning: #9b7348;
+    --saaf-surface-dark: #2f2822;
+}
+
+/* ============================================
+   Shared Utility Classes
+   ============================================ */
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-2xl) var(--space-xl);
+    border: 1.5px dashed var(--saaf-border);
+    border-radius: var(--radius-md);
+    color: var(--saaf-text-muted);
+}
+
+[data-theme="dark"] .empty-state {
+    border-color: rgba(232, 199, 164, 0.2);
+    color: var(--saaf-cream-text);
+    opacity: 0.7;
+}
+
+.text-saaf-btn    { color: var(--saaf-btn); }
+.text-saaf-heading { color: var(--saaf-heading); }
+
+/* ============================================
+   Global Styles
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+.saaf-chat-container {
+    width: min(100%, 1680px);
+    padding-left: clamp(0.9rem, 2.5vw, 2rem);
+    padding-right: clamp(0.9rem, 2.5vw, 2rem);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--saaf-bg);
+    background-image: radial-gradient(circle at 2% 8%, rgba(122, 139, 90, 0.08), transparent 24%), radial-gradient(circle at 94% 14%, rgba(74, 52, 40, 0.04), transparent 26%);
+    color: var(--saaf-text-muted);
+    min-height: calc(100vh - 170px);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    line-height: 1.6;
+    text-align: start;
+    max-height: none;
+}
+
+:lang(ar) {
+    font-family: 'TheYearofHandicrafts', sans-serif;
+}
+
+:focus-visible {
+    outline: 3px solid var(--saaf-focus);
+    outline-offset: 2px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    opacity: 1;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--saaf-heading);
+}
+.saaf-chat-bubble--mine .saaf-chat-time {
+    color: rgba(255, 247, 238, 0.92);
+}
+.saaf-chat-bubble--mine .saaf-chat-text,
+.saaf-chat-bubble--mine .saaf-chat-sender {
+    color: #fff;
+}
+.saaf-chat-bubble--other .saaf-chat-text,
+.saaf-chat-bubble--other .saaf-chat-sender {
+    color: var(--saaf-text);
+}
+.saaf-chat-detail-head .text-muted {
+    color: color-mix(in srgb, var(--saaf-text) 76%, #fff 24%) !important;
+}
+
+p, span {
+    font-family: 'Poppins', sans-serif;
+    color: var(--saaf-body);
+}
+
+button {
+    font-family: 'Poppins', sans-serif;
+[data-theme="dark"] .saaf-chat-detail-head .text-muted,
+[data-theme="dark"] .saaf-chat-list-time,
+[data-theme="dark"] .saaf-chat-list-meta,
+[data-theme="dark"] .saaf-chat-helper-text,
+[data-theme="dark"] .saaf-chat-time {
+    color: rgba(245, 232, 214, 0.86) !important;
+}
+[data-theme="dark"] .saaf-chat-bubble--other .saaf-chat-text,
+[data-theme="dark"] .saaf-chat-bubble--other .saaf-chat-sender {
+    color: var(--saaf-cream);
+}
+[data-theme="dark"] .saaf-chat-bubble--mine .saaf-chat-time {
+    color: rgba(255, 243, 227, 0.95);
+}
+}
+    .saaf-chat-detail-card {
+        min-height: calc(100vh - 130px);
+        border-radius: 18px;
+    }
+
+a {
+    color: var(--saaf-heading);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--saaf-brown-light);
+}
+
+/* ============================================
+   NAVBAR STYLES
+   ============================================ */
+
+.saaf-navbar,
+.saaf-nav-wrapper {
+    background-color: var(--saaf-nav-bg) !important;
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--saaf-border);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1040;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.saaf-navbar.hidden,
+.saaf-nav-wrapper.hidden {
+    transform: translateY(-100%);
+    box-shadow: none;
+}
+
+.saaf-nav-wrapper .saaf-nav-container {
+    display: flex;
+    align-items: center;
+}
+
+.saaf-nav-wrapper .navbar-collapse {
+    align-items: center;
+}
+
+.saaf-nav-wrapper .navbar-nav {
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.saaf-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.saaf-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--saaf-brown);
+}
+
+.saaf-nav-link {
+    color: var(--saaf-brown);
+    font-weight: 500;
+    position: relative;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    transition: color 0.3s ease, background-color 0.25s ease;
+}
+
+.saaf-nav-link:hover {
+    color: var(--saaf-brown-light);
+    background-color: rgba(224, 210, 180, 0.6);
+}
+
+.saaf-nav-link.active {
+    color: var(--saaf-brown);
+    background-color: rgba(224, 210, 180, 0.7);
+}
+
+.saaf-nav-wrapper .navbar-toggler {
+    border-color: rgba(92, 70, 52, 0.28);
+    padding: 0.45rem 0.55rem;
+}
+
+.saaf-nav-wrapper .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.18rem rgba(160, 127, 98, 0.18);
+}
+
+.saaf-account-toggle {
+    border: 0.5px solid var(--saaf-brown);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.saaf-account-toggle:hover,
+.saaf-account-toggle:focus,
+.saaf-account-toggle:active {
+    background-color: var(--saaf-beige);
+    color: var(--saaf-brown);
+    border-color: var(--saaf-brown);
+}
+
+.saaf-account-menu {
+    border: 0.5px solid var(--saaf-border);
+    border-radius: 14px;
+    background-color: var(--saaf-surface-1);
+    min-width: 180px;
+    padding: 0.35rem;
+}
+
+.saaf-account-menu .dropdown-item {
+    border-radius: 10px;
+    color: var(--saaf-brown);
+    font-weight: 500;
+    padding: 0.45rem 0.75rem;
+}
+
+.saaf-account-menu .dropdown-item:hover,
+.saaf-account-menu .dropdown-item:focus {
+    background-color: var(--saaf-beige);
+    color: var(--saaf-brown);
+}
+
+/* ============================================
+   BUTTON STYLES
+   ============================================ */
+
+.btn {
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-saaf-primary {
+    background-color: var(--saaf-btn);
+    color: var(--saaf-white);
+    border: none;
+    font-weight: 500;
+    box-shadow: 0 3px 10px rgba(169, 94, 73, 0.18);
+}
+
+.btn-saaf-primary:hover {
+    background-color: var(--saaf-btn-hover);
+    color: var(--saaf-white);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(169, 94, 73, 0.24);
+}
+
+.btn-saaf-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 0 var(--saaf-text-muted);
+}
+
+.btn-saaf-outline {
+    background-color: transparent;
+    color: var(--saaf-brown);
+    border: 1px solid var(--saaf-brown);
+    font-weight: 500;
+}
+
+.btn-saaf-outline:hover {
+    background-color: var(--saaf-beige);
+    border-color: var(--saaf-brown);
+    color: var(--saaf-brown);
+}
+
+.btn:focus-visible,
+.btn-saaf-outline:focus-visible,
+.btn-saaf-primary:focus-visible,
+.saaf-theme-toggle:focus-visible,
+.saaf-bell-btn:focus-visible {
+    box-shadow: 0 0 0 3px var(--saaf-focus);
+}
+
+.rounded-pill {
+    border-radius: 50px;
+    padding: 0.65rem 1.5rem;
+}
+
+/* ============================================
+   BOOTSTRAP OVERRIDES - Button Colors
+   ============================================ */
+
+/* Override Bootstrap primary (blue) buttons */
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--saaf-btn);
+    border-color: var(--saaf-btn);
+    color: var(--saaf-white);
+}
+
+.btn-primary:hover {
+    background-color: var(--saaf-btn-hover);
+    border-color: var(--saaf-btn-hover);
+}
+
+/* Override Bootstrap info (cyan) buttons */
+.btn-info,
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:active {
+    background-color: var(--saaf-brown-light);
+    border-color: var(--saaf-brown-light);
+    color: var(--saaf-white);
+}
+
+.btn-info:hover {
+    background-color: var(--saaf-brown);
+    border-color: var(--saaf-brown);
+}
+
+/* Override text-info color utility */
+.text-info {
+    color: var(--saaf-brown-light) !important;
+}
+
+[data-theme="dark"] {
+    --saaf-bg: #1B140F;
+    --saaf-beige: #2A2019;
+    --saaf-brown-light: #A2B081;
+    --saaf-brown: #F2E3CF;
+    --saaf-text-muted: #C9B79F;
+    --saaf-white: #241B15;
+    --saaf-border: rgba(232, 199, 164, 0.2);
+    --saaf-focus: rgba(212, 139, 104, 0.42);
+    --saaf-surface-soft: rgba(39, 30, 24, 0.92);
+    --saaf-btn: #D48B68;
+    --saaf-btn-hover: #E29C7A;
+    --saaf-accent: #A2B081;
+    --saaf-heading: #F2E3CF;
+    --saaf-body: #E3D1BA;
+    --saaf-cream-text: #F2E3CF;
+    --saaf-espresso: #1B140F;
+    --saaf-surface-1: #241B15;
+    --saaf-surface-2: #30241D;
+    --saaf-nav-bg: rgba(38, 29, 23, 0.9);
+    --saaf-card-bg: linear-gradient(156deg, #2A2019 0%, #332720 100%);
+    --saaf-sidebar-bg: rgba(44, 33, 26, 0.93);
+    --saaf-modal-bg: #2D221B;
+    --saaf-shadow-sm: 0 12px 24px rgba(10, 7, 5, 0.35);
+    --saaf-shadow-lg: 0 22px 44px rgba(8, 5, 4, 0.5);
+    --sand: var(--saaf-beige);
+    --clay: var(--saaf-btn);
+    --ink: var(--saaf-brown);
+    --ink-light: var(--saaf-text-muted);
+    --cream: var(--saaf-bg);
+    --white: var(--saaf-white);
+    --sand-dark: #3A2D24;
+}
+
+[data-theme="dark"] html,
+[data-theme="dark"] body {
+    background-color: var(--saaf-bg);
+    color: var(--saaf-body);
+}
+
+[data-theme="dark"] {
+    background-color: var(--saaf-bg) !important;
+    color: var(--saaf-body) !important;
+}
+
+[data-theme="dark"] .saaf-sidebar-toggle {
+    color: var(--saaf-cream-text);
+    background-color: rgba(232, 199, 164, 0.16);
+}
+
+[data-theme="dark"] .saaf-sidebar-toggle:hover {
+    background-color: rgba(232, 199, 164, 0.24);
+}
+
+[data-theme="dark"] .saaf-sidebar {
+    background: linear-gradient(162deg, rgba(45, 34, 27, 0.96), rgba(35, 27, 21, 0.94));
+    border-color: var(--saaf-border);
+    box-shadow: var(--saaf-shadow-lg);
+}
+
+[data-theme="dark"] .sidebar-label {
+    color: var(--saaf-text-muted);
+}
+
+[data-theme="dark"] .saaf-sidebar-mini-toggle {
+    background: rgba(232, 199, 164, 0.2);
+    border-color: rgba(232, 199, 164, 0.3);
+    color: var(--saaf-cream-text);
+}
+
+[data-theme="dark"] .saaf-sidebar-mini-toggle:hover {
+    background: rgba(232, 199, 164, 0.32);
+}
+
+[data-theme="dark"] .sidebar-btn {
+    background: linear-gradient(150deg, rgba(232, 199, 164, 0.14), rgba(212, 139, 104, 0.08));
+    border-color: var(--saaf-border);
+    color: var(--saaf-cream-text);
+    box-shadow: var(--saaf-shadow-sm);
+}
+
+[data-theme="dark"] .sidebar-btn:hover {
+    background: linear-gradient(150deg, rgba(232, 199, 164, 0.26), rgba(212, 139, 104, 0.18));
+    color: var(--saaf-cream-text);
+}
+
+[data-theme="dark"] .sidebar-btn-active {
+    background: linear-gradient(150deg, rgba(212, 139, 104, 0.5), rgba(162, 176, 129, 0.3));
+    color: var(--saaf-cream-text);
+}
+
+[data-theme="dark"] .sidebar-active-indicator {
+    background-color: var(--saaf-btn);
+    box-shadow: 0 0 10px rgba(212, 139, 104, 0.6);
+}
+
+[data-theme="dark"] .sidebar-divider {
+    background: linear-gradient(90deg, transparent, rgba(232, 199, 164, 0.36), transparent);
+}
+
+[data-theme="dark"] .sidebar-btn-new {
+    background: linear-gradient(150deg, rgba(212, 139, 104, 0.88), rgba(174, 100, 72, 0.88));
+    border-color: rgba(232, 199, 164, 0.35);
+    color: var(--saaf-cream-text);
+    box-shadow: var(--saaf-shadow-sm);
+}
+
+[data-theme="dark"] .saaf-navbar,
+[data-theme="dark"] .saaf-nav-wrapper {
+    background-color: var(--saaf-nav-bg) !important;
+    border-bottom-color: rgba(232, 199, 164, 0.2);
+}
+
+[data-theme="dark"] .saaf-nav-wrapper .navbar-toggler {
+    border-color: rgba(232, 199, 164, 0.22);
+    background-color: rgba(56, 42, 31, 0.5);
+}
+
+[data-theme="dark"] .saaf-nav-wrapper .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28242, 228, 209, 0.96%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2.35' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+[data-theme="dark"] .saaf-nav-wrapper .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.18rem rgba(232, 199, 164, 0.22);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .saaf-dashboard-card,
+[data-theme="dark"] .saaf-info-card,
+[data-theme="dark"] .saaf-featured-card,
+[data-theme="dark"] .saaf-testimonial-card,
+[data-theme="dark"] .results-toolbar,
+[data-theme="dark"] .filter-panel {
+    background: var(--saaf-card-bg) !important;
+    color: var(--saaf-body) !important;
+    border-color: var(--saaf-border) !important;
+}
+
+[data-theme="dark"] .bg-light,
+[data-theme="dark"] .text-bg-light,
+[data-theme="dark"] .badge.text-bg-light,
+[data-theme="dark"] .rating-slider-card,
+[data-theme="dark"] .active-filter-chip,
+[data-theme="dark"] .category-chip {
+    background: var(--saaf-beige) !important;
+    color: var(--saaf-brown) !important;
+    border-color: var(--saaf-border) !important;
+}
+
+[data-theme="dark"] .bg-light-subtle,
+[data-theme="dark"] .bg-body-tertiary,
+[data-theme="dark"] .bg-body-secondary,
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .card-footer.bg-white {
+    background: var(--saaf-surface-2) !important;
+    color: var(--saaf-cream-text) !important;
+    border-color: var(--saaf-border) !important;
+}
+
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .small.text-muted,
+[data-theme="dark"] .form-text,
+[data-theme="dark"] .text-body-secondary {
+    color: rgba(242, 228, 209, 0.82) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .input-group-text {
+    background-color: var(--saaf-surface-2) !important;
+    color: var(--saaf-cream-text) !important;
+    border-color: var(--saaf-border) !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: rgba(201, 183, 159, 0.78) !important;
+}
+
+[data-theme="dark"] .table,
+[data-theme="dark"] .table th,
+[data-theme="dark"] .table td {
+    color: var(--saaf-cream-text);
+    border-color: var(--saaf-border);
+    background-color: var(--saaf-surface-1);
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    --bs-table-accent-bg: rgba(232, 199, 164, 0.05);
+}
+
+/* ============================================
+   SECTION STYLES
+   ============================================ */
+
+.saaf-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 72vh;
+    display: flex;
+    align-items: center;
+    padding-top: 6rem;
+    padding-bottom: 5rem;
+    margin: 0.9rem clamp(0.6rem, 1.2vw, 1.1rem) 0;
+    border-radius: 24px;
+    border: 1px solid rgba(233, 217, 195, 0.45);
+}
+
+.saaf-hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.saaf-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(20, 13, 9, 0.7), rgba(20, 13, 9, 0.4));
+    z-index: 1;
+}
+
+.saaf-hero-content-wrap {
+    position: relative;
+    z-index: 2;
+}
+
+.saaf-section {
+    padding: 4rem 0;
+    background-color: var(--saaf-bg);
+}
+
+.saaf-eyebrow {
+    font-size: 0.85rem;
+    color: var(--saaf-text-muted);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.saaf-section-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--saaf-brown);
+}
+
+/* ============================================
+   LAYOUT & SIDEBAR
+   ============================================ */
+
+.saaf-layout {
+    display: block;
+    min-height: auto;
+}
+
+.saaf-sidebar-toggle {
+    position: fixed;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(150deg, rgba(74, 52, 40, 0.9), rgba(122, 139, 90, 0.75));
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #f4f4f4;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1036;
+    box-shadow: 0 12px 26px rgba(15, 10, 8, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+}
+
+.saaf-sidebar-toggle:hover {
+    transform: translateY(-50%) scale(1.06);
+    box-shadow: 0 16px 34px rgba(15, 10, 8, 0.28);
+}
+
+.saaf-sidebar-toggle.hidden {
+    display: none !important;
+}
+
+.saaf-sidebar-mini-toggle {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    border: 1px solid rgba(74, 52, 40, 0.16);
+    background: rgba(48, 38, 32, 0.82);
+    color: #f4f4f4;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    cursor: pointer;
+    margin-bottom: 0;
+    position: absolute;
+    top: 50%;
+    right: -11px;
+    transform: translateY(-50%);
+    z-index: 2;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.saaf-sidebar-mini-toggle:hover {
+    transform: translateY(-50%) scale(1.08);
+    background: rgba(60, 48, 40, 0.92);
+}
+
+.saaf-sidebar-mini-toggle.hidden {
+    display: none !important;
+}
+
+.saaf-sidebar {
+    width: 68px;
+    background: linear-gradient(165deg, rgba(255, 248, 240, 0.96), rgba(248, 237, 223, 0.88));
+    border: 1px solid rgba(74, 52, 40, 0.14);
+    border-radius: 24px;
+    box-shadow: 0 22px 46px rgba(28, 18, 8, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 12px 10px;
+    position: fixed;
+    top: calc(50vh - 120px);
+    left: 10px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    border-right: none;
+    z-index: 1035;
+    transition: transform 0.28s ease, opacity 0.28s ease, box-shadow 0.28s ease;
+    opacity: 1;
+    overflow: visible;
+}
+
+.saaf-sidebar.collapsed {
+    transform: translateX(-112%) scale(0.96);
+    opacity: 0;
+    pointer-events: none;
+}
+
+html[dir="rtl"] .saaf-sidebar-toggle {
+    left: auto;
+    right: 12px;
+}
+
+html[dir="rtl"] .saaf-sidebar-mini-toggle {
+    right: auto;
+    left: -11px;
+}
+
+html[dir="rtl"] .saaf-sidebar.collapsed {
+    transform: translateX(100%);
+}
+
+.saaf-main {
+    width: 100%;
+    max-width: 100%;
+    padding: 24px;
+}
+
+.sidebar-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    border: 1px solid rgba(74, 52, 40, 0.12);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.86), rgba(248, 237, 223, 0.72));
+    color: var(--saaf-brown);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 19px;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 8px 16px rgba(33, 24, 17, 0.08);
+    transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sidebar-label {
+    display: block;
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--saaf-text-muted);
+    margin-bottom: 0.2rem;
+    font-weight: 700;
+}
+
+.sidebar-btn i {
+    font-size: 19px;
+}
+
+.sidebar-btn:hover {
+    background: linear-gradient(150deg, rgba(122, 139, 90, 0.18), rgba(255, 255, 255, 0.86));
+    color: var(--saaf-brown);
+    transform: translateX(2px) scale(1.06);
+    box-shadow: 0 12px 20px rgba(33, 24, 17, 0.14);
+}
+
+.sidebar-btn-active {
+    background: linear-gradient(150deg, rgba(74, 52, 40, 0.9), rgba(122, 139, 90, 0.85));
+    border-color: transparent;
+    color: var(--saaf-white);
+    box-shadow: 0 14px 24px rgba(29, 18, 11, 0.22);
+}
+
+.sidebar-active-indicator {
+    position: absolute;
+    right: -8px;
+    width: 6px;
+    height: 22px;
+    background-color: var(--saaf-brown-light);
+    border-radius: 999px;
+    box-shadow: 0 0 10px rgba(122, 139, 90, 0.5);
+}
+
+.sidebar-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background-color: var(--saaf-brown);
+    color: var(--saaf-white);
+    font-size: 0.65rem;
+    line-height: 18px;
+    text-align: center;
+}
+
+.sidebar-badge-brown {
+    background-color: var(--saaf-brown);
+    color: var(--saaf-white);
+}
+
+.sidebar-badge-light {
+    background-color: var(--saaf-beige);
+    color: var(--saaf-brown);
+}
+
+.sidebar-divider {
+    display: block;
+    width: 32px;
+    height: 1px;
+    margin: 4px 0;
+    background: linear-gradient(90deg, transparent, rgba(74, 52, 40, 0.24), transparent);
+}
+
+.sidebar-btn-new {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: linear-gradient(150deg, rgba(201, 123, 99, 0.94), rgba(169, 94, 73, 0.92));
+    color: var(--saaf-cream-text);
+    box-shadow: 0 12px 22px rgba(169, 94, 73, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sidebar-btn-new i {
+    font-size: 19px;
+}
+
+.sidebar-btn-new:hover {
+    color: var(--saaf-cream-text);
+    transform: translateX(2px) scale(1.06);
+    box-shadow: 0 16px 28px rgba(169, 94, 73, 0.36);
+}
+
+html[dir="rtl"] .sidebar-btn:hover,
+html[dir="rtl"] .sidebar-btn-new:hover {
+    transform: translateX(-2px) scale(1.06);
+}
+
+html[dir="rtl"] .sidebar-active-indicator {
+    right: auto;
+    left: -8px;
+}
+
+.saaf-dashboard-card {
+    border: 0.5px solid var(--saaf-border);
+    background: var(--saaf-card-bg);
+    border-radius: 18px;
+    box-shadow: var(--saaf-shadow-sm);
+    transition: transform 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
+}
+
+.saaf-see-all {
+    color: var(--saaf-brown);
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding-top: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.saaf-see-all:hover {
+    color: var(--saaf-brown-light);
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+
+.saaf-hero-text {
+    max-width: 560px;
+}
+
+.saaf-hero-title {
+    font-size: 3.1rem;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+}
+
+.saaf-text-accent {
+    font-style: italic;
+    color: var(--saaf-brown-light);
+}
+
+.saaf-description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(255, 248, 240, 0.92);
+    margin-bottom: 2rem;
+}
+
+.saaf-hero .saaf-eyebrow,
+.saaf-hero .saaf-hero-title,
+.saaf-hero .saaf-text-accent {
+    color: var(--saaf-white);
+}
+
+.saaf-hero .saaf-description {
+    color: rgba(255, 248, 240, 0.92) !important;
+}
+
+.saaf-hero .saaf-eyebrow,
+.saaf-hero .saaf-hero-title,
+.saaf-hero .saaf-text-accent {
+    color: var(--saaf-white) !important;
+}
+
+[data-theme="dark"] .saaf-hero .saaf-eyebrow,
+[data-theme="dark"] .saaf-hero .saaf-hero-title,
+[data-theme="dark"] .saaf-hero .saaf-text-accent,
+[data-theme="dark"] .saaf-hero .saaf-description {
+    color: var(--saaf-cream-text) !important;
+}
+
+.saaf-hero .btn-saaf-outline {
+    background: rgba(255, 248, 240, 0.14);
+    border-color: rgba(255, 248, 240, 0.35);
+    color: var(--saaf-white);
+}
+
+/* Hero Grid Layout */
+.saaf-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 1rem;
+    max-width: 100%;
+}
+
+.saaf-hero-card {
+    border-radius: 18px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.saaf-hero-card-large {
+    grid-row: span 2;
+    background: linear-gradient(135deg, var(--saaf-brown) 0%, var(--saaf-text-muted) 100%);
+    color: var(--saaf-white);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.saaf-card-icon-large {
+    font-size: 4rem;
+    opacity: 0.15;
+    margin-bottom: 1rem;
+}
+
+.saaf-card-badge {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: var(--saaf-white);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    width: fit-content;
+}
+
+.saaf-card-content h5 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--saaf-white);
+}
+
+.saaf-card-content p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.saaf-hero-card-small {
+    background-color: var(--saaf-beige);
+    border: 1px solid var(--saaf-border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.saaf-card-icon-small {
+    font-size: 2.5rem;
+    color: var(--saaf-text-muted);
+    opacity: 0.2;
+}
+
+.saaf-hero-card-stats {
+    background: linear-gradient(135deg, var(--saaf-brown-light) 0%, var(--saaf-beige) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.saaf-card-stats-text p {
+    color: var(--saaf-text-muted);
+    margin-bottom: 0.2rem;
+    font-size: 0.85rem;
+}
+
+.saaf-card-stats-text h6 {
+    color: var(--saaf-brown);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .saaf-hero-card-stats {
+    background: linear-gradient(180deg, rgba(74, 56, 39, 0.92), rgba(56, 41, 30, 0.95));
+}
+
+[data-theme="dark"] .saaf-card-stats-text p {
+    color: rgba(245, 232, 214, 0.82);
+}
+
+[data-theme="dark"] .saaf-card-stats-text h6 {
+    color: var(--saaf-cream);
+}
+
+/* Workshop profile page */
+.saaf-workshop-page {
+    position: relative;
+}
+
+.saaf-workshop-page::before {
+    content: "";
+    position: absolute;
+    inset: 1rem auto auto 1.2rem;
+    width: 18rem;
+    height: 18rem;
+    background: radial-gradient(circle, rgba(209, 176, 124, 0.16) 0%, rgba(209, 176, 124, 0) 72%);
+    pointer-events: none;
+}
+
+.saaf-workshop-profile-shell,
+.saaf-workshop-grid {
+    position: relative;
+    z-index: 1;
+}
+
+.saaf-workshop-profile-cover {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid rgba(107, 72, 38, 0.12);
+}
+
+.saaf-workshop-profile-hero {
+    margin-bottom: 0.8rem;
+}
+
+.saaf-workshop-avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--saaf-cream-text);
+    background: linear-gradient(150deg, rgba(147, 96, 61, 0.98), rgba(118, 76, 47, 0.98));
+    border: 3px solid rgba(255, 255, 255, 0.65);
+}
+
+.saaf-workshop-tags {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+}
+
+.saaf-workshop-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.32rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(107, 72, 38, 0.15);
+    background: rgba(255, 251, 244, 0.9);
+    color: var(--saaf-brown);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.saaf-workshop-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.9fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.saaf-workshop-side-card {
+    position: sticky;
+    top: 1rem;
+}
+
+.saaf-workshop-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.saaf-workshop-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem;
+}
+
+.saaf-workshop-stat-card {
+    background: linear-gradient(180deg, rgba(252, 247, 239, 0.95), rgba(246, 237, 221, 0.9));
+    border: 1px solid rgba(107, 72, 38, 0.09);
+    border-radius: 14px;
+    padding: 0.8rem;
+}
+
+.saaf-workshop-stat-card strong {
+    display: block;
+    color: var(--saaf-brown);
+    font-size: 1.3rem;
+}
+
+.saaf-workshop-stat-card span {
+    color: var(--saaf-text-muted);
+    font-size: 0.82rem;
+}
+
+.saaf-workshop-portfolio-grid,
+.saaf-workshop-project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.saaf-workshop-portfolio-item,
+.saaf-workshop-project-card {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid rgba(107, 72, 38, 0.12);
+    background: var(--saaf-white);
+}
+
+.saaf-workshop-delete-form {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    z-index: 3;
+}
+
+.saaf-workshop-pin-form {
+    position: absolute;
+    top: 0.55rem;
+    left: 0.55rem;
+    z-index: 3;
+}
+
+.saaf-workshop-pin-toggle-btn {
+    border: 0;
+    border-radius: 999px;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--saaf-cream-text);
+    background: rgba(147, 96, 61, 0.96);
+}
+
+.saaf-workshop-delete-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+    color: #a53c2a;
+    background: rgba(255, 255, 255, 0.94);
+}
+
+.saaf-workshop-portfolio-trigger {
+    width: 100%;
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.saaf-workshop-portfolio-image,
+.saaf-workshop-project-image {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    display: block;
+}
+
+.saaf-workshop-pin-badge {
+    position: absolute;
+    top: 0.55rem;
+    left: 0.55rem;
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--saaf-cream-text);
+    background: rgba(147, 96, 61, 0.96);
+}
+
+.saaf-workshop-empty-box {
+    padding: 1.2rem;
+    text-align: center;
+    border-radius: 14px;
+    border: 1px dashed rgba(107, 72, 38, 0.2);
+    color: var(--saaf-text-muted);
+    background: rgba(255, 252, 247, 0.85);
+}
+
+.saaf-workshop-project-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.saaf-workshop-project-fallback {
+    height: 230px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(242, 232, 215, 0.9);
+    color: var(--saaf-text-muted);
+    font-weight: 600;
+}
+
+.saaf-workshop-project-body {
+    padding: 0.8rem;
+}
+
+.saaf-workshop-project-body h5 {
+    color: var(--saaf-brown);
+    font-size: 1rem;
+}
+
+.saaf-workshop-project-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    margin-bottom: 0.4rem;
+}
+
+.saaf-workshop-project-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #237f56;
+    background: rgba(40, 146, 99, 0.12);
+}
+
+.saaf-workshop-detail-list {
+    border-top: 1px solid var(--saaf-border);
+    border-bottom: 1px solid var(--saaf-border);
+}
+
+.saaf-workshop-detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.7rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(107, 72, 38, 0.08);
+}
+
+.saaf-workshop-detail-row:last-child {
+    border-bottom: 0;
+}
+
+.saaf-workshop-detail-row span {
+    color: var(--saaf-text-muted);
+    font-size: 0.92rem;
+}
+
+.saaf-workshop-detail-row strong {
+    color: var(--saaf-brown);
+    font-size: 0.92rem;
+    text-align: end;
+}
+
+.saaf-workshop-notice {
+    border-radius: 12px;
+    padding: 0.85rem;
+    background: rgba(237, 228, 210, 0.7);
+    color: var(--saaf-text);
+    border-inline-start: 3px solid rgba(147, 96, 61, 0.58);
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+.saaf-workshop-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+[data-theme="dark"] .saaf-workshop-page::before {
+    background: radial-gradient(circle, rgba(143, 105, 65, 0.2) 0%, rgba(143, 105, 65, 0) 72%);
+}
+
+[data-theme="dark"] .saaf-workshop-profile-cover,
+[data-theme="dark"] .saaf-workshop-portfolio-item,
+[data-theme="dark"] .saaf-workshop-project-card,
+[data-theme="dark"] .saaf-workshop-stat-card,
+[data-theme="dark"] .saaf-workshop-empty-box,
+[data-theme="dark"] .saaf-workshop-notice {
+    border-color: rgba(219, 191, 155, 0.14);
+}
+
+[data-theme="dark"] .saaf-workshop-stat-card,
+[data-theme="dark"] .saaf-workshop-empty-box,
+[data-theme="dark"] .saaf-workshop-project-fallback,
+[data-theme="dark"] .saaf-workshop-notice {
+    background: linear-gradient(180deg, rgba(74, 56, 39, 0.92), rgba(56, 41, 30, 0.95));
+}
+
+[data-theme="dark"] .saaf-workshop-tag,
+[data-theme="dark"] .saaf-workshop-project-status {
+    background: rgba(255, 248, 238, 0.08);
+    color: var(--saaf-cream);
+}
+
+[data-theme="dark"] .saaf-workshop-project-body h5,
+[data-theme="dark"] .saaf-workshop-detail-row strong,
+[data-theme="dark"] .saaf-workshop-stat-card strong {
+    color: var(--saaf-cream);
+}
+
+[data-theme="dark"] .saaf-workshop-detail-row span,
+[data-theme="dark"] .saaf-workshop-stat-card span {
+    color: rgba(245, 232, 214, 0.82);
+}
+
+@media (max-width: 1199.98px) {
+    .saaf-workshop-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .saaf-workshop-side-card {
+        position: static;
+    }
+
+    .saaf-workshop-portfolio-grid,
+    .saaf-workshop-project-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
+    .saaf-workshop-profile-cover {
+        height: 200px;
+    }
+
+    .saaf-workshop-stats-grid,
+    .saaf-workshop-portfolio-grid,
+    .saaf-workshop-project-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .saaf-workshop-avatar {
+        width: 70px;
+        height: 70px;
+        font-size: 1.3rem;
+    }
+}
+
+/* ============================================
+   TRENDING CARDS SECTION
+   ============================================ */
+
+.saaf-trending-card {
+    border-radius: 18px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.saaf-trending-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.saaf-card-image {
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.saaf-trending-brown .saaf-card-image {
+    background: linear-gradient(135deg, var(--saaf-brown) 0%, var(--saaf-text-muted) 100%);
+}
+
+.saaf-trending-beige .saaf-card-image {
+    background: linear-gradient(135deg, var(--saaf-beige) 0%, var(--saaf-brown-light) 100%);
+}
+
+.saaf-trending-light-brown .saaf-card-image {
+    background: linear-gradient(135deg, var(--saaf-brown-light) 0%, var(--saaf-beige) 100%);
+}
+
+.saaf-card-icon {
+    font-size: 2.5rem;
+    opacity: 0.15;
+}
+
+.saaf-trending-brown .saaf-card-icon {
+    color: var(--saaf-white);
+}
+
+.saaf-trending-beige .saaf-card-icon {
+    color: var(--saaf-brown);
+}
+
+.saaf-trending-light-brown .saaf-card-icon {
+    color: var(--saaf-brown);
+}
+
+.saaf-rank-badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background-color: var(--saaf-brown);
+    color: var(--saaf-white);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.saaf-card-meta {
+    padding: 1rem;
+    background: var(--saaf-card-bg);
+}
+
+.saaf-card-meta h6 {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+}
+
+/* ============================================
+   ARTISAN CARD SECTION
+   ============================================ */
+
+.saaf-artisan-card {
+    background-color: var(--saaf-brown-light);
+    border-radius: 20px;
+    padding: 3rem;
+    color: var(--saaf-white);
+}
+
+.saaf-artisan-quote {
+    font-size: 1.8rem;
+    font-style: italic;
+    color: var(--saaf-white);
+    line-height: 1.4;
+}
+
+.saaf-artisan-card p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.saaf-artisan-card .btn-saaf-outline {
+    background-color: transparent;
+    color: var(--saaf-white);
+    border-color: var(--saaf-white);
+}
+
+.saaf-artisan-card .btn-saaf-outline:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--saaf-white);
+    color: var(--saaf-white);
+}
+
+.saaf-artisan-portrait {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.saaf-portrait-image {
+    width: 220px;
+    height: 220px;
+    background-color: var(--saaf-brown);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: var(--saaf-white);
+    position: relative;
+    z-index: 2;
+}
+
+.saaf-artisan-badge {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--saaf-brown);
+    color: var(--saaf-white);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    z-index: 3;
+    white-space: nowrap;
+}
+
+.saaf-artisan-decor {
+    position: absolute;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    z-index: 1;
+}
+
+.saaf-artisan-decor-tl {
+    top: -20px;
+    left: -20px;
+}
+
+.saaf-artisan-decor-br {
+    bottom: -20px;
+    right: -20px;
+}
+
+/* ============================================
+   MOOD CARDS SECTION
+   ============================================ */
+
+.saaf-mood-card {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    border-radius: 18px;
+    background: var(--saaf-card-bg);
+    border: 1px solid var(--saaf-border);
+    box-shadow: var(--saaf-shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.saaf-mood-card:hover {
+    border-color: var(--saaf-brown);
+    box-shadow: 0 4px 16px rgba(107, 72, 38, 0.1);
+}
+
+.saaf-mood-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto;
+    color: var(--saaf-white);
+}
+
+.saaf-mood-brown {
+    background-color: var(--saaf-brown);
+}
+
+.saaf-mood-light-brown {
+    background-color: var(--saaf-brown-light);
+}
+
+.saaf-mood-card h6 {
+    font-size: 1rem;
+    color: var(--saaf-brown);
+}
+
+/* ============================================
+   HOW IT WORKS SECTION
+   ============================================ */
+
+.saaf-how-works-box {
+    background-color: var(--saaf-beige);
+    border-radius: 20px;
+    padding: 3rem;
+}
+
+.saaf-step {
+    text-align: center;
+}
+
+.saaf-step-number {
+    font-size: 2.25rem;
+    font-family: 'Poppins', sans-serif;
+    color: var(--saaf-brown);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.saaf-step-number.saaf-step-accent {
+    color: var(--saaf-brown-light);
+}
+
+.saaf-step h5 {
+    color: var(--saaf-brown);
+    font-weight: 600;
+}
+
+/* Craft category cards */
+.saaf-craft-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.25rem 0.75rem;
+    background: var(--saaf-card-bg);
+    border: 1px solid var(--saaf-border);
+    border-radius: 14px;
+    color: var(--saaf-brown);
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    text-align: center;
+    min-height: 100px;
+}
+
+.saaf-craft-card:hover {
+    background: var(--saaf-beige);
+    border-color: var(--saaf-brown-light);
+    color: var(--saaf-brown);
+    transform: translateY(-2px);
+}
+
+.saaf-craft-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.saaf-craft-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+/* Artisan join CTA banner */
+.saaf-artisan-cta-banner {
+    background: var(--saaf-beige);
+    border: 1px solid var(--saaf-border);
+    border-radius: 20px;
+    padding: 2.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.saaf-artisan-cta-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem;
+    color: var(--saaf-brown);
+    font-weight: 700;
+}
+
+/* ============================================
+   FOOTER STYLES
+   ============================================ */
+
+/* Notification bell */
+.saaf-bell-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.saaf-bell-btn {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.saaf-nav-wrapper .btn-saaf-outline.rounded-pill,
+.saaf-nav-wrapper .saaf-theme-toggle,
+.saaf-nav-wrapper .saaf-bell-btn {
+    min-height: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+}
+
+.saaf-nav-wrapper .saaf-theme-toggle,
+.saaf-nav-wrapper .saaf-bell-btn {
+    width: 42px;
+    padding-inline: 0;
+}
+
+.saaf-notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--clay, #c2724f);
+    color: var(--saaf-white);
+    font-size: 0.62rem;
+    font-weight: 700;
+    border-radius: 10px;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* Notification dropdown */
+.saaf-notif-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 320px;
+    max-width: calc(100vw - 1.5rem);
+    background: var(--saaf-surface-1);
+    border: 1px solid var(--sand, #e8ddd3);
+    border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    z-index: 1055;
+    overflow: hidden;
+}
+
+.saaf-notif-dd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--sand, #e8ddd3);
+}
+
+.saaf-notif-dd-title {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--ink, #1c1712);
+}
+
+.saaf-notif-dd-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.saaf-notif-dd-settings-btn {
+    font-size: 0.95rem;
+    color: var(--ink-light, #8a7a6e);
+    text-decoration: none;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.saaf-notif-dd-settings-btn:hover { color: var(--clay, #c2724f); }
+
+.saaf-notif-mark-btn {
+    background: none;
+    border: none;
+    font-size: 0.78rem;
+    color: var(--clay, #c2724f);
+    cursor: pointer;
+    padding: 0;
+    font-weight: 600;
+}
+
+.saaf-notif-mark-btn:hover {
+    color: var(--saaf-btn-hover);
+}
+
+.saaf-notif-dd-list {
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.saaf-notif-dd-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--sand, #e8ddd3);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.12s, opacity 0.2s;
+    cursor: default;
+    opacity: 0.5;
+}
+
+a.saaf-notif-dd-item {
+    cursor: pointer;
+}
+
+.saaf-notif-dd-item:last-child {
+    border-bottom: none;
+}
+
+.saaf-notif-dd-item--unread {
+    background: var(--saaf-beige);
+    opacity: 1;
+}
+
+.saaf-notif-dd-item:hover {
+    background: var(--saaf-beige);
+    color: inherit;
+}
+
+.saaf-notif-dd-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+    padding-top: 2px;
+}
+
+.saaf-notif-dd-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.saaf-notif-dd-item-title {
+    font-size: 0.83rem;
+    font-weight: 500;
+    color: var(--ink, #1c1712);
+    margin: 0 0 0.15rem;
+    line-height: 1.35;
+}
+
+.saaf-notif-dd-item--unread .saaf-notif-dd-item-title {
+    font-weight: 700;
+}
+
+.saaf-notif-dd-item-body {
+    font-size: 0.77rem;
+    color: var(--ink-light, #8a7a6e);
+    margin: 0 0 0.2rem;
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+     line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.45;
+}
+
+.saaf-notif-dd-item-time {
+    font-size: 0.72rem;
+    color: var(--ink-light, #8a7a6e);
+}
+
+.saaf-notif-dd-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--ink-light, #8a7a6e);
+}
+
+.saaf-notif-dd-empty i {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    opacity: 0.4;
+}
+
+.saaf-notif-dd-empty p {
+    margin: 0;
+    font-size: 0.83rem;
+}
+
+.saaf-notif-dd-footer {
+    display: block;
+    text-align: center;
+    padding: 0.7rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--clay, #c2724f);
+    text-decoration: none;
+    border-top: 1px solid var(--sand, #e8ddd3);
+    background: var(--saaf-beige);
+    transition: background 0.12s;
+}
+
+.saaf-notif-dd-footer:hover {
+    background: var(--saaf-bg);
+    color: var(--saaf-btn-hover);
+}
+
+/* Toast notifications */
+.saaf-toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1090;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: 360px;
+    width: calc(100% - 3rem);
+}
+
+.saaf-toast {
+    background: var(--saaf-beige);
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--saaf-brown);
+    animation: saaf-toast-in 0.25s ease;
+}
+
+@keyframes saaf-toast-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.saaf-footer {
+    background-color: var(--saaf-beige);
+    border-top: 1px solid var(--saaf-border);
+    color: var(--saaf-text-muted);
+}
+
+.saaf-footer h6 {
+    color: var(--saaf-brown);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.saaf-footer-link {
+    color: var(--saaf-text-muted);
+    transition: color 0.3s ease;
+}
+
+.saaf-footer-link:hover {
+    color: var(--saaf-brown);
+}
+
+.saaf-social-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--saaf-beige);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--saaf-brown);
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.saaf-social-icon:hover {
+    background-color: var(--saaf-brown);
+    color: var(--saaf-white);
+}
+
+.saaf-border-hr {
+    border-color: var(--saaf-border);
+}
+
+/* Shared card/link helpers for standardized templates */
+.saaf-tile-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.saaf-tile-link:hover .saaf-dashboard-card {
+    border-color: rgba(107, 72, 38, 0.25);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(28, 18, 8, 0.1);
+}
+
+.saaf-dashboard-hero {
+    background: linear-gradient(145deg, rgba(245, 240, 230, 0.95), rgba(224, 210, 180, 0.6));
+}
+
+.saaf-dashboard-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.15rem;
+}
+
+.saaf-quick-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--saaf-border);
+    background: var(--saaf-surface-soft);
+    color: var(--saaf-brown);
+    font-weight: 600;
+    font-size: 0.88rem;
+}
+
+.saaf-quick-action-btn:hover {
+    background: rgba(224, 210, 180, 0.8);
+    color: var(--saaf-brown);
+}
+
+.saaf-dashboard-tile-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 0.35rem;
+}
+
+.saaf-dashboard-tile-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(224, 210, 180, 0.62);
+    color: var(--saaf-brown);
+    font-size: 1rem;
+}
+
+.saaf-info-card {
+    background: var(--saaf-white);
+    border: 1px solid var(--saaf-border);
+    border-radius: 14px;
+    padding: 1rem;
+}
+
+.saaf-info-label {
+    display: block;
+    color: var(--saaf-text-muted);
+    font-size: 0.82rem;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.saaf-avatar-preview {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--saaf-white);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.saaf-avatar-fallback {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: var(--saaf-beige);
+    color: var(--saaf-brown);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    border: 3px solid var(--saaf-white);
+}
+
+.saaf-check-card {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--saaf-border);
+    border-radius: 12px;
+    background: var(--saaf-white);
+    cursor: pointer;
+}
+
+.saaf-check-card input {
+    margin: 0;
+}
+
+.saaf-portfolio-item {
+    background: var(--saaf-white);
+    border: 1px solid var(--saaf-border);
+    border-radius: 12px;
+    padding: 0.45rem;
+}
+
+/* Profile page */
+.saaf-profile-shell {
+    position: relative;
+    overflow: hidden;
+}
+
+.saaf-profile-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 90% 10%, rgba(176, 140, 90, 0.16), transparent 36%),
+        radial-gradient(circle at 12% 82%, rgba(107, 72, 38, 0.1), transparent 30%);
+}
+
+.saaf-profile-hero,
+.saaf-profile-bio-card,
+.saaf-profile-info-card {
+    position: relative;
+    z-index: 1;
+}
+
+.saaf-profile-hero {
+    background: linear-gradient(135deg, rgba(224, 210, 180, 0.62), rgba(245, 240, 230, 0.75));
+    border: 1px solid rgba(107, 72, 38, 0.16);
+    border-radius: 20px;
+    padding: 1.1rem 1.1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.saaf-profile-hero-main {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.saaf-profile-avatar-wrap {
+    flex-shrink: 0;
+}
+
+.saaf-profile-avatar {
+    width: 112px;
+    height: 112px;
+    margin: 0;
+    border-width: 4px;
+    box-shadow: 0 8px 22px rgba(38, 22, 8, 0.14);
+}
+
+.saaf-profile-heading-block {
+    min-width: 0;
+}
+
+.saaf-profile-heading-block .saaf-section-title {
+    margin-bottom: 0.35rem;
+    line-height: 1.2;
+}
+
+.saaf-profile-username {
+    color: var(--saaf-brown);
+    font-weight: 600;
+}
+
+.saaf-profile-joined {
+    color: var(--saaf-text-muted);
+    font-size: 0.9rem;
+}
+
+.saaf-profile-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    align-items: flex-end;
+}
+
+.saaf-profile-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    background: rgba(245, 240, 230, 0.95);
+    border: 1px solid rgba(107, 72, 38, 0.18);
+    color: var(--saaf-brown);
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.saaf-profile-pill--ok {
+    background: rgba(74, 124, 89, 0.14);
+    border-color: rgba(74, 124, 89, 0.28);
+    color: #3e654a;
+}
+
+.saaf-profile-info-card {
+    border-radius: 16px;
+    padding: 1rem 1rem 1.1rem;
+}
+
+.saaf-profile-info-card p {
+    color: var(--saaf-brown);
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.saaf-profile-bio-card {
+    background: rgba(245, 240, 230, 0.75);
+    border: 1px solid var(--saaf-border);
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+}
+
+.saaf-profile-subtitle {
+    font-size: 1rem;
+    color: var(--saaf-brown);
+    margin: 0;
+}
+
+.saaf-profile-bio-card p {
+    color: var(--saaf-text-muted);
+}
+
+.saaf-theme-toggle {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.saaf-page-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(245, 230, 211, 0.96);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.saaf-page-loader[aria-hidden="true"] {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.saaf-loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+}
+
+.saaf-loader-logo {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: saaf-logo-pulse 2.5s ease-in-out infinite;
+}
+
+.saaf-loader-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.saaf-loader-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(201, 123, 99, 0.2);
+    border-top-color: var(--saaf-btn);
+    border-radius: 50%;
+    animation: saaf-spin 0.9s linear infinite;
+}
+
+@keyframes saaf-logo-pulse {
+    0%, 100% {
+        transform: scale(1) translateY(0);
+    }
+    50% {
+        transform: scale(1.12) translateY(-16px);
+    }
+}
+
+
+
+/* Dark mode loader */
+[data-theme="dark"] .saaf-page-loader {
+    background: rgba(30, 30, 35, 0.98);
+}
+
+.saaf-loader-dot {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 4px solid rgba(201, 123, 99, 0.25);
+    border-top-color: var(--saaf-btn);
+    animation: saaf-spin 0.85s linear infinite;
+}
+
+@keyframes saaf-spin {
+    to { transform: rotate(360deg); }
+}
+
+.saaf-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.saaf-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.saaf-featured-card,
+.saaf-testimonial-card {
+    background: var(--saaf-card-bg);
+    border: 1px solid var(--saaf-border);
+    border-radius: 20px;
+    box-shadow: var(--saaf-shadow-sm);
+}
+
+.saaf-featured-card {
+    overflow: hidden;
+    transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.saaf-featured-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.09);
+}
+
+.saaf-product-media {
+    height: 190px;
+    background: linear-gradient(140deg, rgba(201, 123, 99, 0.14), rgba(122, 139, 90, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+    color: var(--saaf-brown);
+}
+
+.saaf-product-body {
+    padding: 1rem 1.1rem 1.2rem;
+}
+
+.saaf-price-tag {
+    font-size: 0.92rem;
+    color: var(--saaf-accent);
+    font-weight: 600;
+}
+
+.saaf-testimonial-card {
+    padding: 1.15rem;
+    height: 100%;
+}
+
+.saaf-stars {
+    color: #D4A92D;
+    font-size: 0.95rem;
+    margin-bottom: 0.7rem;
+}
+
+.saaf-testimonial-author {
+    margin-top: 0.75rem;
+    color: var(--saaf-brown);
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+
+.saaf-workshop-no-image {
+    padding: 24px;
+    color: var(--saaf-text-muted);
+}
+
+.saaf-review-count {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--saaf-text-muted);
+}
+
+.saaf-review-card {
+    background: var(--saaf-beige);
+    border: 1px solid var(--saaf-border);
+    border-radius: 12px;
+    padding: 20px 24px;
+}
+
+.saaf-review-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.saaf-review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--saaf-btn);
+    color: var(--saaf-cream-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.saaf-review-author {
+    font-weight: 700;
+    color: var(--saaf-brown);
+}
+
+.saaf-review-date {
+    font-size: 0.8rem;
+    color: var(--saaf-text-muted);
+}
+
+.saaf-review-verified-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #2e7d5a;
+    color: var(--saaf-cream-text);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.saaf-review-stars {
+    color: #D4A92D;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.saaf-review-rating-label {
+    font-size: 0.85rem;
+    color: var(--saaf-text-muted);
+    margin-left: 6px;
+}
+
+.saaf-review-comment {
+    color: var(--saaf-text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.saaf-review-request-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--saaf-accent, #8a6d3b);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.saaf-review-request-link:hover {
+    text-decoration: underline;
+}
+
+[data-theme="dark"] .saaf-review-card {
+    background: #2f2621;
+    border-color: rgba(245, 230, 211, 0.16);
+}
+
+[data-theme="dark"] .saaf-review-verified-pill {
+    background: #2f8f64;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 991px) {
+    .saaf-nav-wrapper .navbar-collapse {
+        padding: 0.95rem;
+        margin-top: 0.8rem;
+        border: 1px solid var(--saaf-border);
+        border-radius: 16px;
+        background: var(--saaf-surface-soft);
+        box-shadow: var(--saaf-shadow-sm);
+    }
+
+    .saaf-nav-wrapper .navbar-nav {
+        align-items: flex-start;
+        margin-inline-start: 0;
+        margin-bottom: 0.8rem;
+    }
+
+    .saaf-section-title {
+        font-size: 1.7rem;
+    }
+
+    .saaf-hero-title {
+        font-size: 1.8rem;
+    }
+
+    .saaf-artisan-card {
+        padding: 2rem;
+    }
+
+    .saaf-how-works-box {
+        padding: 2rem;
+    }
+
+    .saaf-profile-hero-main {
+        grid-template-columns: auto 1fr;
+    }
+
+    .saaf-profile-status-list {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .saaf-sidebar {
+        display: none;
+    }
+
+    .saaf-main {
+        padding: 16px;
+        margin-inline-start: 0;
+    }
+
+    .saaf-hero-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .saaf-hero-card-large {
+        grid-row: span 1;
+    }
+
+    .saaf-section-title {
+        font-size: 1.5rem;
+    }
+
+    .saaf-hero-title {
+        font-size: 1.5rem;
+    }
+
+    .saaf-artisan-quote {
+        font-size: 1.4rem;
+    }
+
+    .saaf-hero-text .d-flex.gap-3 {
+        flex-direction: column;
+    }
+
+    .saaf-hero-text .d-flex.gap-3 .btn {
+        width: 100%;
+    }
+
+    .saaf-artisan-card {
+        padding: 1.5rem;
+    }
+
+    .saaf-artisan-card .row {
+        flex-direction: column;
+    }
+
+    .saaf-how-works-box {
+        padding: 1.5rem;
+    }
+
+    .saaf-footer {
+        text-align: center;
+    }
+
+    .saaf-footer .row {
+        text-align: center;
+    }
+
+    .saaf-dashboard-hero-actions {
+        gap: 0.5rem;
+    }
+
+    .saaf-quick-action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .saaf-dashboard-tile-head {
+        margin-bottom: 0.55rem;
+    }
+
+    .saaf-profile-hero {
+        padding: 0.95rem;
+    }
+
+    .saaf-profile-hero-main {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .saaf-profile-avatar-wrap {
+        display: flex;
+        justify-content: center;
+    }
+
+    .saaf-profile-status-list {
+        justify-content: center;
+    }
+
+    .saaf-profile-joined {
+        font-size: 0.85rem;
+    }
+
+    /* Fix 1: Hide orphaned sidebar toggle button on mobile */
+    .saaf-sidebar-toggle,
+    .saaf-sidebar-mini-toggle {
+        display: none !important;
+    }
+
+    /* Fix 2: Hero section too tall on phones */
+    .saaf-hero {
+        padding-top: 3.5rem;
+        padding-bottom: 3rem;
+        min-height: 60vh;
+        margin: 0.4rem;
+        border-radius: 16px;
+    }
+
+    /* Fix 3: Portrait image too large on phones */
+    .saaf-portrait-image {
+        width: 160px;
+        height: 160px;
+        font-size: 3.5rem;
+        border-radius: 14px;
+    }
+
+    /* Fix 4: Section padding too heavy on mobile */
+    .saaf-section {
+        padding: 2.5rem 0;
+    }
+}
+
+/* Fix 5: Sub-480px breakpoint for very small phones */
+@media (max-width: 480px) {
+    .saaf-hero-title {
+        font-size: 1.3rem;
+    }
+
+    .saaf-section-title {
+        font-size: 1.25rem;
+    }
+
+    .saaf-hero {
+        padding-top: 3rem;
+        padding-bottom: 2.5rem;
+        min-height: 50vh;
+    }
+}
+
+    .saaf-dashboard-shell {
+        position: relative;
+    }
+
+    .saaf-dashboard-shell::before {
+        content: "";
+        position: absolute;
+        inset: 1.25rem auto auto 2rem;
+        width: 18rem;
+        height: 18rem;
+        background: radial-gradient(circle, rgba(209, 176, 124, 0.18) 0%, rgba(209, 176, 124, 0) 70%);
+        pointer-events: none;
+        filter: blur(6px);
+    }
+
+    .saaf-dashboard-hero--split {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .saaf-dashboard-hero--split::after {
+        content: "";
+        position: absolute;
+        inset: auto -4rem -6rem auto;
+        width: 15rem;
+        height: 15rem;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(140, 97, 57, 0.2) 0%, rgba(140, 97, 57, 0) 70%);
+    }
+
+    .saaf-dashboard-hero-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.95fr);
+        gap: 1.25rem;
+        align-items: start;
+    }
+
+    .saaf-dashboard-kicker-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        align-items: center;
+        margin-bottom: 0.9rem;
+    }
+
+    .saaf-hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        border: 1px solid rgba(107, 72, 38, 0.14);
+        background: rgba(255, 251, 245, 0.72);
+        color: var(--saaf-brown);
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .saaf-dashboard-side-panel {
+        display: grid;
+        gap: 0.9rem;
+    }
+
+    .saaf-dashboard-side-card,
+    .saaf-dashboard-mini-stat,
+    .saaf-dashboard-feature-card,
+    .saaf-staff-section-card {
+        background: linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(248, 241, 229, 0.84));
+    }
+
+    .saaf-dashboard-side-card {
+        border: 1px solid rgba(107, 72, 38, 0.12);
+        border-radius: 20px;
+        padding: 1rem 1.05rem;
+        box-shadow: 0 12px 32px rgba(62, 38, 15, 0.08);
+    }
+
+    .saaf-dashboard-side-title,
+    .saaf-dashboard-section-title {
+        color: var(--saaf-brown);
+    }
+
+    .saaf-dashboard-side-title {
+        font-size: 1.15rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .saaf-dashboard-mini-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.9rem;
+    }
+
+    .saaf-dashboard-mini-stat {
+        border: 1px solid rgba(107, 72, 38, 0.1);
+        border-radius: 18px;
+        padding: 0.9rem 1rem;
+    }
+
+    .saaf-dashboard-mini-stat strong {
+        display: block;
+        color: var(--saaf-brown);
+        font-size: 1rem;
+    }
+
+    .saaf-quick-action-btn--soft {
+        background: rgba(255, 251, 245, 0.82);
+    }
+
+    .saaf-dashboard-section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .saaf-dashboard-feature-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 100%;
+    }
+
+    .saaf-dashboard-feature-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -1rem -1rem auto;
+        width: 6rem;
+        height: 6rem;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(209, 176, 124, 0.2) 0%, rgba(209, 176, 124, 0) 72%);
+    }
+
+    .saaf-dashboard-linkline {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        color: var(--saaf-brown);
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .saaf-info-card--metric {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 0.45rem;
+        border-radius: 18px;
+        box-shadow: 0 12px 30px rgba(62, 38, 15, 0.06);
+    }
+
+    .saaf-info-card--metric h5 {
+        font-size: clamp(1.5rem, 2.6vw, 2rem);
+        color: var(--saaf-brown);
+    }
+
+    .saaf-info-card--alert {
+        border-color: rgba(172, 69, 46, 0.18);
+        background: linear-gradient(180deg, rgba(255, 247, 243, 0.96), rgba(250, 235, 226, 0.88));
+    }
+
+    .saaf-staff-inline-link {
+        color: #ac452e;
+        text-decoration: none;
+    }
+
+    .saaf-staff-inline-link:hover {
+        color: #8d341f;
+    }
+
+    .saaf-dashboard-table-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .saaf-table-caption {
+        color: var(--saaf-text-muted);
+        font-size: 0.92rem;
+    }
+
+    .saaf-dashboard-table {
+        --bs-table-bg: transparent;
+        --bs-table-color: var(--saaf-text);
+        margin-bottom: 0;
+    }
+
+    .saaf-dashboard-table thead th {
+        border-bottom-width: 1px;
+        border-color: rgba(107, 72, 38, 0.12);
+        color: var(--saaf-text-muted);
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .saaf-dashboard-table tbody td {
+        padding-top: 0.9rem;
+        padding-bottom: 0.9rem;
+        border-color: rgba(107, 72, 38, 0.08);
+        vertical-align: middle;
+    }
+
+    .saaf-dashboard-table tbody tr:hover {
+        background: rgba(255, 251, 245, 0.72);
+    }
+
+    .saaf-staff-section-card .form-control,
+    .saaf-staff-section-card .btn,
+    .saaf-staff-section-card .badge {
+        position: relative;
+        z-index: 1;
+    }
+
+    [data-theme="dark"] .saaf-dashboard-shell::before {
+        background: radial-gradient(circle, rgba(143, 105, 65, 0.18) 0%, rgba(143, 105, 65, 0) 72%);
+    }
+
+    [data-theme="dark"] .saaf-hero-chip,
+    [data-theme="dark"] .saaf-dashboard-side-card,
+    [data-theme="dark"] .saaf-dashboard-mini-stat,
+    [data-theme="dark"] .saaf-dashboard-feature-card,
+    [data-theme="dark"] .saaf-staff-section-card,
+    [data-theme="dark"] .saaf-info-card--metric {
+        background: linear-gradient(180deg, rgba(74, 56, 39, 0.9), rgba(56, 41, 30, 0.92));
+        border-color: rgba(219, 191, 155, 0.12);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.22);
+    }
+
+    [data-theme="dark"] .saaf-info-card--alert {
+        background: linear-gradient(180deg, rgba(91, 49, 40, 0.94), rgba(73, 39, 31, 0.94));
+    }
+
+    [data-theme="dark"] .saaf-dashboard-side-title,
+    [data-theme="dark"] .saaf-dashboard-section-title,
+    [data-theme="dark"] .saaf-dashboard-mini-stat strong,
+    [data-theme="dark"] .saaf-dashboard-linkline,
+    [data-theme="dark"] .saaf-staff-inline-link,
+    [data-theme="dark"] .saaf-info-card--metric h5 {
+        color: var(--saaf-cream);
+    }
+
+    [data-theme="dark"] .saaf-dashboard-table thead th,
+    [data-theme="dark"] .saaf-table-caption {
+        color: var(--saaf-text-muted);
+    }
+
+    [data-theme="dark"] .saaf-dashboard-table tbody tr:hover {
+        background: rgba(255, 248, 238, 0.04);
+    }
+
+    @media (max-width: 991.98px) {
+        .saaf-dashboard-hero-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .saaf-dashboard-table-head,
+        .saaf-dashboard-section-head {
+            align-items: start;
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .saaf-dashboard-mini-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .saaf-dashboard-shell::before {
+            width: 12rem;
+            height: 12rem;
+            inset: 1rem auto auto 1rem;
+        }
+
+        .saaf-dashboard-table thead th {
+            font-size: 0.74rem;
+        }
+    }
+
+    .saaf-chat-page {
+        position: relative;
+    }
+
+    .saaf-chat-page::before {
+        content: "";
+        position: absolute;
+        inset: 1rem auto auto 1.5rem;
+        width: 16rem;
+        height: 16rem;
+        background: radial-gradient(circle, rgba(209, 176, 124, 0.17) 0%, rgba(209, 176, 124, 0) 72%);
+        pointer-events: none;
+    }
+
+    .saaf-chat-list-hero,
+    .saaf-chat-list-wrap,
+    .saaf-chat-detail-card {
+        position: relative;
+        z-index: 1;
+    }
+
+    .saaf-chat-list-hero {
+        padding: 1.25rem;
+        border-radius: 22px;
+        border: 1px solid rgba(107, 72, 38, 0.12);
+        background: linear-gradient(160deg, rgba(252, 247, 239, 0.98), rgba(240, 225, 195, 0.7));
+    }
+
+    .saaf-chat-list-wrap {
+        border: 1px solid rgba(107, 72, 38, 0.12);
+        border-radius: 22px;
+        overflow: hidden;
+        background: var(--saaf-white);
+        box-shadow: 0 20px 42px rgba(61, 39, 19, 0.08);
+    }
+
+    .saaf-chat-list-item {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.15rem;
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(107, 72, 38, 0.08);
+        transition: background-color 0.24s ease, transform 0.24s ease;
+    }
+
+    .saaf-chat-list-item:last-child {
+        border-bottom: 0;
+    }
+
+    .saaf-chat-list-item:hover {
+        background: rgba(255, 251, 244, 0.88);
+    }
+
+    .saaf-chat-list-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--saaf-brown);
+        background: linear-gradient(160deg, rgba(238, 224, 199, 0.95), rgba(224, 206, 170, 0.95));
+        border: 1px solid rgba(107, 72, 38, 0.16);
+    }
+
+    .saaf-chat-list-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
+    }
+
+    .saaf-chat-list-time {
+        font-size: 0.78rem;
+        color: var(--saaf-text-muted);
+        white-space: nowrap;
+    }
+
+    .saaf-chat-list-title {
+        color: var(--saaf-text);
+        font-weight: 600;
+    }
+
+    .saaf-chat-list-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        color: var(--saaf-text-muted);
+        font-size: 0.8rem;
+    }
+
+    .saaf-chat-proposal-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.22rem 0.65rem;
+        border-radius: 999px;
+        border: 1px solid rgba(107, 72, 38, 0.15);
+        background: rgba(255, 251, 244, 0.86);
+        color: var(--saaf-brown);
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .saaf-chat-meta-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--saaf-text-muted);
+        opacity: 0.7;
+    }
+
+    .saaf-chat-list-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: var(--saaf-brown);
+        font-weight: 700;
+        font-size: 0.86rem;
+    }
+
+    .saaf-chat-empty-state {
+        text-align: center;
+        border: 1px dashed rgba(107, 72, 38, 0.2);
+        border-radius: 20px;
+        padding: 2.1rem 1.25rem;
+        background: rgba(255, 252, 248, 0.85);
+    }
+
+    .saaf-chat-empty-state i {
+        font-size: 2.25rem;
+        color: var(--saaf-text-muted);
+    }
+
+    .saaf-chat-detail-card {
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(107, 72, 38, 0.12);
+        background: var(--saaf-white);
+        box-shadow: 0 22px 44px rgba(61, 39, 19, 0.1);
+    }
+
+    .saaf-chat-detail-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.2rem 1.25rem;
+        border-bottom: 1px solid rgba(107, 72, 38, 0.1);
+        background: linear-gradient(160deg, rgba(252, 247, 239, 0.98), rgba(245, 235, 216, 0.76));
+    }
+
+    .saaf-chat-head-title {
+        font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+        color: var(--saaf-brown);
+    }
+
+    .saaf-chat-head-actions {
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: end;
+        gap: 0.55rem;
+    }
+
+    .saaf-chat-scroll {
+        max-height: 520px;
+        overflow-y: auto;
+        padding: 1rem 1.1rem;
+        background: linear-gradient(180deg, rgba(253, 249, 243, 0.92), rgba(246, 238, 226, 0.88));
+    }
+
+    .saaf-chat-messages-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+    }
+
+    .saaf-chat-row {
+        display: flex;
+    }
+
+    .saaf-chat-row--mine {
+        justify-content: flex-end;
+    }
+
+    .saaf-chat-row--other {
+        justify-content: flex-start;
+    }
+
+    .saaf-chat-bubble {
+        max-width: min(80%, 620px);
+        min-width: 190px;
+        border-radius: 18px;
+        padding: 0.75rem 0.85rem;
+        box-shadow: 0 8px 20px rgba(34, 21, 9, 0.08);
+    }
+
+    .saaf-chat-bubble--mine {
+        background: linear-gradient(160deg, rgba(147, 96, 61, 0.96), rgba(125, 80, 49, 0.96));
+        color: #fff;
+    }
+
+    .saaf-chat-bubble--other {
+        background: #fff;
+        color: var(--saaf-text);
+        border: 1px solid rgba(107, 72, 38, 0.1);
+    }
+
+    .saaf-chat-bubble-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.45rem;
+    }
+
+    .saaf-chat-sender {
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .saaf-chat-time {
+        font-size: 0.74rem;
+        opacity: 0.85;
+    }
+
+    .saaf-chat-bubble--other .saaf-chat-time {
+        color: var(--saaf-text-muted);
+    }
+
+    .saaf-chat-text {
+        white-space: pre-line;
+        line-height: 1.58;
+    }
+
+    .saaf-chat-image {
+        max-width: 280px;
+        max-height: 320px;
+        object-fit: cover;
+        border-radius: 14px;
+    }
+
+    .saaf-chat-report-link {
+        font-size: 0.72rem;
+        color: #b63e2b;
+        text-decoration: none;
+    }
+
+    .saaf-chat-report-link:hover {
+        color: #922e1f;
+    }
+
+    .saaf-chat-composer-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 180px;
+        gap: 0.8rem;
+        align-items: end;
+    }
+
+    .saaf-chat-textarea {
+        min-height: 94px;
+        resize: vertical;
+    }
+
+    .saaf-chat-helper-text {
+        margin-top: 0.35rem;
+        font-size: 0.75rem;
+        color: var(--saaf-text-muted);
+    }
+
+    .saaf-chat-preview-image {
+        max-width: 220px;
+        max-height: 220px;
+        object-fit: cover;
+    }
+
+    [data-theme="dark"] .saaf-chat-page::before {
+        background: radial-gradient(circle, rgba(143, 105, 65, 0.2) 0%, rgba(143, 105, 65, 0) 72%);
+    }
+
+    [data-theme="dark"] .saaf-chat-list-hero,
+    [data-theme="dark"] .saaf-chat-list-wrap,
+    [data-theme="dark"] .saaf-chat-detail-card,
+    [data-theme="dark"] .saaf-chat-bubble--other,
+    [data-theme="dark"] .saaf-chat-empty-state,
+    [data-theme="dark"] .saaf-chat-proposal-pill {
+        background: linear-gradient(180deg, rgba(74, 56, 39, 0.92), rgba(56, 41, 30, 0.95));
+        border-color: rgba(219, 191, 155, 0.13);
+    }
+
+    [data-theme="dark"] .saaf-chat-list-item {
+        border-bottom-color: rgba(219, 191, 155, 0.08);
+    }
+
+    [data-theme="dark"] .saaf-chat-list-item:hover {
+        background: rgba(255, 248, 238, 0.04);
+    }
+
+    [data-theme="dark"] .saaf-chat-list-title,
+    [data-theme="dark"] .saaf-chat-list-cta,
+    [data-theme="dark"] .saaf-chat-head-title,
+    [data-theme="dark"] .saaf-chat-proposal-pill,
+    [data-theme="dark"] .saaf-chat-bubble--other,
+    [data-theme="dark"] .saaf-chat-empty-state i {
+        color: var(--saaf-cream);
+    }
+
+    [data-theme="dark"] .saaf-chat-detail-head {
+        background: linear-gradient(160deg, rgba(56, 41, 30, 0.96), rgba(44, 33, 26, 0.96));
+        border-bottom-color: rgba(219, 191, 155, 0.16);
+    }
+
+    [data-theme="dark"] .saaf-chat-detail-card .card-footer {
+        background: rgba(44, 33, 26, 0.96) !important;
+        border-top-color: rgba(219, 191, 155, 0.16) !important;
+    }
+
+    [data-theme="dark"] .saaf-profile-hero {
+        background: linear-gradient(140deg, rgba(56, 44, 36, 0.95), rgba(47, 37, 30, 0.95));
+        border-color: rgba(232, 199, 164, 0.26);
+    }
+
+    [data-theme="dark"] .saaf-profile-pill {
+        background: rgba(232, 199, 164, 0.18);
+        border-color: rgba(232, 199, 164, 0.34);
+        color: #F2E4D1;
+    }
+
+    [data-theme="dark"] .saaf-profile-pill--ok {
+        background: rgba(74, 124, 89, 0.3);
+        border-color: rgba(125, 173, 137, 0.45);
+        color: #d9f2e3;
+    }
+
+    [data-theme="dark"] .saaf-profile-info-card,
+    [data-theme="dark"] .saaf-profile-bio-card {
+        background: rgba(52, 41, 34, 0.94);
+        border-color: rgba(232, 199, 164, 0.26);
+    }
+
+    [data-theme="dark"] .saaf-chat-scroll {
+        background: linear-gradient(180deg, rgba(50, 38, 28, 0.96), rgba(40, 30, 23, 0.96));
+    }
+
+    [data-theme="dark"] .saaf-chat-bubble--mine {
+        background: linear-gradient(160deg, rgba(148, 98, 64, 0.95), rgba(118, 77, 49, 0.95));
+    }
+
+    [data-theme="dark"] .saaf-chat-report-link {
+        color: #e09584;
+    }
+
+    @media (max-width: 991.98px) {
+        .saaf-chat-detail-head {
+            flex-direction: column;
+        }
+
+        .saaf-chat-head-actions {
+            justify-content: start;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .saaf-chat-list-item {
+            grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        .saaf-chat-list-cta {
+            display: none;
+        }
+
+        .saaf-chat-list-topline {
+            flex-direction: column;
+            align-items: start;
+        }
+
+        .saaf-chat-composer-row {
+            grid-template-columns: 1fr;
+        }
+
+        .saaf-chat-bubble {
+            max-width: 92%;
+            min-width: 0;
+        }
+    }
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-muted {
+    color: var(--saaf-text-muted) !important;
+}
+
+.container-lg {
+    max-width: 1200px;
+}
+
+html[dir="rtl"] body {
+    text-align: right;
+}
+
+html[dir="rtl"] .saaf-layout {
+    display: block;
+}
+
+html[dir="rtl"] .saaf-layout > .saaf-sidebar {
+    order: initial;
+}
+
+html[dir="rtl"] .saaf-layout > .saaf-main {
+    order: initial;
+}
+
+html[dir="rtl"] .saaf-sidebar {
+    left: auto;
+    right: 10px;
+    border-right: none;
+    border-left: none;
+}
+
+html[dir="rtl"] .saaf-sidebar-toggle {
+    left: auto;
+    right: 12px;
+}
+
+html[dir="rtl"] .saaf-notif-dropdown {
+    right: auto;
+    left: 0;
+    direction: rtl;
+    text-align: right;
+    width: min(360px, calc(100vw - 1rem));
+}
+
+.saaf-nav-divider {
+    border-color: var(--saaf-border);
+    margin: 0.25rem 0.75rem;
+    opacity: 1;
+}
+
+@media (max-width: 991.98px) {
+    .saaf-notif-dropdown {
+        position: fixed;
+        /* top/left set by JS */
+        width: min(300px, calc(100vw - 1.5rem));
+    }
+
+    .saaf-notif-dd-list {
+        max-height: 210px;
+    }
+
+    .saaf-notif-dd-header {
+        padding: 0.55rem 0.875rem;
+    }
+
+    .saaf-notif-dd-item {
+        padding: 0.5rem 0.875rem;
+    }
+
+    .saaf-notif-dd-footer {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.8rem;
+    }
+}
+
+html[dir="rtl"] .saaf-notif-dd-item {
+    text-align: right;
+}
+
+html[dir="rtl"] .saaf-notif-dd-item-time {
+    display: inline-block;
+}
+
+html[dir="rtl"] .saaf-notif-badge {
+    right: auto;
+    left: -4px;
+}
+
+html[dir="rtl"] .sidebar-badge {
+    left: auto;
+    right: -4px;
+}
+
+/* Navbar: right-align nav links and button group in the mobile collapsed menu */
+@media (max-width: 991.98px) {
+    html[dir="rtl"] .saaf-nav-wrapper .navbar-nav {
+        align-items: flex-start;
+    }
+    html[dir="rtl"] .saaf-nav-wrapper .navbar-collapse > .d-flex {
+        align-self: flex-start;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+}
+
+/* Hero: move text block to the right side in RTL */
+html[dir="rtl"] .saaf-hero-text {
+    margin-left: auto;
+}
+
+/* Hero: flip overlay gradient so the dark side is behind the RTL text */
+html[dir="rtl"] .saaf-hero-overlay {
+    background: linear-gradient(240deg, rgba(20, 13, 9, 0.7), rgba(20, 13, 9, 0.4));
+}
+
+/* Auth pages readability */
+.saaf-auth-card {
+    background: var(--saaf-card-bg);
+    border: 1px solid var(--saaf-border);
+}
+
+.saaf-auth-card .form-label {
+    color: var(--saaf-brown);
+    font-weight: 600;
+}
+
+.saaf-auth-card p,
+.saaf-auth-card .form-text,
+.saaf-auth-card .text-muted {
+    color: var(--saaf-text-muted) !important;
+}
+
+.saaf-auth-card a {
+    color: var(--saaf-brown);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.saaf-auth-card a:hover {
+    color: var(--saaf-btn-hover);
+}
+
+.saaf-auth-card a:visited {
+    color: var(--saaf-brown);
+}
+
+[data-theme="dark"] .saaf-auth-card {
+    background: #2f2621;
+    border-color: rgba(245, 230, 211, 0.16);
+}
+
+[data-theme="dark"] .saaf-auth-card p,
+[data-theme="dark"] .saaf-auth-card .form-text,
+[data-theme="dark"] .saaf-auth-card .text-muted {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .saaf-auth-card .form-label {
+    color: var(--saaf-cream-text);
+}
+
+[data-theme="dark"] .saaf-auth-card a {
+    color: var(--saaf-cream-text);
+}
+
+[data-theme="dark"] .saaf-auth-card a:hover {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .saaf-auth-card a:visited {
+    color: var(--saaf-cream-text);
+}
+
+/* ── In-site confirmation modal ── */
+.saaf-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 9, 6, 0.55);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: saaf-confirm-fadein 0.15s ease;
+}
+
+@keyframes saaf-confirm-fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.saaf-confirm-card {
+    background: var(--saaf-modal-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 8px 40px rgba(12, 9, 6, 0.18);
+    animation: saaf-confirm-slidein 0.18s ease;
+}
+
+@keyframes saaf-confirm-slidein {
+    from { transform: translateY(10px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+.saaf-confirm-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    color: var(--ink, #1c1712);
+    margin: 0 0 0.6rem;
+    font-weight: 700;
+}
+
+.saaf-confirm-body {
+    font-size: 0.9rem;
+    color: var(--ink-light, #8a7a6e);
+    line-height: 1.6;
+    margin: 0 0 1.5rem;
+}
+
+.saaf-confirm-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.saaf-confirm-cancel {
+    background: none;
+    border: 1px solid var(--sand, #e8ddd3);
+    color: var(--ink, #1c1712);
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.saaf-confirm-cancel:hover {
+    background: var(--sand, #e8ddd3);
+}
+
+.saaf-confirm-ok {
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+}
+
+.saaf-confirm-ok:hover { opacity: 0.88; }
+
+.saaf-confirm-ok--accept {
+    background: #1a7a4a;
+    color: var(--saaf-cream-text);
+}
+
+.saaf-confirm-ok--danger {
+    background: #c0392b;
+    color: var(--saaf-cream-text);
+}
+
+.saaf-confirm-ok--default {
+    background: var(--clay, #c2724f);
+    color: var(--saaf-cream-text);
+}
+
+/* Text clarity pass: keep dark-mode text consistently readable */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] .fw-bold,
+[data-theme="dark"] .fw-semibold {
+    color: var(--saaf-heading, #F2E3CF);
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] small,
+[data-theme="dark"] label,
+[data-theme="dark"] .form-text {
+    color: var(--saaf-body, #E3D1BA);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .table,
+[data-theme="dark"] .list-group-item {
+    color: var(--saaf-body, #E3D1BA);
+}
+
+/* ── react-international-phone: unify flag + input as one control ── */
+
+.react-international-phone-input-container {
+  width: 100%;
+  display: flex;
+  border: 1px solid var(--saaf-border, #ced4da);
+  border-radius: 0.375rem;
+  overflow: hidden;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Focus state — mirrors Bootstrap's .form-control:focus */
+.react-international-phone-input-container:focus-within {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Error state (when is-invalid class is on the input) */
+.react-international-phone-input-container:has(.is-invalid) {
+  border-color: #dc3545;
+}
+
+.react-international-phone-input-container:has(.is-invalid):focus-within {
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+/* Strip the input's own border — the container handles it */
+.react-international-phone-input-container .react-international-phone-input {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  flex: 1;
+}
+
+/* The country selector button */
+.react-international-phone-country-selector-button {
+  border: 0 !important;
+  background: transparent;
+  padding: 0 0.5rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+/* Hover fills the button with the same color as Bootstrap's muted bg */
+.react-international-phone-country-selector-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Dark theme override (matches your data-theme="dark") */
+[data-theme="dark"] .react-international-phone-input-container {
+  border-color: var(--saaf-border, #444);
+  background: var(--saaf-surface-1, #1a1a1a);
+}
+
+[data-theme="dark"] .react-international-phone-country-selector-button:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
