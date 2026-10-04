@@ -28,18 +28,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-=da!3*bk)6e&#i+9zl3jykxi1#w^vr3$eu8brjk4a4+_b^t1i&')
 
-DEBUG = not bool(os.environ.get('RENDER_EXTERNAL_HOSTNAME'))
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ["*"]
 
-# Render injects RENDER_EXTERNAL_HOSTNAME automatically
-RENDER_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_HOSTNAME)
+CSRF_TRUSTED_ORIGINS = [
+    "https://saaf.up.railway.app",
+    "http://127.0.0.1:8000",
+]
+# # Render injects RENDER_EXTERNAL_HOSTNAME automatically
+# RENDER_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+# if RENDER_HOSTNAME:
+#     ALLOWED_HOSTS.append(RENDER_HOSTNAME)
 
-CSRF_TRUSTED_ORIGINS = [f'https://{RENDER_HOSTNAME}'] if RENDER_HOSTNAME else []
+# CSRF_TRUSTED_ORIGINS = [f'https://{RENDER_HOSTNAME}'] if RENDER_HOSTNAME else []
 
-SITE_URL = f'https://{RENDER_HOSTNAME}' if RENDER_HOSTNAME else 'http://127.0.0.1:8000'
+# SITE_URL = f'https://{RENDER_HOSTNAME}' if RENDER_HOSTNAME else 'http://127.0.0.1:8000'
 
 
 # Application definition
@@ -108,19 +112,25 @@ WSGI_APPLICATION = 'rising_phoenix.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-if os.environ.get('EXTERNAL_OR_NOT', 'False').strip().lower() == 'true':
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL', ''), conn_max_age=600)
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+# if os.environ.get('EXTERNAL_OR_NOT', 'False').strip().lower() == 'true':
+#     import dj_database_url
+#     DATABASES = {
+#         'default': dj_database_url.parse(os.environ.get('DATABASE_URL', ''), conn_max_age=600)
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
 
+DATABASES = {
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
