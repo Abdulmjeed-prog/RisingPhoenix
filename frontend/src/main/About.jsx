@@ -1,0 +1,33 @@
+import { useTranslation } from 'react-i18next'
+
+export default function About() {
+  const { t } = useTranslation()
+
+  return (
+    <section className="container-lg py-5">
+      <div className="row justify-content-center">
+        <div className="col-lg-10">
+          <div className="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+            <h1 className="fw-bold mb-4">{t('About Us')}</h1>
+
+            <p className="mb-3">
+              {t('Saaf is a Saudi digital platform built to empower artisans by giving them a professional way to present their handmade work and connect directly with customers looking for custom, one-of-a-kind pieces. At its core, Saaf supports the local creative economy and helps traditional craftsmanship grow in a modern digital environment.')}
+            </p>
+
+            <p className="mb-3">
+              {t('We believe every handmade product carries a story. Artisans do not simply deliver an item; they deliver skill, identity, and culture. That is why Saaf is designed as a clear and trusted space where customers can discover the right artisan, submit requests, communicate directly, and complete payments in an organized workflow.')}
+            </p>
+
+            <p className="mb-3">
+              {t('On the artisan side, the platform offers tools that simplify order management, proposal handling, and reputation building. On the customer side, Saaf provides a smooth journey from idea to final delivery, supported by fast notifications and a clean, easy-to-use interface.')}
+            </p>
+
+            <p className="mb-0">
+              {t('Our vision is for Saaf to become the leading destination for customized handmade work in Saudi Arabia, opening real opportunities for talented artisans and strengthening the digital presence of local products through quality, authenticity, and creativity.')}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}

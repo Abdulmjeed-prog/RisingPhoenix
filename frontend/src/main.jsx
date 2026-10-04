@@ -9,6 +9,8 @@ import './styles/notification.css'
 import './styles/progress.css'
 import './styles/proposal.css'
 import './styles/request.css'
+import './styles/dashboard.css'
+import './styles/artisan-dashboard.css'
 import './i18n'
 import App from './App.jsx'
 

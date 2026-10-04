@@ -1,0 +1,205 @@
+    .saaf-client-overview-card {
+        border: 1px solid var(--saaf-border);
+        border-radius: 16px;
+        padding: 1rem 1.1rem;
+        background: var(--saaf-card-bg);
+        box-shadow: var(--saaf-shadow-sm);
+        height: 100%;
+    }
+    .saaf-client-overview-label {
+        display: block;
+        font-size: .72rem;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--saaf-text-muted);
+        font-weight: 700;
+        margin-bottom: .35rem;
+    }
+    .saaf-client-overview-value {
+        font-size: 1.55rem;
+        line-height: 1.1;
+        color: var(--saaf-heading);
+        font-weight: 700;
+    }
+    .saaf-client-overview-meta {
+        font-size: .82rem;
+        color: var(--saaf-text-muted);
+    }
+    .saaf-client-filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        align-items: center;
+    }
+    .saaf-client-filter select {
+        min-width: 170px;
+        border: 1px solid var(--saaf-border);
+        border-radius: 999px;
+        padding: .35rem .8rem;
+        background: var(--saaf-card-bg);
+        color: var(--saaf-body);
+    }
+    .saaf-client-notif-list {
+        display: flex;
+        flex-direction: column;
+        gap: .7rem;
+    }
+    .saaf-client-notif-item {
+        display: flex;
+        gap: .65rem;
+        align-items: flex-start;
+        border: 1px solid var(--saaf-border);
+        border-radius: 12px;
+        padding: .72rem .78rem;
+        background: rgba(250, 241, 229, .35);
+    }
+    [data-theme="dark"] .saaf-client-notif-item {
+        background: rgba(255, 248, 238, .03);
+    }
+    [data-theme="dark"] .saaf-client-filter select {
+        background: rgba(44, 33, 26, .96);
+        border-color: rgba(232, 199, 164, .34);
+        color: var(--saaf-cream-text);
+    }
+    [data-theme="dark"] .saaf-client-filter select option {
+        background: #2b211b;
+        color: var(--saaf-cream-text);
+    }
+    .saaf-client-notif-dot {
+        width: .55rem;
+        height: .55rem;
+        margin-top: .35rem;
+        border-radius: 50%;
+        background: var(--saaf-btn);
+        flex: 0 0 auto;
+    }
+
+    .saaf-requests-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+        border-radius: 14px;
+        border: 1px solid var(--saaf-border);
+        background: linear-gradient(180deg, rgba(245, 235, 216, .82), rgba(236, 223, 201, .78));
+    }
+
+    .saaf-requests-table thead th {
+        background: rgba(224, 206, 176, .58);
+        color: var(--saaf-heading);
+        font-size: .82rem;
+        font-weight: 700;
+        letter-spacing: .03em;
+        border-bottom: 1px solid var(--saaf-border);
+        padding: .85rem .95rem;
+    }
+
+    .saaf-requests-table tbody td {
+        padding: .85rem .95rem;
+        border-bottom: 1px solid rgba(96, 70, 51, .1);
+        background: rgba(244, 233, 214, .6);
+    }
+
+    .saaf-requests-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .saaf-requests-table tbody tr:hover td {
+        background: rgba(232, 214, 187, .55);
+    }
+
+    .saaf-req-status-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: .24rem .68rem;
+        border-radius: 999px;
+        font-size: .76rem;
+        font-weight: 700;
+        text-transform: capitalize;
+        border: 1px solid transparent;
+    }
+
+    .saaf-req-status-pill--open {
+        background: rgba(76, 175, 125, .14);
+        color: #2e7a56;
+        border-color: rgba(76, 175, 125, .26);
+    }
+
+    .saaf-req-status-pill--in-review {
+        background: rgba(212, 169, 45, .15);
+        color: #7a5a00;
+        border-color: rgba(212, 169, 45, .28);
+    }
+
+    .saaf-req-status-pill--closed,
+    .saaf-req-status-pill--time-ended {
+        background: rgba(192, 57, 43, .12);
+        color: #8e2f24;
+        border-color: rgba(192, 57, 43, .24);
+    }
+
+    .saaf-req-open-link {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        padding: .28rem .66rem;
+        border-radius: 999px;
+        background: rgba(199, 122, 92, .12);
+        color: var(--saaf-btn);
+        font-weight: 700;
+        text-decoration: none;
+        border: 1px solid rgba(199, 122, 92, .24);
+    }
+
+    .saaf-req-open-link:hover {
+        background: rgba(199, 122, 92, .2);
+        color: var(--saaf-btn-hover);
+    }
+
+    [data-theme="dark"] .saaf-requests-table {
+        background: linear-gradient(180deg, rgba(50, 38, 28, .93), rgba(40, 30, 23, .95));
+        border-color: rgba(219, 191, 155, .14);
+    }
+
+    [data-theme="dark"] .saaf-requests-table thead th {
+        background: rgba(56, 41, 30, .95);
+        color: #F2E4D1;
+        border-bottom-color: rgba(219, 191, 155, .16);
+    }
+
+    [data-theme="dark"] .saaf-requests-table tbody td {
+        border-bottom-color: rgba(219, 191, 155, .1);
+    }
+
+    [data-theme="dark"] .saaf-requests-table tbody tr:hover td {
+        background: rgba(255, 248, 238, .04);
+    }
+
+    [data-theme="dark"] .saaf-req-status-pill--open {
+        background: rgba(76, 175, 125, .24);
+        color: #88d9ad;
+        border-color: rgba(76, 175, 125, .34);
+    }
+
+    [data-theme="dark"] .saaf-req-status-pill--in-review {
+        background: rgba(212, 169, 45, .24);
+        color: #f0c84a;
+        border-color: rgba(212, 169, 45, .34);
+    }
+
+    [data-theme="dark"] .saaf-req-status-pill--closed,
+    [data-theme="dark"] .saaf-req-status-pill--time-ended {
+        background: rgba(192, 57, 43, .22);
+        color: #e8a59c;
+        border-color: rgba(192, 57, 43, .34);
+    }
+
+    [data-theme="dark"] .saaf-req-open-link {
+        background: rgba(212, 139, 104, .2);
+        color: #F2E4D1;
+        border-color: rgba(212, 139, 104, .36);
+    }
+
+    [data-theme="dark"] .saaf-req-open-link:hover {
+        background: rgba(212, 139, 104, .3);
+        color: #FFFFFF;
+    }
