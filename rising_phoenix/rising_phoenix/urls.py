@@ -42,4 +42,5 @@ urlpatterns = [
     path('api/v1/', include('api.urls')),   # ← add this
     path('api/v1/auth/', include('account.api_urls')),
     path('api/v1/main/', include('main.api_urls')),   # ← add this
+    path('api/v1/account/', include('account.api_urls')),   # ← add this line
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

@@ -181,3 +181,91 @@ class RegisterArtisanSerializer(serializers.Serializer):
             pass
 
         return user
+
+class ActiveContractSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.SerializerMethodField()
+
+    def get_title(self, obj):
+        try:
+            return obj.proposal.request.title
+        except Exception:
+            return ''
+
+
+class CompletedContractSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.SerializerMethodField()
+
+    def get_title(self, obj):
+        try:
+            return obj.proposal.request.title
+        except Exception:
+            return ''
+
+
+class RevenueSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    net_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
+    status = serializers.CharField()
+    created_at = serializers.DateTimeField()
+
+
+class PublicProfileSerializer(serializers.Serializer):
+    """One endpoint for all three roles: regular user, artisan, staff."""
+    id = serializers.IntegerField()
+    username = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.CharField()
+    date_joined = serializers.DateTimeField()
+    is_staff = serializers.BooleanField()
+    is_artisan = serializers.SerializerMethodField()
+    is_own_profile = serializers.SerializerMethodField()
+    avg_rating = serializers.SerializerMethodField()
+    profile = serializers.SerializerMethodField()
+
+    def get_is_artisan(self, obj):
+        return obj.groups.filter(name='artisan').exists()
+
+    def get_is_own_profile(self, obj):
+        request = self.context.get('request')
+        return bool(request and request.user.is_authenticated and request.user.id == obj.id)
+
+    def get_avg_rating(self, obj):
+        from django.db.models import Avg
+        val = obj.reviews_received.aggregate(v=Avg('rating'))['v']
+        if val is None:
+            return None
+        return round(float(val), 2)
+
+    def get_profile(self, obj):
+        is_artisan = obj.groups.filter(name='artisan').exists()
+
+        if is_artisan:
+            ap = getattr(obj, 'artisanprofile', None)
+            if not ap:
+                return None
+            return {
+                'bio': ap.bio or '',
+                'avatar': ap.avatar.url if ap.avatar else None,
+                'phone': str(ap.phone) if ap.phone else '',
+                'is_phone_verified': ap.is_phone_verified,
+                'is_verified': ap.is_verified,
+                'is_featured': ap.is_featured,
+                'is_banned': ap.is_banned,
+            }
+
+        # Regular user (or staff)
+        p = getattr(obj, 'profile', None)
+        if not p:
+            return None
+        return {
+            'bio': p.bio or '',
+            'avatar': p.avatar.url if p.avatar else None,
+            'phone': str(p.phone) if p.phone else '',
+            'is_phone_verified': p.is_phone_verified,
+            'is_verified': False,
+            'is_featured': False,
+            'is_banned': p.is_banned,
+        }

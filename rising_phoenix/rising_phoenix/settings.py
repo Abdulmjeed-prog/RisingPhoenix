@@ -244,6 +244,8 @@ EMAIL_TIMEOUT = 10
 STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
 
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",

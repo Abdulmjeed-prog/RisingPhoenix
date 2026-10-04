@@ -11,4 +11,12 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='login'),
     path('refresh/', TokenRefreshView.as_view(), name='refresh'),
     path('me/', api_views.me, name='me'),
+    path('artisan-dashboard/', api_views.artisan_dashboard_api, name='artisan_dashboard'),
+    path('profile/<str:username>/', api_views.profile_api, name='profile'),
+    path('update-profile/<str:user_name>/', api_views.update_profile_view, name='update_profile'),
+    path('send-phone-verification/<str:user_name>/', api_views.send_phone_verification, name='send_phone_verification'),
+    path('verify-phone/<str:user_name>/', api_views.verify_phone, name='verify_phone'),
+    path('password-reset/', api_views.password_reset_request, name='password_reset'),
+    path('password-reset/verify/<str:uidb64>/<str:token>/', api_views.password_reset_verify, name='password_reset_verify'),
+    path('password-reset/confirm/<str:uidb64>/<str:token>/', api_views.password_reset_confirm, name='password_reset_confirm'),
 ]
