@@ -185,23 +185,54 @@ class RegisterArtisanSerializer(serializers.Serializer):
 class ActiveContractSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.SerializerMethodField()
+    requester_name = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
 
     def get_title(self, obj):
         try:
             return obj.proposal.request.title
         except Exception:
             return ''
+
+    def get_requester_name(self, obj):
+        try:
+            requester = obj.proposal.request.requester
+            return requester.get_full_name() or requester.username
+        except Exception:
+            return ''
+
+    def get_price(self, obj):
+        try:
+            return str(obj.proposal.price)
+        except Exception:
+            return '0.00'
+
 
 
 class CompletedContractSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.SerializerMethodField()
+    requester_name = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
 
     def get_title(self, obj):
         try:
             return obj.proposal.request.title
         except Exception:
             return ''
+
+    def get_requester_name(self, obj):
+        try:
+            requester = obj.proposal.request.requester
+            return requester.get_full_name() or requester.username
+        except Exception:
+            return ''
+
+    def get_price(self, obj):
+        try:
+            return str(obj.proposal.price)
+        except Exception:
+            return '0.00'
 
 
 class RevenueSerializer(serializers.Serializer):
@@ -209,6 +240,13 @@ class RevenueSerializer(serializers.Serializer):
     net_amount = serializers.DecimalField(max_digits=12, decimal_places=2)
     status = serializers.CharField()
     created_at = serializers.DateTimeField()
+    contract_title = serializers.SerializerMethodField()
+
+    def get_contract_title(self, obj):
+        try:
+            return obj.contract.title or '—'
+        except Exception:
+            return '—'
 
 
 class PublicProfileSerializer(serializers.Serializer):

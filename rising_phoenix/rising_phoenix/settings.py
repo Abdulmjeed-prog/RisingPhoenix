@@ -15,6 +15,7 @@ import os
 import dotenv
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
+import dj_database_url
 
 
 dotenv.load_dotenv()
@@ -28,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-=da!3*bk)6e&#i+9zl3jykxi1#w^vr3$eu8brjk4a4+_b^t1i&')
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -125,12 +126,22 @@ WSGI_APPLICATION = 'rising_phoenix.wsgi.application'
 #         }
 #     }
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-    )
-}
+if DEBUG:
+    # Local development — always use the local SQLite file
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    # Production — use DATABASE_URL (Railway Postgres, etc.)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+            conn_max_age=600,
+        )
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

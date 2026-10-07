@@ -1,0 +1,238 @@
+/* ── Revenue Dashboard — Saaf-native styles ── */
+
+.rev-shell {
+  position: relative;
+  padding-left: 80px;
+}
+
+@media (max-width: 768px) {
+  .rev-shell {
+    padding-left: 0;
+  }
+}
+
+.rev-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 1.5rem;
+  width: 18rem; height: 18rem;
+  background: radial-gradient(circle, rgba(199,122,92,.15) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(6px);
+  z-index: 0;
+}
+
+.rev-stat-card {
+  position: relative;
+  z-index: 1;
+  background: var(--saaf-card-bg);
+  border: 1px solid var(--saaf-border);
+  border-radius: 18px;
+  padding: 1.35rem 1.4rem;
+  box-shadow: var(--saaf-shadow-sm);
+  transition: transform .22s ease, box-shadow .22s ease;
+  overflow: hidden;
+}
+.rev-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--saaf-shadow-lg);
+}
+.rev-stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--saaf-btn);
+  border-radius: 4px 0 0 4px;
+}
+.rev-stat-card.accent-green::before  { background: #4caf7d; }
+.rev-stat-card.accent-blue::before   { background: #5b8dee; }
+.rev-stat-card.accent-amber::before  { background: #d4a92d; }
+
+.rev-stat-icon {
+  width: 42px; height: 42px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  background: rgba(199,122,92,.12);
+  color: var(--saaf-btn);
+  margin-bottom: .9rem;
+}
+.rev-stat-card.accent-green .rev-stat-icon { background: rgba(76,175,125,.12); color: #4caf7d; }
+.rev-stat-card.accent-blue  .rev-stat-icon { background: rgba(91,141,238,.12); color: #5b8dee; }
+.rev-stat-card.accent-amber .rev-stat-icon { background: rgba(212,169,45,.12); color: #b8900a; }
+
+.rev-stat-value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--saaf-heading);
+  line-height: 1.1;
+}
+.rev-stat-label {
+  font-size: .74rem;
+  color: var(--saaf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 600;
+  margin-top: .3rem;
+}
+.rev-stat-badge {
+  position: absolute;
+  top: 1.1rem; right: 1.1rem;
+  font-size: .68rem;
+  padding: .22rem .6rem;
+  border-radius: 20px;
+  font-weight: 700;
+}
+.rbadge-up   { background: rgba(76,175,125,.14); color: #2e7a56; }
+.rbadge-info { background: rgba(91,141,238,.13); color: #2a54b8; }
+
+.rev-panel {
+  position: relative;
+  z-index: 1;
+  background: var(--saaf-card-bg);
+  border: 1px solid var(--saaf-border);
+  border-radius: 18px;
+  padding: 1.5rem 1.6rem;
+  box-shadow: var(--saaf-shadow-sm);
+}
+.rev-panel-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--saaf-heading);
+  margin-bottom: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.rev-panel-title small {
+  font-size: .76rem;
+  font-weight: 400;
+  color: var(--saaf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+.rev-goal-bar {
+  height: 6px;
+  border-radius: 4px;
+  background: var(--saaf-beige);
+  overflow: hidden;
+  margin: .5rem 0 .35rem;
+}
+.rev-goal-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--saaf-btn), #e8a870);
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
+
+.rev-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.rev-table thead th {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--saaf-text-muted);
+  font-weight: 700;
+  padding: .6rem 1rem;
+  border-bottom: 1px solid var(--saaf-border);
+  background: var(--saaf-beige);
+  white-space: nowrap;
+}
+.rev-table thead th:first-child { border-radius: 8px 0 0 8px; }
+.rev-table thead th:last-child  { border-radius: 0 8px 8px 0; }
+.rev-table tbody tr { transition: background .15s; }
+.rev-table tbody tr:hover td { background: rgba(250,241,229,.6); }
+.rev-table tbody td {
+  padding: .9rem 1rem;
+  font-size: .87rem;
+  border-bottom: 1px solid rgba(96,70,51,.07);
+  color: var(--saaf-body);
+  vertical-align: middle;
+}
+.rev-table tbody tr:last-child td { border-bottom: none; }
+
+.rev-pill {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .25rem .7rem;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 700;
+}
+.rev-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill-earned  { background: rgba(76,175,125,.13);  color: #2b7a52; }
+.pill-paid    { background: rgba(91,141,238,.12);  color: #2244a8; }
+.pill-pending { background: rgba(212,169,45,.13);  color: #7a5a00; }
+
+.rev-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--saaf-text-muted);
+}
+.rev-empty i { font-size: 2.2rem; opacity: .35; margin-bottom: .65rem; display: block; }
+
+.rev-qs-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .5rem 0;
+  border-bottom: 1px solid rgba(96,70,51,.07);
+  font-size: .87rem;
+}
+.rev-qs-row:last-child { border-bottom: none; }
+.rev-qs-row span { color: var(--saaf-body); }
+.rev-qs-row strong { color: var(--saaf-heading); font-weight: 700; }
+
+[data-theme="dark"] .rev-stat-card,
+[data-theme="dark"] .rev-panel {
+  background: linear-gradient(180deg, rgba(74,56,39,.9), rgba(56,41,30,.92));
+  border-color: rgba(219,191,155,.12);
+}
+[data-theme="dark"] .rev-stat-value,
+[data-theme="dark"] .rev-panel-title { color: var(--saaf-cream-text); }
+[data-theme="dark"] .rev-table thead th { background: rgba(56,41,30,.9); }
+[data-theme="dark"] .rev-table tbody tr:hover td { background: rgba(255,248,238,.04); }
+[data-theme="dark"] .rev-goal-bar { background: rgba(219,191,155,.18); }
+[data-theme="dark"] .rbadge-up  { background: rgba(76,175,125,.18); color: #68d4a0; }
+[data-theme="dark"] .rbadge-info { background: rgba(91,141,238,.18); color: #8eb3f5; }
+[data-theme="dark"] .rev-qs-row span  { color: var(--saaf-body); }
+[data-theme="dark"] .rev-qs-row strong { color: var(--saaf-cream-text); }
+[data-theme="dark"] .rev-table tbody td { color: var(--saaf-body); border-color: rgba(219,191,155,.07); }
+[data-theme="dark"] .pill-earned  { background: rgba(76,175,125,.18);  color: #68d4a0; }
+[data-theme="dark"] .pill-paid    { background: rgba(91,141,238,.18);  color: #8eb3f5; }
+[data-theme="dark"] .pill-pending { background: rgba(212,169,45,.18);  color: #f0c84a; }
+
+.rev-page-header {
+  background: linear-gradient(145deg, rgba(245,240,230,.96), rgba(224,210,180,.6));
+  border: 1px solid var(--saaf-border);
+  border-radius: 20px;
+  padding: 1.4rem 1.6rem;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+.rev-page-header::after {
+  content: "";
+  position: absolute;
+  inset: auto -3rem -4rem auto;
+  width: 14rem; height: 14rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(199,122,92,.18) 0%, transparent 70%);
+}
+[data-theme="dark"] .rev-page-header {
+  background: linear-gradient(145deg, rgba(56,41,30,.9), rgba(44,33,26,.92));
+  border-color: rgba(219,191,155,.14);
+}
+
+@media (max-width: 767.98px) {
+  .rev-stat-value { font-size: 1.5rem; }
+  .rev-page-header { padding: 1.1rem; }
+  .rev-panel { padding: 1.1rem 1rem; }
+}
