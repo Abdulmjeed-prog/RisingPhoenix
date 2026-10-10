@@ -1,3 +1,5 @@
+import stripe
+
 from decimal import Decimal
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncMonth
@@ -9,16 +11,20 @@ from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User
 from django.utils.http import urlsafe_base64_decode
+from django.urls import reverse
+from django.http import HttpResponseRedirect
+
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 from twilio.rest import Client as TwilioClient
 
-
+from .models import ArtisanProfile
 
 from .serializers import (
     RegisterSerializer,
@@ -457,3 +463,186 @@ def password_reset_confirm(request, uidb64, token):
         form.save()
         return Response({'message': 'Password updated successfully.'})
     return Response(form.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def _get_artisan_profile(user):
+    try:
+        return user.artisanprofile
+    except ArtisanProfile.DoesNotExist:
+        return None
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def stripe_connect(request):
+    """
+    Start or resume Stripe onboarding.
+    Returns {'url': '<stripe onboarding url>'} for React to navigate to.
+    """
+    profile = _get_artisan_profile(request.user)
+    if not profile:
+        return Response(
+            {'detail': 'Artisan profile not found.'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    try:
+        account = None
+
+        # Reuse existing Stripe account if valid
+        if profile.stripe_connected_account_id:
+            try:
+                account = stripe.Account.retrieve(profile.stripe_connected_account_id)
+            except stripe.error.InvalidRequestError:
+                profile.stripe_connected_account_id = None
+                profile.save(update_fields=['stripe_connected_account_id'])
+
+        # Create a new Express account if we don't have one
+        if not account:
+            account = stripe.Account.create(
+                type='express',
+                country='SA',
+                email=request.user.email or None,
+                capabilities={'transfers': {'requested': True}},
+                tos_acceptance={'service_agreement': 'recipient'},
+                metadata={
+                    'user_id': str(request.user.id),
+                    'username': request.user.username,
+                },
+            )
+            profile.stripe_connected_account_id = account.id
+            profile.save(update_fields=['stripe_connected_account_id'])
+
+        # Build the onboarding link
+        account_link = stripe.AccountLink.create(
+            account=account.id,
+            refresh_url=request.build_absolute_uri(
+                reverse('account_api:stripe_connect_refresh')
+            ),
+            return_url=request.build_absolute_uri(
+                reverse('account_api:stripe_connect_return')
+            ),
+            type='account_onboarding',
+        )
+
+        return Response({'url': account_link.url})
+
+    except stripe.error.StripeError as e:
+        return Response(
+            {'detail': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def stripe_connect_refresh(request):
+    """
+    Called when a Stripe onboarding link expires.
+    Generates a fresh onboarding URL.
+    """
+    profile = _get_artisan_profile(request.user)
+    if not profile:
+        return Response(
+            {'detail': 'Artisan profile not found.'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if not profile.stripe_connected_account_id:
+        return Response(
+            {'detail': 'Stripe connected account not found.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        account_link = stripe.AccountLink.create(
+            account=profile.stripe_connected_account_id,
+            refresh_url=request.build_absolute_uri(
+                reverse('account_api:stripe_connect_refresh')
+            ),
+            return_url=request.build_absolute_uri(
+                reverse('account_api:stripe_connect_return')
+            ),
+            type='account_onboarding',
+        )
+        return Response({'url': account_link.url})
+
+    except stripe.error.StripeError as e:
+        return Response(
+            {'detail': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def stripe_status(request):
+    """
+    Return the current Stripe connection status for the logged-in artisan.
+    Used by the dashboard to show the correct button state.
+    """
+    profile = _get_artisan_profile(request.user)
+    if not profile:
+        return Response(
+            {'detail': 'Artisan profile not found.'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    result = {
+        'connected': False,
+        'payouts_enabled': False,
+        'charges_enabled': False,
+        'details_submitted': False,
+        'requirements_due': 0,
+        'status_message': '',
+    }
+
+    account_id = profile.stripe_connected_account_id
+    if not account_id:
+        return Response(result)
+
+    result['connected'] = True
+
+    try:
+        account = stripe.Account.retrieve(account_id)
+
+        result['payouts_enabled'] = bool(getattr(account, 'payouts_enabled', False))
+        result['charges_enabled'] = bool(getattr(account, 'charges_enabled', False))
+        result['details_submitted'] = bool(getattr(account, 'details_submitted', False))
+
+        requirements = getattr(account, 'requirements', None)
+        currently_due = getattr(requirements, 'currently_due', []) if requirements else []
+        result['requirements_due'] = len(currently_due)
+        disabled_reason = getattr(requirements, 'disabled_reason', None) if requirements else None
+
+        if result['payouts_enabled']:
+            result['status_message'] = 'Your Stripe account is connected and ready for payouts.'
+        elif disabled_reason == 'requirements.past_due':
+            result['status_message'] = 'More information is required to enable payouts.'
+        elif disabled_reason == 'requirements.pending_verification':
+            result['status_message'] = 'Stripe is reviewing your information.'
+        elif disabled_reason:
+            result['status_message'] = disabled_reason.replace('.', ' ').replace('_', ' ').title()
+        else:
+            result['status_message'] = 'Complete your Stripe onboarding to receive payouts.'
+
+    except stripe.error.StripeError:
+        result['status_message'] = 'Unable to load Stripe account status right now.'
+
+    return Response(result)
+
+
+from rest_framework.permissions import AllowAny
+from django.http import HttpResponseRedirect
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])          # ← public — Stripe redirects here
+def stripe_connect_return(request):
+    """
+    Stripe redirects the browser here after onboarding.
+    We just bounce the user back to React with a query flag.
+    No auth check — Stripe's redirect doesn't carry our JWT.
+    """
+    frontend = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
+    return HttpResponseRedirect(f'{frontend}/artisan/dashboard?stripe=return')

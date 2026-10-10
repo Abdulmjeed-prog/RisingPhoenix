@@ -19,4 +19,8 @@ urlpatterns = [
     path('password-reset/', api_views.password_reset_request, name='password_reset'),
     path('password-reset/verify/<str:uidb64>/<str:token>/', api_views.password_reset_verify, name='password_reset_verify'),
     path('password-reset/confirm/<str:uidb64>/<str:token>/', api_views.password_reset_confirm, name='password_reset_confirm'),
-]
+    path('stripe/connect/', api_views.stripe_connect, name='stripe_connect'),
+    path('stripe/refresh/', api_views.stripe_connect_refresh, name='stripe_connect_refresh'),
+    path('stripe/return/', api_views.stripe_connect_return, name='stripe_connect_return'),
+    path('stripe/status/', api_views.stripe_status, name='stripe_status'),
+    ]

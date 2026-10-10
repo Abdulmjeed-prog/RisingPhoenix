@@ -618,6 +618,7 @@ def password_reset_view(request: HttpRequest):
 
     return render(request, 'account/password_reset.html', {'form': form})
 
+#no_api
 @login_required(login_url='account:login_view')
 @user_passes_test(is_artisan, login_url='main:home_view')
 def completed_orders_view(request):

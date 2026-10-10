@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Line } from 'react-chartjs-2'
 import {
@@ -14,6 +14,7 @@ import {
 } from 'chart.js'
 import api from '../api/axios'
 import { useTheme } from '../hooks/useTheme'
+import { useStripeStatus } from '../hooks/useStripeStatus'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
 
@@ -35,6 +36,9 @@ export default function ArtisanRevenueDashboard() {
   const { theme } = useTheme()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const { status: stripe, loading: stripeLoading, starting: stripeStarting, startOnboarding } = useStripeStatus()
+  const [searchParams] = useSearchParams()
+  const justReturned = searchParams.get('stripe') === 'return'
 
   useEffect(() => {
     api
@@ -143,13 +147,58 @@ export default function ArtisanRevenueDashboard() {
               </p>
             </div>
             <div className="d-flex gap-2 align-items-center flex-wrap" style={{ position: 'relative', zIndex: 1 }}>
+              {!stripeLoading && stripe && (
+                <>
+                  {!stripe.connected && (
+                    <button
+                      type="button"
+                      className="btn btn-saaf-primary rounded-pill"
+                      style={{ fontSize: '.87rem' }}
+                      onClick={startOnboarding}
+                      disabled={stripeStarting}
+                    >
+                      <i className="bi bi-stripe me-1"></i>
+                      {stripeStarting ? t('Redirecting...') : t('Connect Stripe')}
+                    </button>
+                  )}
+
+                  {stripe.connected && stripe.payouts_enabled && (
+                    <span className="btn rounded-pill" style={{
+                      fontSize: '.87rem',
+                      background: 'rgba(76,175,125,.13)',
+                      color: '#2b7a52',
+                      border: '1px solid rgba(76,175,125,.3)',
+                    }}>
+                      <i className="bi bi-check-circle-fill me-1"></i>
+                      {t('Stripe Active')}
+                    </span>
+                  )}
+
+                  {stripe.connected && !stripe.payouts_enabled && (
+                    <button
+                      type="button"
+                      className="btn rounded-pill"
+                      style={{
+                        fontSize: '.87rem',
+                        background: 'rgba(212,169,45,.13)',
+                        color: '#7a5200',
+                        border: '1px solid rgba(212,169,45,.3)',
+                      }}
+                      onClick={startOnboarding}
+                      disabled={stripeStarting}
+                    >
+                      <i className="bi bi-exclamation-circle-fill me-1"></i>
+                      {stripe.requirements_due > 0
+                        ? `${stripe.requirements_due} ${t('items required')}`
+                        : t('Finish Stripe Setup')}
+                    </button>
+                  )}
+                </>
+              )}
+
               <button type="button" className="btn btn-saaf-outline rounded-pill" style={{ fontSize: '.87rem' }}>
                 <i className="bi bi-download me-1"></i>
                 {t('Export')}
-              </button>
-              <button type="button" className="btn btn-saaf-primary rounded-pill" style={{ fontSize: '.87rem' }}>
-                <i className="bi bi-arrow-up-right-circle me-1"></i>
-                {t('Request Payout')}
               </button>
             </div>
           </div>
